@@ -15,18 +15,25 @@ class CategoryController extends Controller
     }
 
     // 📌 Store new category
-    public function store(Request $request)
-    {
-        $category = Category::create([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
+public function store(Request $request)
+{
+    $imagePath = null;
 
-        return response()->json([
-            'message' => 'Category created successfully',
-            'data' => $category
-        ]);
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('categories', 'public');
     }
+
+    $category = Category::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'image' => $imagePath,
+    ]);
+
+    return response()->json([
+        'message' => 'Category created successfully',
+        'data' => $category
+    ]);
+}
 
     // 📌 Show single category
     public function show($id)
@@ -36,20 +43,25 @@ class CategoryController extends Controller
     }
 
     // 📌 Update category
-    public function update(Request $request, $id)
-    {
-        $category = Category::findOrFail($id);
+public function update(Request $request, $id)
+{
+    $category = Category::findOrFail($id);
 
-        $category->update([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
-
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'data' => $category
-        ]);
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('categories', 'public');
+        $category->image = $imagePath;
     }
+
+    $category->save();
+
+    return response()->json([
+        'message' => 'Category updated successfully',
+        'data' => $category
+    ]);
+}
+
+
+    
 
     // 📌 Delete category
     public function destroy($id)
@@ -61,4 +73,7 @@ class CategoryController extends Controller
             'message' => 'Category deleted successfully'
         ]);
     }
+
+
+    
 }
