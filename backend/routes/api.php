@@ -15,7 +15,8 @@ Route::post('/events', [EventController::class, 'store']);
 Route::get('/events/{id}', [EventController::class, 'show']);
 Route::put('/events/{id}', [EventController::class, 'update']);
 Route::delete('/events/{id}', [EventController::class, 'destroy']);
-
+Route::post('/events/bulk', [EventController::class, 'bulkStore']);
+Route::put('/events/bulk-update', [EventController::class, 'bulkUpdate']);
 
 Route::post('/categories/bulk', [CategoryController::class, 'bulkStore']);
 Route::get('/categories', [CategoryController::class, 'index']);
