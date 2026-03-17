@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryController;
-
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\EventRegistrationsController;
 
 Route::get('/events', [EventController::class, 'index']);
 Route::post('/events', [EventController::class, 'store']);
@@ -18,3 +19,11 @@ Route::post('/categories', [CategoryController::class, 'store']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::put('/categories/{id}', [CategoryController::class, 'update']);
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+
+
+Route::get('/register', [RegisterController::class, 'showForm']);
+Route::post('/register', [RegisterController::class, 'register']);
+
+Route::get('/events/{id}', [EventRegistrationsController::class, 'showEvents']);
+Route::post('/event/register', [EventRegistrationsController::class, 'registerEvent']);
