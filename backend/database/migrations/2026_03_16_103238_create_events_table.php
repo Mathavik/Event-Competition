@@ -9,23 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
+public function up()
 {
     Schema::create('events', function (Blueprint $table) {
         $table->id();
 
-        $table->unsignedBigInteger('category_id');
+        // 🔥 Clean foreign key
+        $table->foreignId('category_id')->constrained()->cascadeOnDelete();
 
         $table->string('name');
         $table->string('type')->nullable();
         $table->string('age_group')->nullable();
 
-        $table->timestamps();
+        // 🖼️ Add image (since you used in model)
+        $table->string('image')->nullable();
 
-        $table->foreign('category_id')
-              ->references('id')
-              ->on('categories')
-              ->onDelete('cascade');
+        $table->timestamps();
     });
 }
 
