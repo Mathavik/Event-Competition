@@ -16,7 +16,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:border-amber-500 hover:text-amber-500 transition-all">
-                  <Icon size={18} />
+                  <Icon size={18}/>
                 </a>
               ))}
             </div>
@@ -61,7 +61,7 @@ const Footer = () => {
       {/* Copyright Bar */}
       <div className="border-t border-slate-900 py-8 bg-black/50">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-[11px] uppercase tracking-[0.2em] font-bold">
-          <p>© 2024 Grand Competition Committee. All Rights Reserved.</p>
+          <p>© 2026 Grand Competition Committee. All Rights Reserved.</p>
           <div className="flex space-x-8 mt-4 md:mt-0">
             <a href="#" className="hover:text-white">Privacy</a>
             <a href="#" className="hover:text-white">Terms</a>

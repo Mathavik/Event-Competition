@@ -39,22 +39,29 @@ class EventController extends Controller
     }
 
     // 📌 Update event
-    public function update(Request $request, $id)
-    {
-        $event = Event::findOrFail($id);
+  public function update(Request $request, $id)
+{
+    $event = Event::findOrFail($id);
 
-        $event->update([
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'type' => $request->type,
-            'age_group' => $request->age_group,
-        ]);
-
-        return response()->json([
-            'message' => 'Event updated successfully',
-            'data' => $event
-        ]);
+    // 🖼️ image upload
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('events', 'public');
+        $event->image = $imagePath;
     }
+
+    // 🔄 other fields
+    $event->category_id = $request->category_id ?? $event->category_id;
+    $event->name = $request->name ?? $event->name;
+    $event->type = $request->type ?? $event->type;
+    $event->age_group = $request->age_group ?? $event->age_group;
+
+    $event->save();
+
+    return response()->json([
+        'message' => 'Event updated successfully',
+        'data' => $event
+    ]);
+}
 
     // 📌 Delete event
     public function destroy($id)
