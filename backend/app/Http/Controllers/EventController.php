@@ -18,19 +18,23 @@ class EventController extends Controller
 
     // 📌 Create event (ADMIN)
     public function store(Request $request)
-    {
-        $event = Event::create([
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'type' => $request->type,
-            'age_group' => $request->age_group,
-        ]);
-
-        return response()->json([
-            'message' => 'Event created successfully',
-            'data' => $event
-        ]);
+{
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('events', 'public');
+    } else {
+        $imagePath = null;
     }
+
+    $event = Event::create([
+        'category_id' => $request->category_id,
+        'name' => $request->name,
+        'type' => $request->type,
+        'age_group' => $request->age_group,
+        'image' => $imagePath
+    ]);
+
+    return response()->json($event);
+}
 
     // 📌 Show event
     public function show($id)
