@@ -7,10 +7,13 @@ type Event = {
   name: string;
   type: string;
   age_group: string;
+  image?: string;
 };
 
 export default function EventManager() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [file, setFile] = useState<any>(null);
+
   const [form, setForm] = useState<Event>({
     category_id: 1,
     name: "",
@@ -34,22 +37,33 @@ export default function EventManager() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔥 CREATE / UPDATE
+  // 🔥 Submit (CREATE + UPDATE)
   const handleSubmit = () => {
+    const formData = new FormData();
+
+    formData.append("category_id", String(form.category_id));
+    formData.append("name", form.name);
+    formData.append("type", form.type);
+    formData.append("age_group", form.age_group);
+
+    if (file) {
+      formData.append("image", file);
+    }
+
     if (isEdit) {
-      api.put(`/events/${form.id}`, form).then(() => {
+      api.post(`/events/${form.id}?_method=PUT`, formData).then(() => {
         fetchEvents();
         resetForm();
       });
     } else {
-      api.post("/events", form).then(() => {
+      api.post("/events", formData).then(() => {
         fetchEvents();
         resetForm();
       });
     }
   };
 
-  // 🔥 Edit click
+  // 🔥 Edit
   const handleEdit = (event: Event) => {
     setForm(event);
     setIsEdit(true);
@@ -67,6 +81,7 @@ export default function EventManager() {
       type: "",
       age_group: "",
     });
+    setFile(null);
     setIsEdit(false);
   };
 
@@ -80,10 +95,44 @@ export default function EventManager() {
         </h2>
 
         <div className="grid grid-cols-2 gap-3">
-          <input name="category_id" placeholder="Category ID" onChange={handleChange} value={form.category_id} className="border p-2" />
-          <input name="name" placeholder="Name" onChange={handleChange} value={form.name} className="border p-2" />
-          <input name="type" placeholder="Type" onChange={handleChange} value={form.type} className="border p-2" />
-          <input name="age_group" placeholder="Age Group" onChange={handleChange} value={form.age_group} className="border p-2" />
+          <input
+            name="category_id"
+            placeholder="Category ID"
+            onChange={handleChange}
+            value={form.category_id}
+            className="border p-2"
+          />
+
+          <input
+            name="name"
+            placeholder="Name"
+            onChange={handleChange}
+            value={form.name}
+            className="border p-2"
+          />
+
+          <input
+            name="type"
+            placeholder="Type"
+            onChange={handleChange}
+            value={form.type}
+            className="border p-2"
+          />
+
+          <input
+            name="age_group"
+            placeholder="Age Group"
+            onChange={handleChange}
+            value={form.age_group}
+            className="border p-2"
+          />
+
+          {/* 🔥 IMAGE INPUT */}
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0])}
+            className="border p-2 col-span-2"
+          />
         </div>
 
         <button
@@ -98,7 +147,8 @@ export default function EventManager() {
       <table className="w-full bg-white shadow rounded">
         <thead className="bg-gray-100">
           <tr>
-            <th className="p-2">ID</th>
+            <th>ID</th>
+            <th>Image</th>
             <th>Name</th>
             <th>Type</th>
             <th>Age</th>
@@ -109,7 +159,19 @@ export default function EventManager() {
         <tbody>
           {events.map((e) => (
             <tr key={e.id} className="text-center border-t">
+
               <td>{e.id}</td>
+
+              {/* 🔥 IMAGE SHOW */}
+              <td>
+                {e.image && (
+                  <img
+                    src={`http://127.0.0.1:8000/storage/${e.image}`}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                )}
+              </td>
+
               <td>{e.name}</td>
               <td>{e.type}</td>
               <td>{e.age_group}</td>
@@ -129,6 +191,7 @@ export default function EventManager() {
                   Delete
                 </button>
               </td>
+
             </tr>
           ))}
         </tbody>

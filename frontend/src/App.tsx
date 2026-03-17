@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
 import CategoryForm from "./pages/CategoriesEvents.tsx/updatecategoriespage";
 import Home from "./pages/Home/home";
+import EventManager from "./pages/CategoriesEvents.tsx/eventupadte";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/events/:id" element={<EventsByCategory />} />
             <Route path="/updatecategoriespage" element={<CategoryForm />} />
+            <Route path="/eventupdate" element={<EventManager/>} />
 
             <Route path="/register" element={<StudentRegister />} />
             <Route path="/categories" element={<Categories />} />
