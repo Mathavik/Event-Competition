@@ -1,18 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Student;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class RegisterController extends Controller
+class StudentController extends Controller
 {
-    public function showForm()
-    {
-        return view('register');
-    }
-
-    public function register(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
@@ -23,16 +18,15 @@ class RegisterController extends Controller
         ]);
 
         // School restriction
-        $allowedSchools = ['SCH001','SCH002','SCH003'];
+        $allowedSchools = ['SCH001','SCH002'];
 
         if (!in_array($request->school_code, $allowedSchools)) {
             return back()->with('error', 'School not allowed');
         }
 
-        // Age calculate
         $age = Carbon::parse($request->dob)->age;
 
-        $student = Student::create([
+        Student::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
@@ -46,6 +40,6 @@ class RegisterController extends Controller
             'city' => $request->city,
         ]);
 
-        return redirect('/events/'.$student->id);
+        return redirect()->back()->with('success', 'Registered Successfully');
     }
 }
