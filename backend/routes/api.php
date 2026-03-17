@@ -6,7 +6,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminAuthController;
 
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AuthController;
 
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/students', [StudentController::class, 'store']);
 Route::post('/event-register', [EventController::class, 'store']);
 
