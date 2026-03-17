@@ -2,7 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import RegistrationForm from "./pages/RegistrationForm";
+// import RegistrationForm from "./pages/RegistrationForm";
+import AdminRoutes from "./admin/components/AdminRoutes";
+import Login from "./admin/pages/Login";
+import Home from "./pages/Home/home";
 // import HomePage from "./pages/HomePage";
 // import RegisterPage from "./pages/RegisterPage";
 // import AdminPage from "./pages/AdminPage";
@@ -14,9 +17,11 @@ function App() {
         <Header />
         <main className="flex-grow">
           <Routes>
-            {/* <Route path="/" element={<HomePage />} /> */}
-            <Route path="/register" element={<RegistrationForm />} />
-            {/* <Route path="/admin" element={<AdminPage />} /> */}
+            <Route path="/" element={<Home />} />
+            
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/admin/login" element={<Login />} />
+           
           </Routes>
         </main>
         <Footer />
