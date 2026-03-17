@@ -74,6 +74,22 @@ public function update(Request $request, $id)
         ]);
     }
 
+public function bulkStore(Request $request)
+{
+    $categories = [];
 
+    foreach ($request->categories as $cat) {
+        $categories[] = Category::create([
+            'name' => $cat['name'],
+            'description' => $cat['description'] ?? null,
+            'image' => $cat['image'] ?? null,
+        ]);
+    }
+
+    return response()->json([
+        'message' => 'Bulk categories created successfully',
+        'data' => $categories
+    ]);
+}
     
 }

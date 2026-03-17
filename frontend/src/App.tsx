@@ -2,9 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import RegistrationForm from "./pages/RegistrationForm";
+// import RegistrationForm from "./pages/RegistrationForm";
 import Categories from "./pages/CategoriesEvents.tsx/Categories";
 import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
+import CategoryForm from "./pages/CategoriesEvents.tsx/updatecategoriespage";
 // import HomePage from "./pages/HomePage";
 // import RegisterPage from "./pages/RegisterPage";
 // import AdminPage from "./pages/AdminPage";
@@ -17,9 +18,11 @@ function App() {
         <main className="flex-grow">
           <Routes>
             {/* <Route path="/" element={<HomePage />} /> */}
-            <Route path="/register" element={<RegistrationForm />} />
+            {/* <Route path="/register" element={<RegistrationForm />} /> */}
    <Route path="/categories" element={<Categories/>} />
         <Route path="/events/:id" element={<EventsByCategory/>} />
+                <Route path="/updatecategoriespage" element={<CategoryForm/>} />
+
             {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>
         </main>
