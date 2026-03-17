@@ -25,21 +25,21 @@ export default function Categories() {
 
       <div className="grid md:grid-cols-3 gap-4">
         {categories.map((cat) => (
-          <div
-            key={cat.id}
-            onClick={() => navigate(`/events/${cat.id}`)} // 🔥 click
-            className="cursor-pointer bg-white shadow p-4 rounded-lg"
-          >
-            {cat.image && (
-              <img
-                src={`http://127.0.0.1:8000/storage/${cat.image}`}
-                className="w-full h-32 object-cover mb-2 rounded"
-              />
-            )}
+         <div
+  key={cat.id}
+  onClick={() => navigate(`/events/${cat.id}`)}
+  className="cursor-pointer bg-white shadow-lg p-4 rounded-xl hover:shadow-2xl transition-all duration-300"
+>
+  {cat.image && (
+    <img
+      src={`http://127.0.0.1:8000/storage/${cat.image}`}
+      className="w-full h-56 object-cover mb-3 rounded-lg"
+    />
+  )}
 
-            <h2 className="font-semibold">{cat.name}</h2>
-            <p className="text-sm text-gray-500">{cat.description}</p>
-          </div>
+  <h2 className="font-bold text-lg mb-1">{cat.name}</h2>
+  <p className="text-sm text-gray-500">{cat.description}</p>
+</div>
         ))}
       </div>
     </div>
