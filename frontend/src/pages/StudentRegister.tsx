@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   name: string;
@@ -15,6 +16,7 @@ interface FormData {
 }
 
 const StudentRegister: React.FC = () => {
+    const navigate = useNavigate();
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -35,31 +37,25 @@ const StudentRegister: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
+  e.preventDefault();
+  setMessage("");
 
-    try {
-      const res = await axios.post("http://127.0.0.1:8000/api/students", form, {
-        headers: { "Content-Type": "application/json" },
-      });
-      setMessage("Registered Successfully 🎉");
-      setForm({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-        gender: "Male",
-        dob: "",
-        school_name: "",
-        school_code: "",
-        class: "",
-        city: "",
-      });
-    } catch (err: any) {
-      setMessage(err.response?.data?.error || "Something went wrong!");
-    }
-  };
+  try {
+    const res = await axios.post("http://127.0.0.1:8000/api/students", form, {
+      headers: { "Content-Type": "application/json" },
+    });
 
+    setMessage("Registered Successfully 🎉");
+
+    // 👉 Redirect to login page
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000); // small delay (optional)
+
+  } catch (err: any) {
+    setMessage(err.response?.data?.error || "Something went wrong!");
+  }
+};
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form

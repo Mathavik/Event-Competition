@@ -4,6 +4,8 @@ import { Menu, X, Trophy, Music, Mic, Users } from 'lucide-react';
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [competitionsOpen, setCompetitionsOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("token");
+  
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -79,12 +81,21 @@ const Header = () => {
                 </a>
               )
             )}
-            <a
-              href="/register"
-              className="bg-amber-500 text-slate-950 px-5 py-2 rounded-full font-bold text-sm hover:bg-amber-400 transition-all transform hover:scale-105"
-            >
-              REGISTER NOW
-            </a>
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.reload();
+                }}
+                className="bg-red-500 px-5 py-2 rounded-full text-sm font-bold"
+              >
+                LOGOUT
+              </button>
+            ) : (
+              <a href="/register" className="bg-amber-500 px-5 py-2 rounded-full">
+                REGISTER NOW
+              </a>
+            )}
           </div>
 
           {/* Mobile Button */}
