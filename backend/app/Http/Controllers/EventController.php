@@ -126,4 +126,51 @@ class EventController extends Controller
             'message' => 'Event registered successfully'
         ]);
     }
+
+    public function bulkStore(Request $request)
+{
+    $events = $request->all();
+
+    $data = [];
+
+    foreach ($events as $event) {
+        $data[] = [
+            'category_id' => $event['category_id'],
+            'name' => $event['name'],
+            'type' => $event['type'],
+            'age_group' => $event['age_group'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    Event::insert($data); // 🔥 fast bulk insert
+
+    return response()->json([
+        'message' => 'Bulk events inserted successfully'
+    ]);
+}
+
+
+public function bulkUpdate(Request $request)
+{
+    $events = $request->all();
+
+    foreach ($events as $item) {
+        $event = Event::find($item['id']);
+
+        if ($event) {
+            $event->update([
+                'category_id' => $item['category_id'] ?? $event->category_id,
+                'name' => $item['name'] ?? $event->name,
+                'type' => $item['type'] ?? $event->type,
+                'age_group' => $item['age_group'] ?? $event->age_group,
+            ]);
+        }
+    }
+
+    return response()->json([
+        'message' => 'Bulk update successful'
+    ]);
+}
 }

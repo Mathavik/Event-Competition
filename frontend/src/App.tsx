@@ -23,14 +23,12 @@ function App() {
             <Route path="/admin/login" element={<Login />} />
 
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/register" element={<RegistrationForm />} /> */}
             <Route path="/categories" element={<Categories />} />
             <Route path="/events/:id" element={<EventsByCategory />} />
             <Route path="/updatecategoriespage" element={<CategoryForm />} />
 
             <Route path="/register" element={<StudentRegister />} />
             <Route path="/categories" element={<Categories />} />
-            {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>
         </main>
         <Footer />
