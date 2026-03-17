@@ -6,6 +6,10 @@ import Footer from "./components/Footer";
 import AdminRoutes from "./admin/components/AdminRoutes";
 import Login from "./admin/pages/Login";
 import Home from "./pages/Home/home";
+// import RegistrationForm from "./pages/RegistrationForm";
+import Categories from "./pages/CategoriesEvents.tsx/Categories";
+import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
+import StudentRegister from "./pages/StudentRegister";
 // import HomePage from "./pages/HomePage";
 // import RegisterPage from "./pages/RegisterPage";
 // import AdminPage from "./pages/AdminPage";
@@ -22,6 +26,12 @@ function App() {
             <Route path="/admin/*" element={<AdminRoutes />} />
             <Route path="/admin/login" element={<Login />} />
            
+            {/* <Route path="/" element={<HomePage />} /> */}
+            {/* <Route path="/register" element={<RegistrationForm />} /> */}
+            <Route path="/register" element={<StudentRegister />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/events/:id" element={<EventsByCategory />} />
+            {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>
         </main>
         <Footer />

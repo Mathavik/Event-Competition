@@ -5,7 +5,10 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminAuthController;
 
+use App\Http\Controllers\StudentController;
 
+Route::post('/students', [StudentController::class, 'store']);
+Route::post('/event-register', [EventController::class, 'store']);
 
 Route::get('/events', [EventController::class, 'index']);
 Route::post('/events', [EventController::class, 'store']);
