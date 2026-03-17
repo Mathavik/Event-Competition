@@ -6,7 +6,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminAuthController;
 
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AuthController;
 
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/students', [StudentController::class, 'store']);
 Route::post('/event-register', [EventController::class, 'store']);
 
@@ -15,7 +18,8 @@ Route::post('/events', [EventController::class, 'store']);
 Route::get('/events/{id}', [EventController::class, 'show']);
 Route::put('/events/{id}', [EventController::class, 'update']);
 Route::delete('/events/{id}', [EventController::class, 'destroy']);
-
+Route::post('/events/bulk', [EventController::class, 'bulkStore']);
+Route::put('/events/bulk-update', [EventController::class, 'bulkUpdate']);
 
 Route::post('/categories/bulk', [CategoryController::class, 'bulkStore']);
 Route::get('/categories', [CategoryController::class, 'index']);
