@@ -10,8 +10,7 @@ import AdminRoutes from "./admin/components/AdminRoutes";
 import Login from "./admin/pages/Login";
 import Home from "./pages/Home/home";
 // import RegistrationForm from "./pages/RegistrationForm";
-import Categories from "./pages/CategoriesEvents.tsx/Categories";
-import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
+
 import StudentRegister from "./pages/StudentRegister";
 // import HomePage from "./pages/HomePage";
 // import RegisterPage from "./pages/RegisterPage";
