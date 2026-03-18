@@ -16,8 +16,8 @@
 /public/build
 /public/hot
 /public/storage/*
-!public/storage/events/
-!public/storage/categories/
+!/public/storage/events/*
+!/public/storage/categories/*
 /storage/*.key
 /storage/pail
 /vendor
