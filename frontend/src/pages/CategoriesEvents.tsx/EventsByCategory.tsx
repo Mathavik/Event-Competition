@@ -5,6 +5,8 @@ import targetGif from "../../assets/c.gif";
 
 // 🎥 Videos
 import sportsVideo from "../../assets/sports.mp4";
+import performingVideo from "../../assets/Classical.mp4";
+
 import artsVideo from "../../assets/Visual.mp4";
 import funVideo from "../../assets/Visual.mp4";
 
@@ -127,7 +129,7 @@ export default function EventsByCategory() {
 
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-3">
-            <img src={targetGif} className="w-10 h-10" />
+            {/* <img src={targetGif} className="w-10 h-10" /> */}
             Events in this Category
           </h2>
         </div>
@@ -159,13 +161,8 @@ export default function EventsByCategory() {
               </div>
 
               {/* 🔥 ACTIONS */}
-              <div className="p-4 flex justify-between items-center">
-                <Link
-                  to={`/event-details/${event.id}`}
-                  className="text-blue-600 text-sm font-bold"
-                >
-                  VIEW
-                </Link>
+<div className="p-4 mt-auto flex justify-end">
+                   
 
                 {/* 🔥 BOOK BUTTON */}
                 <button
