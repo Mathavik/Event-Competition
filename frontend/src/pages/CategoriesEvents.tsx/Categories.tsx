@@ -31,13 +31,10 @@ export default function Categories() {
   className="cursor-pointer bg-white shadow-lg p-4 rounded-xl hover:shadow-2xl transition-all duration-300"
 >
   {cat.image && (
-//  <img
-//   src={`http://127.0.0.1:8000/storage/${cat.image}`} 
-//   className="w-full h-56 object-cover"
-// />
-<img
-  src={`http://127.0.0.1:8000/upload/catogories/${cat.image}`} 
- />
+ <img
+  src={`http://127.0.0.1:8000/storage/${cat.image}`} 
+  className="w-full h-56 object-cover"
+/>
   )}
 
   <h2 className="font-bold text-lg mb-1">{cat.name}</h2>
