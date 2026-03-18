@@ -1,6 +1,2 @@
 *
 !.gitignore
-!events/
-!events/**
-!categories/
-!categories/**
