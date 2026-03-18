@@ -15,3 +15,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# ❌ DO NOT IGNORE STORAGE PUBLIC FILES
+# (images must be tracked)
