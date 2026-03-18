@@ -4,9 +4,25 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
+public function getRegistrations()
+{
+    
+    $registrations = DB::table('event_student') 
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->select(
+            'event_student.id',
+            'students.name',
+            'students.email',
+            'event_student.event_id'
+        )
+        ->get();
+
+    return response()->json($registrations);
+}
     public function store(Request $request)
     {
         $request->validate([
@@ -24,6 +40,7 @@ class StudentController extends Controller
     return response()->json(['error' => 'School not allowed'], 403);
 }
 
+
         $age = Carbon::parse($request->dob)->age;
 
         Student::create([
@@ -39,6 +56,7 @@ class StudentController extends Controller
             'class' => $request->class,
             'city' => $request->city,
         ]);
+        
 
 return response()->json([
     'message' => 'Registered Successfully',

@@ -36,3 +36,4 @@ Route::put('/categories/{id}', [CategoryController::class, 'update']);
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+Route::get('/registrations', [StudentController::class, 'getRegistrations']);

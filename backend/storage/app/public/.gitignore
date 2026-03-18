@@ -3,7 +3,3 @@
 
 # allow only these
 !.gitignore
-!events/
-!events/*
-!categories/
-!categories/*
