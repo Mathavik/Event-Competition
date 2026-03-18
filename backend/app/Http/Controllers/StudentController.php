@@ -20,9 +20,9 @@ class StudentController extends Controller
         // School restriction
         $allowedSchools = ['SCH001','SCH002'];
 
-        if (!in_array($request->school_code, $allowedSchools)) {
-            return back()->with('error', 'School not allowed');
-        }
+       if (!in_array($request->school_code, $allowedSchools)) {
+    return response()->json(['error' => 'School not allowed'], 403);
+}
 
         $age = Carbon::parse($request->dob)->age;
 
@@ -40,6 +40,8 @@ class StudentController extends Controller
             'city' => $request->city,
         ]);
 
-        return redirect()->back()->with('success', 'Registered Successfully');
-    }
+return response()->json([
+    'message' => 'Registered Successfully',
+    'status' => 'success'
+], 201);    }
 }
