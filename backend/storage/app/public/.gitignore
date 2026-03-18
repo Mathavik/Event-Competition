@@ -1,6 +1,9 @@
+# ignore everything
 *
+
+# allow only these
 !.gitignore
 !events/
-!events/**
+!events/*
 !categories/
-!categories/**
+!categories/*
