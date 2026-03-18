@@ -78,59 +78,6 @@ class EventController extends Controller
         ]);
     }
 
-    // 🔥🔥 STUDENT EVENT REGISTRATION (IMPORTANT)
-    public function registerEvent(Request $request)
-    {
-        $student = Student::findOrFail($request->student_id);
-        $event = Event::findOrFail($request->event_id);
-
-        // ❌ Max 5 events
-        if ($student->events()->count() >= 5) {
-            return response()->json([
-                'error' => 'Max 5 events only allowed'
-            ], 400);
-        }
-
-        // ❌ Time clash
-        $exists = $student->events()
-            ->wherePivot('event_time', $request->event_time)
-            ->exists();
-
-        if ($exists) {
-            return response()->json([
-                'error' => 'Time clash! Choose another event'
-            ], 400);
-        }
-
-        // ❌ Age validation
-        $groups = explode(',', $event->age_group);
-        $groups = array_map('trim', $groups);
-
-        if (!in_array('All Ages', $groups)) {
-            $valid = false;
-
-            foreach ($groups as $g) {
-                if ($g == 'U16' && $student->age <= 16) $valid = true;
-                if ($g == 'U18' && $student->age <= 18) $valid = true;
-                if ($g == 'U19' && $student->age <= 19) $valid = true;
-            }
-
-            if (!$valid) {
-                return response()->json([
-                    'error' => 'Not eligible for this event'
-                ], 400);
-            }
-        }
-
-        // ✅ Register event
-        $student->events()->attach($event->id, [
-            'event_time' => $request->event_time
-        ]);
-
-        return response()->json([
-            'message' => 'Event registered successfully'
-        ]);
-    }
 
     public function bulkStore(Request $request)
 {

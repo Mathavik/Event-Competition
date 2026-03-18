@@ -51,10 +51,26 @@ class EventRegistrationsController extends Controller
         }
     }
 
+    $student = Student::findOrFail($request->student_id);
+$event = Event::findOrFail($request->event_id);
+
+// ✅ NEW RULE
+$alreadyExists = $event->students()
+    ->where('school_code', $student->school_code)
+    ->exists();
+
+if ($alreadyExists) {
+    return response()->json([
+        'message' => 'Only one student per school allowed in this event'
+    ], 400);
+}
+
     // Attach event
     $student->events()->attach($event->id, [
         'event_time' => $request->event_time
     ]);
+
+    
 
     return response()->json([
         'message' => 'Registered successfully'
