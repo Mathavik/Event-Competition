@@ -67,7 +67,7 @@ export default function EventsByCategory() {
     try {
       setLoadingId(eventId);
 
-      await api.post("/event/register", {
+      await api.post("/event-register", {
         student_id: studentId,
         event_id: eventId,
         event_time: "2026-04-10 10:00:00", // 🔥 static (later dynamic panna sollu)
@@ -141,12 +141,10 @@ export default function EventsByCategory() {
               {/* Image */}
               <div className="h-52 overflow-hidden">
                 {event.image && (
-
-<img
-  src={`http://127.0.0.1:8000/upload/events/${event.image}`}
-  className="w-full h-full object-cover" 
+ <img
+  src={`http://127.0.0.1:8000/storage/${event.image}`}
+  className="w-full h-full object-cover"
 />
- 
 )}
               </div>
 
