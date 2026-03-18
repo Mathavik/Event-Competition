@@ -7,11 +7,18 @@ use App\Http\Controllers\AdminAuthController;
 
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventRegistrationsController;
+
+// Get all events for a student
+Route::get('/student/{id}/events', [EventRegistrationsController::class, 'showEvents']);
+
+// Register student for an event
+Route::post('/event/register', [EventRegistrationsController::class, 'registerEvent']);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/students', [StudentController::class, 'store']);
-Route::post('/event-register', [EventController::class, 'store']);
+// Route::post('/event-register', [EventController::class, 'store']);
 
 Route::get('/events', [EventController::class, 'index']);
 Route::post('/events', [EventController::class, 'store']);

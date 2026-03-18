@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Event;
 
-class EventController extends Controller
+class EventRegistrationsController extends Controller
 {
     public function showEvents($id)
     {
@@ -50,11 +50,13 @@ class EventController extends Controller
                 return back()->with('error', 'Not eligible');
             }
         }
-
+        dd($student, $event);
         $student->events()->attach($event->id, [
             'event_time' => $request->event_time
         ]);
 
-        return back()->with('success', 'Registered!');
+        return response()->json([
+    'message' => 'Registered successfully'
+], 200);
     }
 }

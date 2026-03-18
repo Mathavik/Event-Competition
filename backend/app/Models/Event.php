@@ -21,10 +21,10 @@ class Event extends Model
     }
 
     // 🔗 Relation with Students (Many-to-Many)
-    public function students()
-    {
-        return $this->belongsToMany(Student::class, 'event_registrations')
-                    ->withPivot('event_time')
-                    ->withTimestamps();
-    }
+  public function students()
+{
+    return $this->belongsToMany(Student::class)
+                ->withPivot('event_time')
+                ->withTimestamps();
+}
 }
