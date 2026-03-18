@@ -48,9 +48,11 @@ public function update(Request $request, $id)
     $category = Category::findOrFail($id);
 
     if ($request->hasFile('image')) {
-        $imagePath = $request->file('image')->store('categories', 'public');
-        $category->image = $imagePath;
-    }
+    $file = $request->file('image');
+    $fileName = time() . '_' . $file->getClientOriginalName();
+    $file->move(public_path('upload/catogories'), $fileName); // Direct-a public folder-kku move pannum
+    $category->image = $fileName;
+}
 
     $category->save();
 

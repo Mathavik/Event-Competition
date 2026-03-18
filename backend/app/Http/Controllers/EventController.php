@@ -104,6 +104,7 @@ class EventController extends Controller
 
         // ❌ Age validation
         $groups = explode(',', $event->age_group);
+        $groups = array_map('trim', $groups);
 
         if (!in_array('All Ages', $groups)) {
             $valid = false;
@@ -137,16 +138,17 @@ class EventController extends Controller
 
     $data = [];
 
-    foreach ($events as $event) {
-        $data[] = [
-            'category_id' => $event['category_id'],
-            'name' => $event['name'],
-            'type' => $event['type'],
-            'age_group' => $event['age_group'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-    }
+foreach ($events as $event) {
+    $data[] = [
+        'category_id' => $event['category_id'],
+        'name'        => $event['name'],
+        'type'        => $event['type'],
+        'age_group'   => $event['age_group'],
+        'image'       => $event['image'] ?? null, // Filename JSON-la irunthu edukkum
+        'created_at'  => now(),
+        'updated_at'  => now(),
+    ];
+}
 
     Event::insert($data); // 🔥 fast bulk insert
 

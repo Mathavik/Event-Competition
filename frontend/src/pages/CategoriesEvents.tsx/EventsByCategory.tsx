@@ -147,7 +147,8 @@ export default function EventsByCategory() {
 //   className="w-full h-full object-cover"
 // />
 <img
-  src={`http://127.0.0.1:8000/storage/events/${event.image}`}
+  src={`http://127.0.0.1:8000/upload/events/${event.image}`}
+  className="w-full h-full object-cover" 
 />
 )}
               </div>

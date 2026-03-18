@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Event extends Model
 {
@@ -14,17 +15,27 @@ class Event extends Model
         'image'
     ];
 
-    // 🔗 Relation with Category
+    // 🖼️ Image-ku Full URL kidaikka intha Accessor
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        // Path: public/upload/events/
+        return URL::to('/') . '/upload/events/' . $this->image;
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // 🔗 Relation with Students (Many-to-Many)
-  public function students()
-{
-    return $this->belongsToMany(Student::class)
-                ->withPivot('event_time')
-                ->withTimestamps();
-}
+    public function students()
+    {
+        return $this->belongsToMany(Student::class)
+                    ->withPivot('event_time')
+                    ->withTimestamps();
+    }
 }

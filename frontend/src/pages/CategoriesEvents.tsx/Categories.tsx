@@ -36,7 +36,7 @@ export default function Categories() {
 //   className="w-full h-56 object-cover"
 // />
 <img
-  src={`http://127.0.0.1:8000/storage/categories/${cat.image}`} 
+  src={`http://127.0.0.1:8000/upload/catogories/${cat.image}`} 
   className="w-full h-56 object-cover"
 />
   )}
