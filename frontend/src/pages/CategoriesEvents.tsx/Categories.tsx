@@ -37,8 +37,7 @@ export default function Categories() {
 // />
 <img
   src={`http://127.0.0.1:8000/upload/catogories/${cat.image}`} 
-  className="w-full h-56 object-cover"
-/>
+ />
   )}
 
   <h2 className="font-bold text-lg mb-1">{cat.name}</h2>
