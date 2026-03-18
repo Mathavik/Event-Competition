@@ -42,7 +42,8 @@ const StudentRegister: React.FC = () => {
 
   try {
     const res = await axios.post("http://127.0.0.1:8000/api/students", form, {
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" ,"Accept": "application/json"},
+      
     });
 
     setMessage("Registered Successfully 🎉");

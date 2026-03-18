@@ -1,28 +1,37 @@
 import React, { useState } from "react";
 import axiosInstance from "../axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setMessage("");
+   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage("");
 
-        try {
-            const res = await axiosInstance.post("/login", { email, password });
-            const { token, student } = res.data;
+    try {
+        const res = await axiosInstance.post("/login", { email, password });
+        const { token, student } = res.data;
 
-            // Save token in localStorage
-            localStorage.setItem("token", token);
-            localStorage.setItem("student_name", student.name);
-            localStorage.setItem("student_id", student.id);
-            setMessage("Login successful 🎉");
-        } catch (err: any) {
-            setMessage(err.response?.data?.error || "Something went wrong!");
-        }
-    };
+        // Save token
+        localStorage.setItem("token", token);
+        localStorage.setItem("student_name", student.name);
+        localStorage.setItem("student_id", student.id);
+
+        setMessage("Login successful 🎉");
+
+        // ✅ Redirect to categories page
+        setTimeout(() => {
+            navigate("/categories");
+        }, 1000);
+
+    } catch (err: any) {
+        setMessage(err.response?.data?.error || "Something went wrong!");
+    }
+};
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
