@@ -6,7 +6,6 @@ import targetGif from "../../assets/c.gif";
 // 🎥 Videos
 import sportsVideo from "../../assets/sports.mp4";
 import performingVideo from "../../assets/Classical.mp4";
-
 import artsVideo from "../../assets/Visual.mp4";
 import funVideo from "../../assets/Visual.mp4";
 
@@ -44,7 +43,7 @@ export default function EventsByCategory() {
   const videoMap: { [key: string]: string } = {
     sports: sportsVideo,
     visual: artsVideo,
-    arts: artsVideo,
+    arts: performingVideo,
     fun: funVideo,
     misc: funVideo,
   };
