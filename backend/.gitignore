@@ -3,18 +3,27 @@
 .env
 .env.backup
 .env.production
-
-/node_modules
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_module-s
 /public/build
 /public/hot
-
+/public/storage/*
+!/public/storage/
+!/public/storage/events/
+!/public/storage/events/*
+!/public/storage/categories/
+!/public/storage/categories/*
 /storage/*.key
 /storage/pail
-
 /vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
-
-# ❌ DO NOT IGNORE STORAGE PUBLIC FILES
-# (images must be tracked)

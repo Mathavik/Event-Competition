@@ -141,13 +141,9 @@ export default function EventsByCategory() {
               {/* Image */}
               <div className="h-52 overflow-hidden">
                 {event.image && (
-//  <img
-//   src={`http://127.0.0.1:8000/storage/${event.image}`}
-  
-//   className="w-full h-full object-cover"
-// />
-<img
-  src={`http://127.0.0.1:8000/storage/events/${event.image}`}
+ <img
+  src={`http://127.0.0.1:8000/storage/${event.image}`}
+  className="w-full h-full object-cover"
 />
 )}
               </div>
