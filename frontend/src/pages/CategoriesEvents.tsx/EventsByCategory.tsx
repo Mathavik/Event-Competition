@@ -67,7 +67,7 @@ export default function EventsByCategory() {
     try {
       setLoadingId(eventId);
 
-      await api.post("/event-register", {
+      await api.post("/event/register", {
         student_id: studentId,
         event_id: eventId,
         event_time: "2026-04-10 10:00:00", // 🔥 static (later dynamic panna sollu)
