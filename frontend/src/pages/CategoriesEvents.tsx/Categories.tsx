@@ -32,11 +32,15 @@ export default function Categories() {
 >
   {cat.image && (
     <img
-      src={`http://127.0.0.1:8000/storage/${cat.image}`}
-      className="w-full h-56 object-cover mb-3 rounded-lg"
-    />
+src={`http://127.0.0.1:8000/storage/categories/${cat.image}`}
+  className="w-full h-56 object-cover mb-3 rounded-lg"
+/>
   )}
-
+{/* <img
+    src={`http://127.0.0.1:8000/storage/events/${event.image}`}
+    className="w-full h-full object-cover"
+  />
+)} */}
   <h2 className="font-bold text-lg mb-1">{cat.name}</h2>
   <p className="text-sm text-gray-500">{cat.description}</p>
 </div>
