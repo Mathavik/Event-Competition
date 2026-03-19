@@ -5,6 +5,7 @@ import targetGif from "../../assets/c.gif";
 
 // 🎥 Videos
 import sportsVideo from "../../assets/sports.mp4";
+import performingVideo from "../../assets/Classical.mp4";
 import artsVideo from "../../assets/Visual.mp4";
 import funVideo from "../../assets/Visual.mp4";
 
@@ -14,6 +15,7 @@ type Event = {
   type: string;
   age_group: string;
   image: string;
+  time: string;
 };
 
 type Category = {
@@ -42,7 +44,7 @@ export default function EventsByCategory() {
   const videoMap: { [key: string]: string } = {
     sports: sportsVideo,
     visual: artsVideo,
-    arts: artsVideo,
+    arts: performingVideo,
     fun: funVideo,
     misc: funVideo,
   };
@@ -127,7 +129,7 @@ export default function EventsByCategory() {
 
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-3">
-            <img src={targetGif} className="w-10 h-10" />
+            {/* <img src={targetGif} className="w-10 h-10" /> */}
             Events in this Category
           </h2>
         </div>
@@ -142,12 +144,12 @@ export default function EventsByCategory() {
               <div className="h-52 overflow-hidden">
                 {event.image && (
 
-<img
-  src={`http://127.0.0.1:8000/upload/events/${event.image}`}
-  className="w-full h-full object-cover" 
-/>
- 
-)}
+                  <img
+                    src={`http://127.0.0.1:8000/upload/events/${event.image}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                )}
               </div>
 
               {/* Content */}
@@ -156,16 +158,17 @@ export default function EventsByCategory() {
                 <p className="text-sm text-gray-500">
                   {event.age_group}
                 </p>
+                <p className="text-sm text-blue-500 font-semibold mt-1">
+                  {new Date(`1970-01-01T${event.time}`).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
               </div>
 
               {/* 🔥 ACTIONS */}
-              <div className="p-4 flex justify-between items-center">
-                <Link
-                  to={`/event-details/${event.id}`}
-                  className="text-blue-600 text-sm font-bold"
-                >
-                  VIEW
-                </Link>
+              <div className="p-4 mt-auto flex justify-end">
+
 
                 {/* 🔥 BOOK BUTTON */}
                 <button
