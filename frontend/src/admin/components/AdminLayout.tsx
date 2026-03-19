@@ -8,14 +8,15 @@ interface Props {
 
 const AdminLayout: React.FC<Props> = ({ children }) => {
   return (
-    <div className="flex">
+    // min-h-screen window full height cover pannum
+    // items-stretch sidebar-ai content bottom varai stretch pannum
+    <div className="flex min-h-screen items-stretch bg-gray-100">
       {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 bg-gray-100 min-h-screen">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
         <AdminHeader />
-
         <div className="p-6">
           {children}
         </div>
@@ -24,4 +25,4 @@ const AdminLayout: React.FC<Props> = ({ children }) => {
   );
 };
 
-export default AdminLayout;
+export default AdminLayout
