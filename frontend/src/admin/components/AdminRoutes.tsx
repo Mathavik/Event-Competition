@@ -5,12 +5,13 @@ import Dashboard from "../pages/Dashboard";
 import Categories from "../pages/Categories";
 import Events from "../pages/adminEvents";
 import Registrations from "../pages/Registrations";
+import AdminLogin from "./AdminLogin";
 
 const AdminRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Dashboard */}
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/admindashboard" element={<Dashboard />} />
 
       {/* Category */}
       <Route path="categories" element={<Categories />} />
@@ -20,6 +21,8 @@ const AdminRoutes: React.FC = () => {
 
       {/* Registrations */}
       <Route path="registrations" element={<Registrations />} />
+      <Route path="adminlogin" element={<AdminLogin />} />
+
     </Routes>
   );
 };

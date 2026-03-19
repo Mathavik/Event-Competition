@@ -10,19 +10,19 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        $admin = Admin::where('email', $request->email)->first();
+   public function login(Request $request)
+{
+    $admin = Admin::where('email', $request->input('email'))->first();
 
-        if (!$admin || !Hash::check($request->password, $admin->password)) {
-            return response()->json([
-                'message' => 'Invalid email or password'
-            ], 401);
-        }
-
+    if (!$admin || !Hash::check($request->input('password'), $admin->password)) {
         return response()->json([
-            'message' => 'Login successful',
-            'admin' => $admin
-        ]);
+            'message' => 'Invalid email or password'
+        ], 401);
     }
+
+    return response()->json([
+        'message' => 'Login successful',
+        'admin' => $admin
+    ]);
+}
 }
