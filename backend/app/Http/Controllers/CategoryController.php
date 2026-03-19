@@ -17,16 +17,20 @@ class CategoryController extends Controller
     // 📌 Store new category
 public function store(Request $request)
 {
-    $imagePath = null;
+    $fileName = null;
 
     if ($request->hasFile('image')) {
-        $imagePath = $request->file('image')->store('categories', 'public');
+        $file = $request->file('image');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+
+        // ✅ same path as update
+        $file->move(public_path('upload/catogories'), $fileName);
     }
 
     $category = Category::create([
         'name' => $request->name,
         'description' => $request->description,
-        'image' => $imagePath,
+        'image' => $fileName,
     ]);
 
     return response()->json([
@@ -47,12 +51,18 @@ public function update(Request $request, $id)
 {
     $category = Category::findOrFail($id);
 
+    // 🔥 IMPORTANT: add this
+    $category->name = $request->name;
+    $category->description = $request->description;
+
+    // image optional
     if ($request->hasFile('image')) {
-    $file = $request->file('image');
-    $fileName = time() . '_' . $file->getClientOriginalName();
-    $file->move(public_path('upload/catogories'), $fileName); // Direct-a public folder-kku move pannum
-    $category->image = $fileName;
-}
+        $file = $request->file('image');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('upload/catogories'), $fileName);
+
+        $category->image = $fileName;
+    }
 
     $category->save();
 

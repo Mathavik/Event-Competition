@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
 import Categories from "../pages/Categories";
-import Events from "../pages/Events";
+import Events from "../pages/adminEvents";
 import Registrations from "../pages/Registrations";
 
 const AdminRoutes: React.FC = () => {
@@ -16,7 +16,7 @@ const AdminRoutes: React.FC = () => {
       <Route path="categories" element={<Categories />} />
 
       {/* Events */}
-      <Route path="events" element={<Events />} />
+      <Route path="adminEvents" element={<Events />} />
 
       {/* Registrations */}
       <Route path="registrations" element={<Registrations />} />
