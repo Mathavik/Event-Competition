@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventRegistrationsController;
+use App\Http\Controllers\TeamController;
+
 
 // Get all events for a student
 Route::get('/student/{id}/events', [EventRegistrationsController::class, 'showEvents']);
@@ -37,3 +39,5 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/registrations', [StudentController::class, 'getRegistrations']);
+
+Route::post('/team/register', [TeamController::class, 'registerTeam']);
