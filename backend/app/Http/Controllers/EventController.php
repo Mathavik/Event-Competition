@@ -30,7 +30,8 @@ class EventController extends Controller
         'name' => $request->name,
         'type' => $request->type,
         'age_group' => $request->age_group,
-        'image' => $imagePath
+        'image' => $imagePath,
+        'entry_fee' => $request->entry_fee,
     ]);
 
     return response()->json($event);

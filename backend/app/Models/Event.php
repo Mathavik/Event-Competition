@@ -12,7 +12,8 @@ class Event extends Model
         'name',
         'type',
         'age_group',
-        'image'
+        'image',
+        'entry_fee'
     ];
 
     // 🖼️ Image-ku Full URL kidaikka intha Accessor

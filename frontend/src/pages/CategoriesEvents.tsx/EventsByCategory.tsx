@@ -15,6 +15,7 @@ type Event = {
   age_group: string;
   image: string;
   time: string;
+  entry_fee: number;
 };
 
 type Category = {
@@ -30,11 +31,15 @@ export default function EventsByCategory() {
   const [category, setCategory] = useState<Category | null>(null);
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
-  // 🔥 TEAM POPUP STATE
+  // 🔥 TEAM POPUP
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [teamName, setTeamName] = useState("");
   const [members, setMembers] = useState<string[]>([""]);
+
+  // 💳 PAYMENT POPUP
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentEvent, setPaymentEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     api
@@ -90,12 +95,11 @@ export default function EventsByCategory() {
   const handleTeamSubmit = async () => {
     const studentId = localStorage.getItem("student_id");
 
-    if (!teamName.trim() || members.length === 0) {
-      alert("Enter team details");
+    if (!teamName.trim()) {
+      alert("Enter team name");
       return;
     }
 
-    // 🔥 empty remove
     const filteredMembers = members.filter((m) => m.trim() !== "");
 
     try {
@@ -103,12 +107,11 @@ export default function EventsByCategory() {
         event_id: selectedEvent?.id,
         captain_id: studentId,
         team_name: teamName,
-        members: filteredMembers, // ✅ names send panrom
+        members: filteredMembers,
       });
 
       alert("✅ Team Registered!");
 
-      // reset
       setShowPopup(false);
       setTeamName("");
       setMembers([""]);
@@ -117,8 +120,7 @@ export default function EventsByCategory() {
     }
   };
 
-  if (!category)
-    return <div className="text-center mt-20">Loading...</div>;
+  if (!category) return <div className="text-center mt-20">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,6 +163,11 @@ export default function EventsByCategory() {
                   })}
                 </p>
 
+                {/* 💰 ENTRY FEE */}
+                <p className="text-green-600 font-bold mt-1">
+                  ₹ {event.entry_fee}
+                </p>
+
                 <p className="text-xs text-purple-500 mt-1">
                   {event.type}
                 </p>
@@ -169,11 +176,16 @@ export default function EventsByCategory() {
               <div className="p-3 flex justify-end">
                 <button
                   onClick={() => {
-                    if (event.type === "Team") {
-                      setSelectedEvent(event);
-                      setShowPopup(true);
+                    if (event.entry_fee > 0) {
+                      setPaymentEvent(event);
+                      setShowPayment(true);
                     } else {
-                      handleSoloBooking(event);
+                      if (event.type === "Team") {
+                        setSelectedEvent(event);
+                        setShowPopup(true);
+                      } else {
+                        handleSoloBooking(event);
+                      }
                     }
                   }}
                   className="bg-green-500 text-white px-3 py-1 rounded"
@@ -185,6 +197,40 @@ export default function EventsByCategory() {
           ))}
         </div>
       </div>
+
+      {/* 💳 PAYMENT POPUP */}
+      {showPayment && paymentEvent && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+          <div className="bg-white p-5 rounded-xl w-96">
+
+            <h2 className="text-xl font-bold mb-3">Payment</h2>
+
+            <p>Event: {paymentEvent.name}</p>
+            <p className="mb-3">Amount: ₹ {paymentEvent.entry_fee}</p>
+
+            <input placeholder="Card Number" className="border p-2 w-full mb-2" />
+            <input placeholder="Expiry" className="border p-2 w-full mb-2" />
+            <input placeholder="CVV" className="border p-2 w-full mb-3" />
+
+            <button
+              onClick={() => {
+                setShowPayment(false);
+
+                if (paymentEvent.type === "Team") {
+                  setSelectedEvent(paymentEvent);
+                  setShowPopup(true);
+                } else {
+                  handleSoloBooking(paymentEvent);
+                }
+              }}
+              className="bg-green-500 text-white w-full py-2 rounded"
+            >
+              Pay & Register
+            </button>
+
+          </div>
+        </div>
+      )}
 
       {/* 🔥 TEAM POPUP */}
       {showPopup && (
@@ -205,7 +251,7 @@ export default function EventsByCategory() {
             {members.map((m, i) => (
               <input
                 key={i}
-                placeholder={`Member ${i + 1} Name`} // ✅ FIXED
+                placeholder={`Member ${i + 1} Name`}
                 className="border p-2 w-full mb-2"
                 value={m}
                 onChange={(e) => {
