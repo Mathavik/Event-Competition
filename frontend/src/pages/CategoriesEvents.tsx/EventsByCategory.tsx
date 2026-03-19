@@ -90,17 +90,20 @@ export default function EventsByCategory() {
   const handleTeamSubmit = async () => {
     const studentId = localStorage.getItem("student_id");
 
-    if (!teamName || members.length === 0) {
+    if (!teamName.trim() || members.length === 0) {
       alert("Enter team details");
       return;
     }
+
+    // 🔥 empty remove
+    const filteredMembers = members.filter((m) => m.trim() !== "");
 
     try {
       await api.post("/team/register", {
         event_id: selectedEvent?.id,
         captain_id: studentId,
         team_name: teamName,
-        members: members.map(Number),
+        members: filteredMembers, // ✅ names send panrom
       });
 
       alert("✅ Team Registered!");
@@ -202,7 +205,7 @@ export default function EventsByCategory() {
             {members.map((m, i) => (
               <input
                 key={i}
-                placeholder={`Member ${i + 1} ID`}
+                placeholder={`Member ${i + 1} Name`} // ✅ FIXED
                 className="border p-2 w-full mb-2"
                 value={m}
                 onChange={(e) => {
