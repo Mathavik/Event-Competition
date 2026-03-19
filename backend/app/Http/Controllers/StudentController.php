@@ -33,9 +33,6 @@ public function getRegistrations()
             'school_code' => 'required'
         ]);
 
-        // School restriction
-//         $allowedSchools = ['SCH001','SCH002'];
-
 //        if (!in_array($request->school_code, $allowedSchools)) {
 //     return response()->json(['error' => 'School not allowed'], 403);
 // }

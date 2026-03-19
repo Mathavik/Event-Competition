@@ -15,6 +15,7 @@ type Event = {
   type: string;
   age_group: string;
   image: string;
+  time: string;
 };
 
 type Category = {
@@ -143,12 +144,12 @@ export default function EventsByCategory() {
               <div className="h-52 overflow-hidden">
                 {event.image && (
 
-<img
-  src={`http://127.0.0.1:8000/upload/events/${event.image}`}
-  className="w-full h-full object-cover" 
-/>
- 
-)}
+                  <img
+                    src={`http://127.0.0.1:8000/upload/events/${event.image}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                )}
               </div>
 
               {/* Content */}
@@ -157,11 +158,17 @@ export default function EventsByCategory() {
                 <p className="text-sm text-gray-500">
                   {event.age_group}
                 </p>
+                <p className="text-sm text-blue-500 font-semibold mt-1">
+                  {new Date(`1970-01-01T${event.time}`).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
               </div>
 
               {/* 🔥 ACTIONS */}
-<div className="p-4 mt-auto flex justify-end">
-                   
+              <div className="p-4 mt-auto flex justify-end">
+
 
                 {/* 🔥 BOOK BUTTON */}
                 <button
