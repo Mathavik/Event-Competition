@@ -40,3 +40,6 @@ class Event extends Model
                     ->withTimestamps();
     }
 }
+
+
+
