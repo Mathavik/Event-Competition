@@ -16,16 +16,31 @@ class Event extends Model
         'entry_fee'
     ];
 
-    // 🖼️ Image-ku Full URL kidaikka intha Accessor
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'status']; // ✅ updated
 
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
             return null;
         }
-        // Path: public/upload/events/
         return URL::to('/') . '/upload/events/' . $this->image;
+    }
+
+    // ✅ NEW FUNCTION
+    public function getStatusAttribute()
+    {
+        if (!$this->time || !$this->event_date) return "upcoming";
+
+        $eventDateTime = \Carbon\Carbon::parse($this->event_date . ' ' . $this->time);
+        $now = \Carbon\Carbon::now();
+
+        if ($now->lt($eventDateTime)) {
+            return 'upcoming';
+        } elseif ($now->between($eventDateTime, $eventDateTime->copy()->addHour())) {
+            return 'ongoing';
+        } else {
+            return 'completed';
+        }
     }
 
     public function category()

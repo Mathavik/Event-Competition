@@ -6,6 +6,7 @@ import Categories from "../pages/Categories";
 import Events from "../pages/adminEvents";
 import Registrations from "../pages/Registrations";
 import AdminLogin from "./AdminLogin";
+import AdminGallery from "../pages/AdminGallery";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -18,6 +19,8 @@ const AdminRoutes: React.FC = () => {
 
       {/* Events */}
       <Route path="adminEvents" element={<Events />} />
+      <Route path="adminGallery" element={<AdminGallery />} />
+      
 
       {/* Registrations */}
       <Route path="registrations" element={<Registrations />} />
