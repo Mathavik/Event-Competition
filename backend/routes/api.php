@@ -11,6 +11,7 @@ use App\Http\Controllers\EventRegistrationsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PaymentController;
 
+use App\Http\Controllers\GalleryController;
 
 
 // Get all events for a student
@@ -53,3 +54,5 @@ Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/registrations', [StudentController::class, 'getRegistrations']);
 
 Route::post('/team/register', [TeamController::class, 'registerTeam']);
+Route::get('/gallery', [GalleryController::class, 'index']);
+Route::post('/gallery', [GalleryController::class, 'store']);

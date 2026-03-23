@@ -15,7 +15,11 @@ type Event = {
   age_group: string;
   image: string;
   time: string;
-  entry_fee?: number;
+  start_time: string;
+  end_time: string;
+  event_date: string;
+  entry_fee: number;
+  status: string;
 };
 
 type Category = {
@@ -33,10 +37,15 @@ export default function EventsByCategory() {
   const [category, setCategory] = useState<Category | null>(null);
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
+  // TEAM POPUP
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [teamName, setTeamName] = useState("");
   const [members, setMembers] = useState<string[]>([""]);
+
+  // PAYMENT POPUP
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentEvent, setPaymentEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     api
@@ -55,9 +64,7 @@ export default function EventsByCategory() {
 
   const getVideoByCategory = (name: string) => {
     const key = name.toLowerCase();
-    const matchedKey = Object.keys(videoMap).find((k) =>
-      key.includes(k)
-    );
+    const matchedKey = Object.keys(videoMap).find((k) => key.includes(k));
     return matchedKey ? videoMap[matchedKey] : sportsVideo;
   };
 
@@ -75,7 +82,8 @@ export default function EventsByCategory() {
       const res = await api.post("/register-event", {
         student_id: studentId,
         event_id: event.id,
-        event_time: "2026-04-10 10:00:00",
+        event_time: `${event.event_date} ${event.start_time}`,
+        amount: event.entry_fee || 0,
       });
 
       navigate("/payment", {
@@ -83,7 +91,7 @@ export default function EventsByCategory() {
           isTeam: false,
           event_student_id: res.data.event_student_id,
           event_name: res.data.event_name || event.name,
-          amount: event.entry_fee || 0,
+          amount: res.data.amount ?? event.entry_fee ?? 0,
         },
       });
     } catch (error: any) {
@@ -101,19 +109,36 @@ export default function EventsByCategory() {
       return;
     }
 
-    if (!teamName.trim() || members.length === 0) {
-      alert("Enter team details");
+    if (!selectedEvent) {
+      alert("No event selected");
+      return;
+    }
+
+    if (!teamName.trim()) {
+      alert("Enter team name");
       return;
     }
 
     const filteredMembers = members.filter((m) => m.trim() !== "");
 
+    if (filteredMembers.length === 0) {
+      alert("Enter at least one member");
+      return;
+    }
+
     try {
+      setLoadingId(selectedEvent.id);
+
       const res = await api.post("/register-event", {
-        event_id: selectedEvent?.id,
+        event_id: selectedEvent.id,
+        captain_id: studentId,
+        team_name: teamName,
         members: [studentId, ...filteredMembers],
-        event_time: "2026-04-10 10:00:00",
+        event_time: `${selectedEvent.event_date} ${selectedEvent.start_time}`,
+        amount: selectedEvent.entry_fee || 0,
       });
+
+      alert("✅ Team Registered!");
 
       setShowPopup(false);
       setTeamName("");
@@ -122,13 +147,15 @@ export default function EventsByCategory() {
       navigate("/payment", {
         state: {
           isTeam: true,
-          registrations: res.data.registrations,
-          event_name: selectedEvent?.name,
-          amount: selectedEvent?.entry_fee || 0,
+          registrations: res.data.data || [],
+          event_name: res.data.event_name || selectedEvent.name,
+          amount: res.data.amount ?? selectedEvent.entry_fee ?? 0,
         },
       });
     } catch (error: any) {
       alert(error?.response?.data?.message || "Error");
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -142,57 +169,95 @@ export default function EventsByCategory() {
         <video autoPlay loop muted className="w-full h-full object-cover">
           <source src={getVideoByCategory(category.name)} />
         </video>
+
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <h1 className="text-4xl text-white font-bold">
-            {category.name}
-          </h1>
+          <h1 className="text-4xl text-white font-bold">{category.name}</h1>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid md:grid-cols-3 gap-6">
           {category.events.map((event) => (
-            <div key={event.id} className="bg-white rounded-xl shadow">
+            <div key={event.id} className="bg-white rounded-xl shadow-lg">
               <img
                 src={`http://127.0.0.1:8000/upload/events/${event.image}`}
-                className="h-48 w-full object-cover"
+                className="h-48 w-full object-cover rounded-t-xl"
+                alt={event.name}
               />
 
               <div className="p-4 text-center">
-                <h3 className="font-bold">{event.name}</h3>
+                <h3 className="font-bold text-lg">{event.name}</h3>
 
-                <p className="text-sm text-gray-500">{event.age_group}</p>
+                <span
+                  className={`text-white text-xs px-2 py-1 rounded ${
+                    event.status === "completed"
+                      ? "bg-green-500"
+                      : event.status === "ongoing"
+                      ? "bg-yellow-400"
+                      : "bg-red-500"
+                  }`}
+                >
+                  {event.status.toUpperCase()}
+                </span>
 
-                <p className="text-blue-500 text-sm">
+                <p className="text-sm text-gray-500 mt-2">{event.age_group}</p>
+
+                <p className="text-blue-500 text-sm mt-1">
                   ⏰{" "}
-                  {new Date(`1970-01-01T${event.time}`).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString(
+                    [],
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}{" "}
+                  -{" "}
+                  {new Date(`1970-01-01T${event.end_time}`).toLocaleTimeString(
+                    [],
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
+                </p>
+
+                <p className="text-xs text-gray-400">📅 {event.event_date}</p>
+
+                <p className="text-green-600 font-bold mt-1">
+                  ₹ {event.entry_fee || 0}
                 </p>
 
                 <p className="text-xs text-purple-500 mt-1">{event.type}</p>
-
-                <p className="text-sm text-green-600 mt-1">
-                  Entry Fee: ₹{event.entry_fee || 0}
-                </p>
               </div>
 
               <div className="p-3 flex justify-end">
                 <button
+                  disabled={
+                    event.status === "completed" || loadingId === event.id
+                  }
                   onClick={() => {
-                    if (event.type === "Team") {
-                      setSelectedEvent(event);
-                      setShowPopup(true);
+                    if ((event.entry_fee || 0) > 0) {
+                      setPaymentEvent(event);
+                      setShowPayment(true);
                     } else {
-                      handleSoloBooking(event);
+                      if (event.type === "Team") {
+                        setSelectedEvent(event);
+                        setShowPopup(true);
+                      } else {
+                        handleSoloBooking(event);
+                      }
                     }
                   }}
-                  className="bg-green-500 text-white px-3 py-1 rounded"
-                  disabled={loadingId === event.id}
+                  className={`px-3 py-1 rounded text-white ${
+                    event.status === "completed"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500"
+                  }`}
                 >
                   {loadingId === event.id
                     ? "Processing..."
+                    : event.status === "completed"
+                    ? "Closed"
                     : event.type === "Team"
                     ? "Book Team"
                     : "Book"}
@@ -203,11 +268,44 @@ export default function EventsByCategory() {
         </div>
       </div>
 
+      {showPayment && paymentEvent && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+          <div className="bg-white p-5 rounded-xl w-96">
+            <h2 className="text-xl font-bold mb-3">Payment</h2>
+
+            <p>Event: {paymentEvent.name}</p>
+            <p className="mb-3">Amount: ₹ {paymentEvent.entry_fee || 0}</p>
+
+            <input
+              placeholder="Card Number"
+              className="border p-2 w-full mb-2"
+            />
+            <input placeholder="Expiry" className="border p-2 w-full mb-2" />
+            <input placeholder="CVV" className="border p-2 w-full mb-3" />
+
+            <button
+              onClick={() => {
+                setShowPayment(false);
+
+                if (paymentEvent.type === "Team") {
+                  setSelectedEvent(paymentEvent);
+                  setShowPopup(true);
+                } else {
+                  handleSoloBooking(paymentEvent);
+                }
+              }}
+              className="bg-green-500 text-white w-full py-2 rounded"
+            >
+              Pay & Register
+            </button>
+          </div>
+        </div>
+      )}
+
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white p-5 rounded-xl w-96 relative">
-            {/* Close Button Added Here */}
-            <button 
+            <button
               onClick={() => setShowPopup(false)}
               className="absolute top-2 right-4 text-gray-500 hover:text-black text-2xl"
             >

@@ -9,6 +9,8 @@ import Login from "./components/Login";
 import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
 import Home from "./pages/Home/home";
 import PaymentPage from "./pages/Home/PaymentPage";
+import Schedule from "./pages/Schedule/Schedule";
+import Gallery from "./pages/Gallery/Gallery";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
 
             <Route path="/register" element={<StudentRegister />} />
             <Route path="/categories" element={<Categories />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/gallery" element={<Gallery/>}/>
           </Routes>
         </main>
         <Footer />

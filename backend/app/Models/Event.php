@@ -8,14 +8,19 @@ use Illuminate\Support\Facades\URL;
 class Event extends Model
 {
     protected $fillable = [
-        'category_id',
-        'name',
-        'type',
-        'age_group',
-        'image'
+     'category_id',
+    'name',
+    'type',
+    'age_group',
+    'image',
+    'entry_fee',
+    'event_date',
+    'start_time',
+    'end_time'
     ];
 
-    protected $appends = ['image_url'];
+    // protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'status']; // ✅ updated
 
     public function getImageUrlAttribute()
     {
@@ -24,6 +29,23 @@ class Event extends Model
         }
 
         return URL::to('/') . '/upload/events/' . $this->image;
+    }
+
+    // ✅ NEW FUNCTION
+    public function getStatusAttribute()
+    {
+        if (!$this->time || !$this->event_date) return "upcoming";
+
+        $eventDateTime = \Carbon\Carbon::parse($this->event_date . ' ' . $this->time);
+        $now = \Carbon\Carbon::now();
+
+        if ($now->lt($eventDateTime)) {
+            return 'upcoming';
+        } elseif ($now->between($eventDateTime, $eventDateTime->copy()->addHour())) {
+            return 'ongoing';
+        } else {
+            return 'completed';
+        }
     }
 
     public function category()
@@ -38,3 +60,6 @@ public function students()
                 ->withTimestamps();
 }
 }
+
+
+
