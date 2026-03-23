@@ -14,8 +14,11 @@ type Event = {
   type: string;
   age_group: string;
   image: string;
-  time: string;
+  start_time: string;
+  end_time: string;
+  event_date: string;
   entry_fee: number;
+  status: string;
 };
 
 type Category = {
@@ -80,12 +83,11 @@ export default function EventsByCategory() {
       await api.post("/event/register", {
         student_id: studentId,
         event_id: event.id,
-        event_time: "2026-04-10 10:00:00",
       });
 
       alert("✅ Event Registered Successfully!");
     } catch (error: any) {
-      alert(error?.response?.data?.message || "Error");
+      alert(error?.response?.data?.error || "Error");
     } finally {
       setLoadingId(null);
     }
@@ -141,26 +143,50 @@ export default function EventsByCategory() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid md:grid-cols-3 gap-6">
           {category.events.map((event) => (
-            <div key={event.id} className="bg-white rounded-xl shadow">
+            <div key={event.id} className="bg-white rounded-xl shadow-lg">
 
               <img
                 src={`http://127.0.0.1:8000/upload/events/${event.image}`}
-                className="h-48 w-full object-cover"
+                className="h-48 w-full object-cover rounded-t-xl"
               />
 
               <div className="p-4 text-center">
-                <h3 className="font-bold">{event.name}</h3>
+                <h3 className="font-bold text-lg">{event.name}</h3>
 
-                <p className="text-sm text-gray-500">
+                {/* 🔥 STATUS */}
+                <span
+                  className={`text-white text-xs px-2 py-1 rounded ${
+                    event.status === "completed"
+                      ? "bg-green-500"
+                      : event.status === "ongoing"
+                      ? "bg-yellow-400"
+                      : "bg-red-500"
+                  }`}
+                >
+                  {event.status.toUpperCase()}
+                </span>
+
+                <p className="text-sm text-gray-500 mt-1">
                   {event.age_group}
                 </p>
 
-                <p className="text-blue-500 text-sm">
+                {/* ⏰ TIME */}
+                <p className="text-blue-500 text-sm mt-1">
                   ⏰{" "}
-                  {new Date(`1970-01-01T${event.time}`).toLocaleTimeString([], {
+                  {new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
+                  {" - "}
+                  {new Date(`1970-01-01T${event.end_time}`).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+
+                {/* 📅 DATE */}
+                <p className="text-xs text-gray-400">
+                  📅 {event.event_date}
                 </p>
 
                 {/* 💰 ENTRY FEE */}
@@ -175,6 +201,7 @@ export default function EventsByCategory() {
 
               <div className="p-3 flex justify-end">
                 <button
+                  disabled={event.status === "completed"}
                   onClick={() => {
                     if (event.entry_fee > 0) {
                       setPaymentEvent(event);
@@ -188,9 +215,17 @@ export default function EventsByCategory() {
                       }
                     }
                   }}
-                  className="bg-green-500 text-white px-3 py-1 rounded"
+                  className={`px-3 py-1 rounded text-white ${
+                    event.status === "completed"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500"
+                  }`}
                 >
-                  {event.type === "Team" ? "Book Team" : "Book"}
+                  {event.status === "completed"
+                    ? "Closed"
+                    : event.type === "Team"
+                    ? "Book Team"
+                    : "Book"}
                 </button>
               </div>
             </div>
@@ -202,7 +237,6 @@ export default function EventsByCategory() {
       {showPayment && paymentEvent && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-white p-5 rounded-xl w-96">
-
             <h2 className="text-xl font-bold mb-3">Payment</h2>
 
             <p>Event: {paymentEvent.name}</p>
@@ -227,7 +261,6 @@ export default function EventsByCategory() {
             >
               Pay & Register
             </button>
-
           </div>
         </div>
       )}
@@ -237,9 +270,7 @@ export default function EventsByCategory() {
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-white p-5 rounded-xl w-96">
 
-            <h2 className="text-xl font-bold mb-3">
-              Create Team
-            </h2>
+            <h2 className="text-xl font-bold mb-3">Create Team</h2>
 
             <input
               placeholder="Team Name"

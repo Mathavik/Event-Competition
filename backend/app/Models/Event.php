@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\URL;
 class Event extends Model
 {
     protected $fillable = [
-        'category_id',
-        'name',
-        'type',
-        'age_group',
-        'image',
-        'entry_fee'
+     'category_id',
+    'name',
+    'type',
+    'age_group',
+    'image',
+    'entry_fee',
+    'event_date',
+    'start_time',
+    'end_time'
     ];
 
     protected $appends = ['image_url', 'status']; // ✅ updated
