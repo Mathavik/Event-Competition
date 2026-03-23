@@ -16,10 +16,11 @@ class Student extends Model
 
     protected $hidden = ['password'];
 
-    public function events()
+public function events()
 {
     return $this->belongsToMany(Event::class)
-                ->withPivot('event_time')
+                ->withPivot('event_name', 'payment_ref_id', 'event_time')
                 ->withTimestamps();
 }
 }
+

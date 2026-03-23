@@ -9,6 +9,8 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventRegistrationsController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\PaymentController;
+
 
 
 // Get all events for a student
@@ -36,6 +38,16 @@ Route::post('/categories', [CategoryController::class, 'store']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::put('/categories/{id}', [CategoryController::class, 'update']);
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+
+
+Route::post('/register-event', [EventRegistrationsController::class, 'registerEvent']);
+
+Route::get('/payments', [PaymentController::class, 'index']);
+Route::post('/payments', [PaymentController::class, 'store']);
+Route::get('/payments/{id}', [PaymentController::class, 'show']);
+Route::put('/payments/{id}', [PaymentController::class, 'update']);
+Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/registrations', [StudentController::class, 'getRegistrations']);

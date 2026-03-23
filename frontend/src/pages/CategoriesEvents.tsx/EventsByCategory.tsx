@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api";
 
 // 🎥 Videos
@@ -15,6 +15,7 @@ type Event = {
   age_group: string;
   image: string;
   time: string;
+  entry_fee?: number;
 };
 
 type Category = {
@@ -27,10 +28,11 @@ type Category = {
 
 export default function EventsByCategory() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [category, setCategory] = useState<Category | null>(null);
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
-  // 🔥 TEAM POPUP STATE
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [teamName, setTeamName] = useState("");
@@ -43,7 +45,6 @@ export default function EventsByCategory() {
       .catch((err) => console.log(err));
   }, [id]);
 
-  // 🎯 Video Mapping
   const videoMap: { [key: string]: string } = {
     sports: sportsVideo,
     visual: artsVideo,
@@ -60,7 +61,6 @@ export default function EventsByCategory() {
     return matchedKey ? videoMap[matchedKey] : sportsVideo;
   };
 
-  // 🔥 SOLO BOOK
   const handleSoloBooking = async (event: Event) => {
     const studentId = localStorage.getItem("student_id");
 
@@ -72,13 +72,20 @@ export default function EventsByCategory() {
     try {
       setLoadingId(event.id);
 
-      await api.post("/event/register", {
+      const res = await api.post("/register-event", {
         student_id: studentId,
         event_id: event.id,
         event_time: "2026-04-10 10:00:00",
       });
 
-      alert("✅ Event Registered Successfully!");
+      navigate("/payment", {
+        state: {
+          isTeam: false,
+          event_student_id: res.data.event_student_id,
+          event_name: res.data.event_name || event.name,
+          amount: event.entry_fee || 0,
+        },
+      });
     } catch (error: any) {
       alert(error?.response?.data?.message || "Error");
     } finally {
@@ -86,44 +93,51 @@ export default function EventsByCategory() {
     }
   };
 
-  // 🔥 TEAM SUBMIT
   const handleTeamSubmit = async () => {
     const studentId = localStorage.getItem("student_id");
+
+    if (!studentId) {
+      alert("Please login first!");
+      return;
+    }
 
     if (!teamName.trim() || members.length === 0) {
       alert("Enter team details");
       return;
     }
 
-    // 🔥 empty remove
     const filteredMembers = members.filter((m) => m.trim() !== "");
 
     try {
-      await api.post("/team/register", {
+      const res = await api.post("/register-event", {
         event_id: selectedEvent?.id,
-        captain_id: studentId,
-        team_name: teamName,
-        members: filteredMembers, // ✅ names send panrom
+        members: [studentId, ...filteredMembers],
+        event_time: "2026-04-10 10:00:00",
       });
 
-      alert("✅ Team Registered!");
-
-      // reset
       setShowPopup(false);
       setTeamName("");
       setMembers([""]);
+
+      navigate("/payment", {
+        state: {
+          isTeam: true,
+          registrations: res.data.registrations,
+          event_name: selectedEvent?.name,
+          amount: selectedEvent?.entry_fee || 0,
+        },
+      });
     } catch (error: any) {
       alert(error?.response?.data?.message || "Error");
     }
   };
 
-  if (!category)
+  if (!category) {
     return <div className="text-center mt-20">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* VIDEO */}
       <div className="relative h-64 md:h-[350px]">
         <video autoPlay loop muted className="w-full h-full object-cover">
           <source src={getVideoByCategory(category.name)} />
@@ -135,12 +149,10 @@ export default function EventsByCategory() {
         </div>
       </div>
 
-      {/* EVENTS */}
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid md:grid-cols-3 gap-6">
           {category.events.map((event) => (
             <div key={event.id} className="bg-white rounded-xl shadow">
-
               <img
                 src={`http://127.0.0.1:8000/upload/events/${event.image}`}
                 className="h-48 w-full object-cover"
@@ -149,9 +161,7 @@ export default function EventsByCategory() {
               <div className="p-4 text-center">
                 <h3 className="font-bold">{event.name}</h3>
 
-                <p className="text-sm text-gray-500">
-                  {event.age_group}
-                </p>
+                <p className="text-sm text-gray-500">{event.age_group}</p>
 
                 <p className="text-blue-500 text-sm">
                   ⏰{" "}
@@ -161,8 +171,10 @@ export default function EventsByCategory() {
                   })}
                 </p>
 
-                <p className="text-xs text-purple-500 mt-1">
-                  {event.type}
+                <p className="text-xs text-purple-500 mt-1">{event.type}</p>
+
+                <p className="text-sm text-green-600 mt-1">
+                  Entry Fee: ₹{event.entry_fee || 0}
                 </p>
               </div>
 
@@ -177,8 +189,13 @@ export default function EventsByCategory() {
                     }
                   }}
                   className="bg-green-500 text-white px-3 py-1 rounded"
+                  disabled={loadingId === event.id}
                 >
-                  {event.type === "Team" ? "Book Team" : "Book"}
+                  {loadingId === event.id
+                    ? "Processing..."
+                    : event.type === "Team"
+                    ? "Book Team"
+                    : "Book"}
                 </button>
               </div>
             </div>
@@ -186,14 +203,18 @@ export default function EventsByCategory() {
         </div>
       </div>
 
-      {/* 🔥 TEAM POPUP */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-white p-5 rounded-xl w-96">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white p-5 rounded-xl w-96 relative">
+            {/* Close Button Added Here */}
+            <button 
+              onClick={() => setShowPopup(false)}
+              className="absolute top-2 right-4 text-gray-500 hover:text-black text-2xl"
+            >
+              &times;
+            </button>
 
-            <h2 className="text-xl font-bold mb-3">
-              Create Team
-            </h2>
+            <h2 className="text-xl font-bold mb-3 text-center">Create Team</h2>
 
             <input
               placeholder="Team Name"
@@ -205,7 +226,7 @@ export default function EventsByCategory() {
             {members.map((m, i) => (
               <input
                 key={i}
-                placeholder={`Member ${i + 1} Name`} // ✅ FIXED
+                placeholder={`Member ${i + 1} Student ID`}
                 className="border p-2 w-full mb-2"
                 value={m}
                 onChange={(e) => {
@@ -225,11 +246,10 @@ export default function EventsByCategory() {
 
             <button
               onClick={handleTeamSubmit}
-              className="bg-green-500 text-white w-full py-2 rounded"
+              className="bg-green-500 text-white w-full py-2 rounded font-bold"
             >
               Submit
             </button>
-
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ import StudentRegister from "./pages/StudentRegister";
 import Login from "./components/Login";
 import EventsByCategory from "./pages/CategoriesEvents.tsx/EventsByCategory";
 import Home from "./pages/Home/home";
+import PaymentPage from "./pages/Home/PaymentPage";
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/events/:id" element={<EventsByCategory />} />
-           
+          <Route path="/payment" element={<PaymentPage/>} />
+
 
             <Route path="/register" element={<StudentRegister />} />
             <Route path="/categories" element={<Categories />} />

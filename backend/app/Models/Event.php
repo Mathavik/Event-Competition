@@ -15,7 +15,6 @@ class Event extends Model
         'image'
     ];
 
-    // 🖼️ Image-ku Full URL kidaikka intha Accessor
     protected $appends = ['image_url'];
 
     public function getImageUrlAttribute()
@@ -23,7 +22,7 @@ class Event extends Model
         if (!$this->image) {
             return null;
         }
-        // Path: public/upload/events/
+
         return URL::to('/') . '/upload/events/' . $this->image;
     }
 
@@ -32,10 +31,10 @@ class Event extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function students()
-    {
-        return $this->belongsToMany(Student::class)
-                    ->withPivot('event_time')
-                    ->withTimestamps();
-    }
+public function students()
+{
+    return $this->belongsToMany(Student::class)
+                ->withPivot('event_name', 'payment_ref_id', 'event_time')
+                ->withTimestamps();
+}
 }
