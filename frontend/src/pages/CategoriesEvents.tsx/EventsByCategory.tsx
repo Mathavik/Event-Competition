@@ -98,21 +98,21 @@ export default function EventsByCategory() {
     }
   };
 
-  const openTeamPopup = (event: Event) => {
-    const studentId = localStorage.getItem("student_id");
+const openTeamPopup = (event: Event) => {
+  const studentId = localStorage.getItem("student_id");
 
-    if (!studentId) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
 
-    setSelectedEvent(event);
-    setTeamName("");
-    setMembers([""]);
-    setShowPopup(true);
-  };
-
+  setSelectedEvent(event);
+  setTeamName("");
+  setMembers([""]);
+  console.log("popup opened");
+  setShowPopup(true);
+};
   const handleTeamSubmit = async () => {
     const studentId = localStorage.getItem("student_id");
 
@@ -189,7 +189,7 @@ const handleBookNow = (event: Event) => {
     return;
   }
 
-  if (event.type?.trim().toLowerCase() === "team") {
+  if (event.type && event.type.trim().toLowerCase().includes("team")) {
     openTeamPopup(event);
   } else {
     handleSoloBooking(event);
@@ -281,9 +281,9 @@ const handleBookNow = (event: Event) => {
       ? "Processing..."
       : event.status === "completed"
       ? "Closed"
-      : event.type?.trim().toLowerCase() === "team"
-      ? "Book Team"
-      : "Book Now"}
+     : event.type && event.type.trim().toLowerCase().includes("team")
+? "Book Team"
+: "Book Now"}
   </button>
 </div>
             </div>
