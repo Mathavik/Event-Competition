@@ -7,7 +7,8 @@ type Event = {
   name: string;
   type: string;
   age_group: string;
-  time: string;
+  start_time: string;
+end_time: string;
   event_date: string;
   status: string;
 };
@@ -107,13 +108,22 @@ export default function Schedule() {
                   ></div>
 
                   {/* TIME */}
-                  <p className="text-sm text-gray-500">
-                    ⏰{" "}
-                    {new Date(`1970-01-01T${event.time}`).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+                <p className="text-sm text-gray-500">
+  ⏰{" "}
+  {event.start_time
+    ? new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "N/A"}
+  {" - "}
+  {event.end_time
+    ? new Date(`1970-01-01T${event.end_time}`).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "N/A"}
+</p>
 
                   {/* DATE */}
                   <p className="text-xs text-gray-400">
