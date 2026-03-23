@@ -5,151 +5,52 @@
     <title>Certificate</title>
 
     <style>
-        @page { size: A4; margin: 0; }
+        @page {
+            size: A4;
+            margin: 0;
+        }
 
-        body {
+        html, body {
             margin: 0;
             padding: 0;
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100%;
         }
 
+        body {
+            background: #f0f0f0;
+        }
+
+        /* ✅ A4 Perfect Size */
         .certificate {
-            width: 794px;
-            height: 1123px;
-            background: #fff;
+            width: 210mm;
+            height: 297mm;
+            background: #ffffff;
             position: relative;
             box-sizing: border-box;
-            padding: 50px;
+            padding: 40px;
             text-align: center;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            page-break-after: avoid;
         }
 
-        /* ✅ OUTER BORDER - 4px */
+        /* ✅ OUTER BORDER */
         .outer-border {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
+            top: 10mm;
+            left: 10mm;
+            right: 10mm;
+            bottom: 10mm;
             border: 4px solid #c9a646;
         }
 
         /* ✅ INNER BORDER */
         .inner-border {
             position: absolute;
-            top: 30px;
-            left: 30px;
-            right: 30px;
-            bottom: 30px;
+            top: 15mm;
+            left: 15mm;
+            right: 15mm;
+            bottom: 15mm;
             border: 1px solid #1a237e;
-        }
-
-        .org-name {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1a237e;
-            margin-top: 20px;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .org-sub {
-            font-size: 14px;
-            color: #999;
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .title {
-            font-size: 44px;
-            font-weight: bold;
-            color: #1a237e;
-            margin: 20px 0 5px 0;
-            position: relative;
-            z-index: 1;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            font-size: 16px;
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
-            color: #666;
-        }
-
-        .name {
-            font-size: 40px;
-            font-weight: bold;
-            color: #1a237e;
-            border-bottom: 2px solid #c9a646;
-            display: inline-block;
-            padding: 8px 60px;
-            margin: 30px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .event {
-            font-size: 24px;
-            margin: 15px 0;
-            position: relative;
-            z-index: 1;
-            color: #333;
-        }
-
-        .prize {
-            font-size: 28px;
-            color: #c9a646;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            position: relative;
-            z-index: 1;
-            letter-spacing: 1px;
-        }
-
-        .footer {
-            position: absolute;
-            bottom: 60px;
-            left: 80px;
-            right: 80px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 1;
-            font-size: 14px;
-        }
-
-        .sign-line {
-            width: 150px;
-            border-top: 1px solid #000;
-            margin-bottom: 8px;
-        }
-
-        .seal {
-            position: absolute;
-            bottom: 100px;
-            right: 80px;
-            width: 80px;
-            height: 80px;
-            border: 2px double #c9a646;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: #c9a646;
-            transform: rotate(-15deg);
-            z-index: 2;
         }
 
         .watermark {
@@ -157,18 +58,121 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 100px;
+            font-size: 90px;
             color: rgba(200, 160, 70, 0.08);
-            z-index: 0;
             font-weight: bold;
+            z-index: 0;
         }
-        
-        p {
-            position: relative;
+
+        .org-name {
+            font-size: 30px;
+            font-weight: bold;
+            color: #1a237e;
+            margin-top: 20px;
             z-index: 1;
-            color: #333;
-            margin: 15px 0;
+            position: relative;
+        }
+
+        .org-sub {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 25px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #1a237e;
+            letter-spacing: 2px;
+            margin: 20px 0 5px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 35px;
+            z-index: 1;
+            position: relative;
+        }
+
+        p {
             font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .name {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1a237e;
+            border-bottom: 2px solid #c9a646;
+            display: inline-block;
+            padding: 8px 60px;
+            margin: 25px 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .event {
+            font-size: 22px;
+            margin: 15px 0;
+            color: #333;
+            z-index: 1;
+            position: relative;
+        }
+
+        .prize {
+            font-size: 26px;
+            color: #c9a646;
+            font-weight: bold;
+            margin-top: 40px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 50px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .sign-line {
+            width: 150px;
+            border-top: 1px solid #000;
+            margin-bottom: 5px;
+        }
+
+        .seal {
+            position: absolute;
+            bottom: 90px;
+            right: 70px;
+            width: 70px;
+            height: 70px;
+            border: 2px double #c9a646;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #c9a646;
+            transform: rotate(-15deg);
+            z-index: 2;
+        }
+
+        /* ❌ prevent page break */
+        * {
+            page-break-inside: avoid;
         }
     </style>
 </head>
@@ -176,6 +180,7 @@
 <body>
 
 <div class="certificate">
+
     <div class="outer-border"></div>
     <div class="inner-border"></div>
 
@@ -199,7 +204,8 @@
 
     <div class="footer">
         <div>
-            <strong>Date:</strong> {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
+            <strong>Date:</strong>
+            {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
         </div>
 
         <div>
@@ -209,6 +215,7 @@
     </div>
 
     <div class="seal">OFFICIAL</div>
+
 </div>
 
 </body>

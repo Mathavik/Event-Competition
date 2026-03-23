@@ -3,26 +3,25 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Barryvdh\DomPDF\Facade\Pdf; // ✅ IMPORTANT
 
 class WinnerMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $student;   // Student object
-    public $event;     // Event object
-    public $prize;     // Prize string
+    public $student;
+    public $event;
+    public $prize;
 
     /**
      * Create a new message instance.
      */
     public function __construct($student, $event, $prize)
-    
     {
         $this->student = $student;
         $this->event   = $event;
@@ -30,7 +29,7 @@ class WinnerMail extends Mailable
     }
 
     /**
-     * Get the message envelope.
+     * Email Subject
      */
     public function envelope(): Envelope
     {
@@ -40,20 +39,36 @@ class WinnerMail extends Mailable
     }
 
     /**
-     * Get the message content definition.
+     * Email Body View
      */
     public function content(): Content
     {
         return new Content(
             view: 'emails.winner',
+            with: [
+                'student' => $this->student,
+                'event'   => $this->event,
+                'prize'   => $this->prize,
+            ],
         );
     }
 
     /**
-     * Get the attachments for the message.
+     * Attach Certificate PDF
      */
     public function attachments(): array
     {
-        return [];
+        $pdf = Pdf::loadView('certificate', [
+            'student' => $this->student,
+            'event'   => $this->event,
+            'prize'   => $this->prize,
+        ])->setPaper('A4', 'portrait');
+
+        return [
+            Attachment::fromData(
+                fn () => $pdf->output(),
+                'certificate.pdf'
+            )->withMime('application/pdf'),
+        ];
     }
 }
