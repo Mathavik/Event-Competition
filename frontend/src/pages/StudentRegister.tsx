@@ -95,7 +95,7 @@ const StudentRegister: React.FC = () => {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="School Email"
           value={form.email}
           onChange={handleChange}
           className="mb-3 w-full p-2 border rounded"
