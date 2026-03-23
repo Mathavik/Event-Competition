@@ -171,26 +171,30 @@ export default function EventsByCategory() {
     }
   };
 
-  const handleBookNow = (event: Event) => {
-    if (event.status === "completed") {
-      alert("Registration closed for this event");
-      return;
-    }
+const handleBookNow = (event: Event) => {
+  console.log("clicked event =", event);
+  console.log("event.type =", event.type);
+  console.log("normalized type =", event.type?.trim().toLowerCase());
 
-    const studentId = localStorage.getItem("student_id");
+  if (event.status === "completed") {
+    alert("Registration closed for this event");
+    return;
+  }
 
-    if (!studentId) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  const studentId = localStorage.getItem("student_id");
 
-    if (event.type === "Team") {
-      openTeamPopup(event);
-    } else {
-      handleSoloBooking(event);
-    }
-  };
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
+
+  if (event.type?.trim().toLowerCase() === "team") {
+    openTeamPopup(event);
+  } else {
+    handleSoloBooking(event);
+  }
+};
 
   if (!category) {
     return <div className="text-center mt-20">Loading...</div>;
@@ -263,27 +267,25 @@ export default function EventsByCategory() {
                 <p className="text-xs text-purple-500 mt-1">{event.type}</p>
               </div>
 
-              <div className="p-3 flex justify-end">
-                <button
-                  disabled={
-                    event.status === "completed" || loadingId === event.id
-                  }
-                  onClick={() => handleBookNow(event)}
-                  className={`px-3 py-1 rounded text-white ${
-                    event.status === "completed"
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-500"
-                  }`}
-                >
-                  {loadingId === event.id
-                    ? "Processing..."
-                    : event.status === "completed"
-                    ? "Closed"
-                    : event.type === "Team"
-                    ? "Book Team"
-                    : "Book Now"}
-                </button>
-              </div>
+             <div className="p-3 flex justify-end">
+  <button
+    disabled={event.status === "completed" || loadingId === event.id}
+    onClick={() => handleBookNow(event)}
+    className={`px-3 py-1 rounded text-white ${
+      event.status === "completed"
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-green-500"
+    }`}
+  >
+    {loadingId === event.id
+      ? "Processing..."
+      : event.status === "completed"
+      ? "Closed"
+      : event.type?.trim().toLowerCase() === "team"
+      ? "Book Team"
+      : "Book Now"}
+  </button>
+</div>
             </div>
           ))}
         </div>
