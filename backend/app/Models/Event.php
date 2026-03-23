@@ -4,53 +4,66 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
 
 class Event extends Model
 {
     protected $fillable = [
-     'category_id',
-    'name',
-    'type',
-    'age_group',
-    'image',
-    'entry_fee',
-    'event_date',
-    'start_time',
-    'end_time'
+        'category_id',
+        'name',
+        'type',
+        'age_group',
+        'image',
+        'entry_fee',
+        'event_date',
+        'start_time',
+        'end_time'
     ];
 
-    protected $appends = ['image_url', 'status']; // ✅ updated
+    protected $appends = ['image_url', 'status'];
 
+    // 🖼️ Image URL
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
             return null;
         }
+
         return URL::to('/') . '/upload/events/' . $this->image;
     }
 
-    // ✅ NEW FUNCTION
+    // 🔥 STATUS LOGIC (FULL FIXED)
     public function getStatusAttribute()
     {
-        if (!$this->time || !$this->event_date) return "upcoming";
+        // ❌ if missing values
+        if (!$this->event_date || !$this->start_time || !$this->end_time) {
+            return "upcoming";
+        }
 
-        $eventDateTime = \Carbon\Carbon::parse($this->event_date . ' ' . $this->time);
-        $now = \Carbon\Carbon::now();
+        try {
+            $start = Carbon::parse($this->event_date . ' ' . $this->start_time);
+            $end   = Carbon::parse($this->event_date . ' ' . $this->end_time);
+            $now   = Carbon::now();
 
-        if ($now->lt($eventDateTime)) {
-            return 'upcoming';
-        } elseif ($now->between($eventDateTime, $eventDateTime->copy()->addHour())) {
-            return 'ongoing';
-        } else {
-            return 'completed';
+            if ($now->lt($start)) {
+                return 'upcoming';
+            } elseif ($now->between($start, $end)) {
+                return 'ongoing';
+            } else {
+                return 'completed';
+            }
+        } catch (\Exception $e) {
+            return "upcoming"; // fallback
         }
     }
 
+    // 📂 Category relation
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    // 👥 Students relation
     public function students()
     {
         return $this->belongsToMany(Student::class)
@@ -58,6 +71,3 @@ class Event extends Model
                     ->withTimestamps();
     }
 }
-
-
-
