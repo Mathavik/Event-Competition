@@ -1,38 +1,47 @@
 import React, { useState } from "react";
 import axiosInstance from "../axiosInstance";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
    const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
+  e.preventDefault();
 
-    try {
-        const res = await axiosInstance.post("/login", { email, password });
-        const { token, student } = res.data;
+  try {
+    const res = await axiosInstance.post("/login", { email, password });
+    const { token, student } = res.data;
 
-        // Save token
-        localStorage.setItem("token", token);
-        localStorage.setItem("student_name", student.name);
-        localStorage.setItem("student_id", student.id);
+    // Save token
+    localStorage.setItem("token", token);
+    localStorage.setItem("student_name", student.name);
+    localStorage.setItem("student_id", student.id);
 
-        setMessage("Login successful 🎉");
+    // ✅ SUCCESS POPUP
+    Swal.fire({
+      icon: "success",
+      title: "Login Successful 🎉",
+      text: `Welcome ${student.name}`,
+      timer: 1500,
+      showConfirmButton: false,
+    });
 
-        // ✅ Redirect to categories page
-        setTimeout(() => {
-            navigate("/categories");
-        }, 1000);
+    setTimeout(() => {
+      navigate("/categories");
+    }, 1500);
 
-    } catch (err: any) {
-        setMessage(err.response?.data?.error || "Something went wrong!");
-    }
+  } catch (err: any) {
+    // ❌ ERROR POPUP
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: err.response?.data?.error || "Invalid credentials",
+    });
+  }
 };
-
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <form
@@ -40,8 +49,6 @@ const Login: React.FC = () => {
                 className="bg-white p-8 rounded shadow-md w-full max-w-md"
             >
                 <h2 className="text-2xl font-bold mb-6 text-center">Student Login</h2>
-
-                {message && <p className="mb-4 text-center text-red-500">{message}</p>}
 
                 <input
                     type="email"
