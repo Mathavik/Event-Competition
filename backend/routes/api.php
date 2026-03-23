@@ -12,6 +12,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PaymentController;
 
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\ContactController;
 
 
 // Get all events for a student
@@ -56,3 +57,6 @@ Route::get('/registrations', [StudentController::class, 'getRegistrations']);
 Route::post('/team/register', [TeamController::class, 'registerTeam']);
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::post('/gallery', [GalleryController::class, 'store']);
+
+Route::post('/contact', [ContactController::class, 'store']);
+Route::get('/contacts', [ContactController::class, 'index']); // admin
