@@ -205,4 +205,22 @@ public function registerEvent(Request $request)
         ], 500);
     }
 }
+
+public function checkRegistration(Request $request)
+{
+    $studentId = $request->student_id;
+    $eventId = $request->event_id;
+
+    $registration = DB::table('event_student')
+        ->where('student_id', $studentId)
+        ->where('event_id', $eventId)
+        ->first();
+
+    return response()->json([
+        'student_id' => $studentId,
+        'event_id' => $eventId,
+        'registered' => !!$registration,
+        'registration' => $registration
+    ]);
+}
 }
