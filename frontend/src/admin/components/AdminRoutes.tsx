@@ -7,6 +7,7 @@ import Events from "../pages/adminEvents";
 import Registrations from "../pages/Registrations";
 import AdminLogin from "./AdminLogin";
 import AdminGallery from "../pages/AdminGallery";
+import Winners from "../pages/Winners";
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -25,6 +26,8 @@ const AdminRoutes: React.FC = () => {
       {/* Registrations */}
       <Route path="registrations" element={<Registrations />} />
       <Route path="adminlogin" element={<AdminLogin />} />
+      <Route path="winners" element={<Winners />} />
+
 
     </Routes>
   );

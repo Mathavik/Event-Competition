@@ -60,3 +60,7 @@ Route::post('/gallery', [GalleryController::class, 'store']);
 
 Route::post('/contact', [ContactController::class, 'store']);
 Route::get('/contacts', [ContactController::class, 'index']); // admin
+
+Route::get('/event/{id}/students', [EventController::class, 'getEventStudents']);
+Route::post('/event/assign-winners', [EventController::class, 'assignWinners']);
+Route::get('/event/{id}/certificate', [EventController::class, 'sendCertificates']);

@@ -12,6 +12,7 @@ import PaymentPage from "./pages/Home/PaymentPage";
 import Schedule from "./pages/Schedule/Schedule";
 import Gallery from "./pages/Gallery/Gallery";
 import Contact from "./pages/Contact/Contact";
+// import Winners from "./pages/Winners/Winners";
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/gallery" element={<Gallery/>}/>
             <Route path="/contact" element={<Contact/>}/>
+            {/* <Route path="/winners" element={<Winners/>}/> */}
+
           </Routes>
         </main>
         <Footer />
