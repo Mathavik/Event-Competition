@@ -11,6 +11,7 @@ import Home from "./pages/Home/home";
 import PaymentPage from "./pages/Home/PaymentPage";
 import Schedule from "./pages/Schedule/Schedule";
 import Gallery from "./pages/Gallery/Gallery";
+import Contact from "./pages/Contact/Contact";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/gallery" element={<Gallery/>}/>
+            <Route path="/contact" element={<Contact/>}/>
           </Routes>
         </main>
         <Footer />
