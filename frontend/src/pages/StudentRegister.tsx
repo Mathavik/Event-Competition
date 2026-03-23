@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
 interface FormData {
   name: string;
   email: string;
@@ -16,7 +16,7 @@ interface FormData {
 }
 
 const StudentRegister: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -35,28 +35,43 @@ const StudentRegister: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setMessage("");
+    e.preventDefault();
 
-  try {
-    const res = await axios.post("http://127.0.0.1:8000/api/students", form, {
-      headers: { "Content-Type": "application/json" ,"Accept": "application/json"},
-      
-    });
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/students",
+        form,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
 
-    setMessage("Registered Successfully 🎉");
+      // ✅ SUCCESS POPUP
+      Swal.fire({
+        icon: "success",
+        title: "Registered Successfully 🎉",
+        text: "Redirecting to login...",
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
-    // 👉 Redirect to login page
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000); // small delay (optional)
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
 
-  } catch (err: any) {
-    setMessage(err.response?.data?.error || "Something went wrong!");
-  }
-};
+    } catch (err: any) {
+      // ❌ ERROR POPUP
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: err.response?.data?.error || "Something went wrong!",
+      });
+    }
+  };
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form
@@ -115,7 +130,7 @@ const StudentRegister: React.FC = () => {
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-
+        <label className="mb-3 block text-gray-700">Date of Birth :</label>
         <input
           type="date"
           name="dob"
