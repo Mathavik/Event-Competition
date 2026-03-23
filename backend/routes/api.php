@@ -33,7 +33,7 @@ Route::put('/events/{id}', [EventController::class, 'update']);
 Route::delete('/events/{id}', [EventController::class, 'destroy']);
 Route::post('/events/bulk', [EventController::class, 'bulkStore']);
 Route::put('/events/bulk-update', [EventController::class, 'bulkUpdate']);
-
+Route::get('/check-registration', [EventRegistrationsController::class, 'checkRegistration']);
 Route::post('/categories/bulk', [CategoryController::class, 'bulkStore']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);

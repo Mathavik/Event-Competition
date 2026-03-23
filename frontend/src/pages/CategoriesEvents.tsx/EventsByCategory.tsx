@@ -43,10 +43,6 @@ export default function EventsByCategory() {
   const [teamName, setTeamName] = useState("");
   const [members, setMembers] = useState<string[]>([""]);
 
-  // PAYMENT POPUP
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentEvent, setPaymentEvent] = useState<Event | null>(null);
-
   useEffect(() => {
     api
       .get(`/categories/${id}`)
@@ -73,6 +69,7 @@ export default function EventsByCategory() {
 
     if (!studentId) {
       alert("Please login first!");
+      navigate("/login");
       return;
     }
 
@@ -95,17 +92,33 @@ export default function EventsByCategory() {
         },
       });
     } catch (error: any) {
-      alert(error?.response?.data?.message || "Error");
+      alert(error?.response?.data?.message || "Please register");
     } finally {
       setLoadingId(null);
     }
   };
 
+const openTeamPopup = (event: Event) => {
+  const studentId = localStorage.getItem("student_id");
+
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
+
+  setSelectedEvent(event);
+  setTeamName("");
+  setMembers([""]);
+  console.log("popup opened");
+  setShowPopup(true);
+};
   const handleTeamSubmit = async () => {
     const studentId = localStorage.getItem("student_id");
 
     if (!studentId) {
       alert("Please login first!");
+      navigate("/login");
       return;
     }
 
@@ -138,8 +151,6 @@ export default function EventsByCategory() {
         amount: selectedEvent.entry_fee || 0,
       });
 
-      alert("✅ Team Registered!");
-
       setShowPopup(false);
       setTeamName("");
       setMembers([""]);
@@ -148,16 +159,42 @@ export default function EventsByCategory() {
         state: {
           isTeam: true,
           registrations: res.data.data || [],
+          team_name: teamName,
           event_name: res.data.event_name || selectedEvent.name,
           amount: res.data.amount ?? selectedEvent.entry_fee ?? 0,
         },
       });
     } catch (error: any) {
-      alert(error?.response?.data?.message || "Error");
+      alert(error?.response?.data?.message || "Please register");
     } finally {
       setLoadingId(null);
     }
   };
+
+const handleBookNow = (event: Event) => {
+  console.log("clicked event =", event);
+  console.log("event.type =", event.type);
+  console.log("normalized type =", event.type?.trim().toLowerCase());
+
+  if (event.status === "completed") {
+    alert("Registration closed for this event");
+    return;
+  }
+
+  const studentId = localStorage.getItem("student_id");
+
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
+
+  if (event.type && event.type.trim().toLowerCase().includes("team")) {
+    openTeamPopup(event);
+  } else {
+    handleSoloBooking(event);
+  }
+};
 
   if (!category) {
     return <div className="text-center mt-20">Loading...</div>;
@@ -188,17 +225,17 @@ export default function EventsByCategory() {
               <div className="p-4 text-center">
                 <h3 className="font-bold text-lg">{event.name}</h3>
 
-                <span
+                {/* <span
                   className={`text-white text-xs px-2 py-1 rounded ${
                     event.status === "completed"
-                      ? "bg-green-500"
+                      ? "bg-gray-500"
                       : event.status === "ongoing"
                       ? "bg-yellow-400"
                       : "bg-red-500"
                   }`}
                 >
                   {event.status.toUpperCase()}
-                </span>
+                </span> */}
 
                 <p className="text-sm text-gray-500 mt-2">{event.age_group}</p>
 
@@ -221,7 +258,7 @@ export default function EventsByCategory() {
                   )}
                 </p>
 
-                <p className="text-xs text-gray-400">📅 {event.event_date}</p>
+                {/* <p className="text-xs text-gray-400">📅 {event.event_date}</p> */}
 
                 <p className="text-green-600 font-bold mt-1">
                   ₹ {event.entry_fee || 0}
@@ -230,77 +267,29 @@ export default function EventsByCategory() {
                 <p className="text-xs text-purple-500 mt-1">{event.type}</p>
               </div>
 
-              <div className="p-3 flex justify-end">
-                <button
-                  disabled={
-                    event.status === "completed" || loadingId === event.id
-                  }
-                  onClick={() => {
-                    if ((event.entry_fee || 0) > 0) {
-                      setPaymentEvent(event);
-                      setShowPayment(true);
-                    } else {
-                      if (event.type === "Team") {
-                        setSelectedEvent(event);
-                        setShowPopup(true);
-                      } else {
-                        handleSoloBooking(event);
-                      }
-                    }
-                  }}
-                  className={`px-3 py-1 rounded text-white ${
-                    event.status === "completed"
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-500"
-                  }`}
-                >
-                  {loadingId === event.id
-                    ? "Processing..."
-                    : event.status === "completed"
-                    ? "Closed"
-                    : event.type === "Team"
-                    ? "Book Team"
-                    : "Book"}
-                </button>
-              </div>
+             <div className="p-3 flex justify-end">
+  <button
+    disabled={event.status === "completed" || loadingId === event.id}
+    onClick={() => handleBookNow(event)}
+    className={`px-3 py-1 rounded text-white ${
+      event.status === "completed"
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-green-500"
+    }`}
+  >
+    {loadingId === event.id
+      ? "Processing..."
+      : event.status === "completed"
+      ? "Closed"
+     : event.type && event.type.trim().toLowerCase().includes("team")
+? "Book Team"
+: "Book Now"}
+  </button>
+</div>
             </div>
           ))}
         </div>
       </div>
-
-      {showPayment && paymentEvent && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-white p-5 rounded-xl w-96">
-            <h2 className="text-xl font-bold mb-3">Payment</h2>
-
-            <p>Event: {paymentEvent.name}</p>
-            <p className="mb-3">Amount: ₹ {paymentEvent.entry_fee || 0}</p>
-
-            <input
-              placeholder="Card Number"
-              className="border p-2 w-full mb-2"
-            />
-            <input placeholder="Expiry" className="border p-2 w-full mb-2" />
-            <input placeholder="CVV" className="border p-2 w-full mb-3" />
-
-            <button
-              onClick={() => {
-                setShowPayment(false);
-
-                if (paymentEvent.type === "Team") {
-                  setSelectedEvent(paymentEvent);
-                  setShowPopup(true);
-                } else {
-                  handleSoloBooking(paymentEvent);
-                }
-              }}
-              className="bg-green-500 text-white w-full py-2 rounded"
-            >
-              Pay & Register
-            </button>
-          </div>
-        </div>
-      )}
 
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
@@ -346,7 +335,7 @@ export default function EventsByCategory() {
               onClick={handleTeamSubmit}
               className="bg-green-500 text-white w-full py-2 rounded font-bold"
             >
-              Submit
+              Submit & Go Payment
             </button>
           </div>
         </div>
