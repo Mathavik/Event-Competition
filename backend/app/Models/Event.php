@@ -20,7 +20,9 @@ class Event extends Model
         'end_time'
     ];
 
-    protected $appends = ['image_url', 'status'];
+    // protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'status']; // ✅ updated
+    // protected $appends = ['image_url', 'status'];
 
     // 🖼️ Image URL
     public function getImageUrlAttribute()
@@ -63,11 +65,13 @@ class Event extends Model
         return $this->belongsTo(Category::class);
     }
 
-    // 👥 Students relation
-    public function students()
-    {
-        return $this->belongsToMany(Student::class)
-                    ->withPivot('event_time')
-                    ->withTimestamps();
-    }
+public function students()
+{
+    return $this->belongsToMany(Student::class)
+                ->withPivot('event_name', 'payment_ref_id', 'event_time')
+                ->withTimestamps();
 }
+}
+
+
+
