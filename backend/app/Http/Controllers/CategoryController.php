@@ -41,10 +41,29 @@ public function store(Request $request)
 
     // 📌 Show single category
     public function show($id)
-    {
-        $category = Category::with('events')->findOrFail($id);
-        return response()->json($category);
-    }
+{
+    $category = Category::with('events')->findOrFail($id);
+
+    $category->events->map(function ($event) {
+
+        $now = \Carbon\Carbon::now('Asia/Kolkata');
+
+        $start = \Carbon\Carbon::parse($event->event_date . ' ' . $event->start_time);
+        $end   = \Carbon\Carbon::parse($event->event_date . ' ' . $event->end_time);
+
+        if ($now->lt($start)) {
+            $event->status = 'upcoming';
+        } elseif ($now->greaterThanOrEqualTo($start) && $now->lessThanOrEqualTo($end)) {
+            $event->status = 'ongoing';
+        } else {
+            $event->status = 'completed';
+        }
+
+        return $event;
+    });
+
+    return response()->json($category);
+}
 
     // 📌 Update category
 public function update(Request $request, $id)
