@@ -131,8 +131,29 @@ class EventController extends Controller
     }
 
     // 📥 PDF → School + Students
-    public function downloadEventSchoolStudents($eventId)
-    {
+public function downloadEventSchoolStudents($eventId)
+{
+    $event = Event::findOrFail($eventId);
+
+// 🔥 FINAL FIX for Team Reports
+if (str_contains(strtolower($event->type), 'team')) {
+
+    $teams = DB::table('teams')
+        ->join('students', 'teams.captain_id', '=', 'students.id')
+        ->where('teams.event_id', $eventId)
+        // students.email ah inga add panniruken
+        ->select('teams.team_name', 'students.school_name', 'students.email') 
+        ->get()
+        ->groupBy('school_name');
+
+    $pdf = Pdf::loadView('pdf.event_team_report', [
+        'event' => $event,
+        'teams' => $teams
+    ]);
+
+}
+    else {
+
         $event = Event::with('students')->findOrFail($eventId);
 
         $grouped = $event->students->groupBy('school_name');
@@ -141,10 +162,10 @@ class EventController extends Controller
             'event' => $event,
             'data' => $grouped
         ]);
-
-        return $pdf->download($event->name . '_full_report.pdf');
     }
 
+    return $pdf->download($event->name . '_report.pdf');
+}
     // 🏫 Event → Schools Only
     public function eventSchoolsOnly($eventId)
     {
@@ -159,24 +180,26 @@ class EventController extends Controller
     }
 
     // 📥 PDF → Schools Only
-    public function downloadEventSchools($eventId)
-    {
-        $event = Event::findOrFail($eventId);
+   // 📥 PDF → Schools Only function-la intha change pannunga
+public function downloadEventSchools($eventId)
+{
+    $event = Event::findOrFail($eventId);
 
-        $schools = DB::table('students')
-            ->join('event_student', 'students.id', '=', 'event_student.student_id')
-            ->where('event_student.event_id', $eventId)
-            ->select('students.school_name')
-            ->distinct()
-            ->get();
+    $schools = DB::table('students')
+        ->join('event_student', 'students.id', '=', 'event_student.student_id')
+        ->where('event_student.event_id', $eventId)
+        ->select('students.school_name')
+        ->distinct()
+        ->get();
 
-        $pdf = Pdf::loadView('pdf.event_schools', [
-            'event' => $event,
-            'schools' => $schools
-        ]);
+    // Inga 'pdf.event_schools' nu maathunga (pudhu file name)
+    $pdf = Pdf::loadView('pdf.event_schools', [
+        'event' => $event,
+        'data' => $schools 
+    ]);
 
-        return $pdf->download($event->name . '_schools.pdf');
-    }
+    return $pdf->download($event->name . '_schools.pdf');
+}
 
     // 🏫 School-wise Report
     public function schoolWiseReport()
