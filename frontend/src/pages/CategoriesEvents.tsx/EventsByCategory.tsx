@@ -150,7 +150,7 @@ const handleTeamSubmit = async () => {
       event_id: selectedEvent.id,
       captain_id: Number(studentId),
       team_name: teamName.trim(),
-      amount: selectedEvent.entry_fee || 0,
+event_name:  selectedEvent.name
     };
 
     console.log("team payload =", payload);
