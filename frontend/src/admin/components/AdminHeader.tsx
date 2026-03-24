@@ -1,21 +1,26 @@
 import React from "react";
 import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AdminHeader: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    // Logout logic: token clear pannuvatharku
-    console.log("Logging out...");
-    // localStorage.removeItem("token");
-    // window.location.href = "/login";
+    // 🔥 Clear all auth data
+    localStorage.removeItem("token");
+    localStorage.removeItem("admin"); // optional
+
+    // 🔁 Redirect to login page
+    navigate("/adminlogin");
   };
 
   return (
     <header className="h-16 bg-slate-950 border-b border-amber-500/20 flex items-center justify-end px-8 shadow-2xl relative z-50">
       
-      {/* Right Side: User & Logout Only */}
+      {/* Right Side */}
       <div className="flex items-center gap-6">
         
-        {/* User Identity */}
+        {/* User Info */}
         <div className="text-right hidden sm:block border-r border-slate-800 pr-6">
           <p className="text-white text-xs font-black uppercase tracking-wider leading-none mb-1">
             Admin User
