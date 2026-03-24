@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X, Trophy } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,20 +21,20 @@ const Header = () => {
 
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute -inset-1 bg-amber-500 rounded-full blur opacity-25"></div>
               <div className="relative bg-slate-900 p-2 rounded-full border border-amber-500/50">
                 <Trophy className="text-amber-500" size={24} />
               </div>
-            </div>
-            <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase italic">
-                Grand <span className="text-amber-500 font-bold not-italic">Competition</span>
-              </h1>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
-                Excellence • Culture • Sports
-              </p>
-            </div>
+            </div> */}
+            <div className="flex items-center space-x-3">
+  <img
+   src={logo} 
+    
+    alt="Event Logo"
+    className="h-18 w-auto object-contain"
+  />
+</div>
           </div>
 
           {/* Desktop Nav */}

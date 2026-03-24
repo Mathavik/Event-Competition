@@ -17,8 +17,9 @@ class EventController extends Controller
     // 📌 Get all events
     public function index()
     {
-        $events = Event::with('category')->get();
-        return response()->json($events);
+        return response()->json(
+            Event::with('category')->get()
+        );
     }
 
     // 📌 Create event
@@ -116,61 +117,99 @@ class EventController extends Controller
         return response()->json(['message' => 'Registered']);
     }
 
-    // 🏫 Get students (school-wise)
-    public function getEventStudents($eventId)
-    {
-        $event = Event::with('students')->findOrFail($eventId);
-        return response()->json(
-            $event->students->groupBy('school_name')
-        );
-    }
-
-    // 🏆 Assign Winners + Mail
-    public function assignWinners(Request $request)
-    {
-        foreach ($request->winners as $w) {
-
-            DB::table('event_student')
-                ->where('event_id', $request->event_id)
-                ->where('student_id', $w['student_id'])
-                ->update(['prize' => $w['prize']]);
-
-            $student = Student::find($w['student_id']);
-            $event   = Event::find($request->event_id);
-
-            Mail::to($student->email)->send(
-                new WinnerMail($student, $event, $w['prize'])
-            );
-        }
-
-        return response()->json([
-            'message' => 'Winners updated & email sent'
-        ]);
-    }
-
-    // 🎓 SEND CERTIFICATES (PDF)
-    public function sendCertificates($eventId)
+    // 🏫 Event → School + Students
+    public function eventSchoolStudents($eventId)
     {
         $event = Event::with('students')->findOrFail($eventId);
 
-        foreach ($event->students as $student) {
-
-            if (!$student->pivot->prize) continue;
-
-            $pdf = Pdf::loadView('certificate', [
-                'student' => $student,
-                'event'   => $event,
-                'prize'   => $student->pivot->prize
-            ]);
-
-          Mail::to($student->email)->send(
-    (new WinnerMail($student, $event, $student->pivot->prize))
-        ->attachData($pdf->output(), "certificate.pdf")
-);
-        }
+        $grouped = $event->students->groupBy('school_name');
 
         return response()->json([
-            'message' => 'Certificates sent successfully'
+            'event' => $event->name,
+            'data' => $grouped
         ]);
+    }
+
+    // 📥 PDF → School + Students
+    public function downloadEventSchoolStudents($eventId)
+    {
+        $event = Event::with('students')->findOrFail($eventId);
+
+        $grouped = $event->students->groupBy('school_name');
+
+        $pdf = Pdf::loadView('pdf.event_school_students', [
+            'event' => $event,
+            'data' => $grouped
+        ]);
+
+        return $pdf->download($event->name . '_full_report.pdf');
+    }
+
+    // 🏫 Event → Schools Only
+    public function eventSchoolsOnly($eventId)
+    {
+        $schools = DB::table('students')
+            ->join('event_student', 'students.id', '=', 'event_student.student_id')
+            ->where('event_student.event_id', $eventId)
+            ->select('students.school_name')
+            ->distinct()
+            ->get();
+
+        return response()->json($schools);
+    }
+
+    // 📥 PDF → Schools Only
+    public function downloadEventSchools($eventId)
+    {
+        $event = Event::findOrFail($eventId);
+
+        $schools = DB::table('students')
+            ->join('event_student', 'students.id', '=', 'event_student.student_id')
+            ->where('event_student.event_id', $eventId)
+            ->select('students.school_name')
+            ->distinct()
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.event_schools', [
+            'event' => $event,
+            'schools' => $schools
+        ]);
+
+        return $pdf->download($event->name . '_schools.pdf');
+    }
+
+    // 🏫 School-wise Report
+    public function schoolWiseReport()
+    {
+        $data = DB::table('students')
+            ->join('event_student', 'students.id', '=', 'event_student.student_id')
+            ->select(
+                'students.school_name',
+                DB::raw('COUNT(DISTINCT students.id) as total_students'),
+                DB::raw('COUNT(event_student.event_id) as total_events')
+            )
+            ->groupBy('students.school_name')
+            ->orderBy('students.school_name')
+            ->get();
+
+        return response()->json($data);
+    }
+
+    // 📥 School-wise PDF
+    public function downloadSchoolReport()
+    {
+        $data = DB::table('students')
+            ->join('event_student', 'students.id', '=', 'event_student.student_id')
+            ->select(
+                'students.school_name',
+                DB::raw('COUNT(DISTINCT students.id) as total_students'),
+                DB::raw('COUNT(event_student.event_id) as total_events')
+            )
+            ->groupBy('students.school_name')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.school_report', ['data' => $data]);
+
+        return $pdf->download('school_report.pdf');
     }
 }
