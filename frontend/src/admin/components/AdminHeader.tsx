@@ -1,37 +1,41 @@
 import React from "react";
+import { LogOut } from "lucide-react";
 
 const AdminHeader: React.FC = () => {
-  return (
-    // Background Slate-950, Header border and shadow match panniruken
-    <div className="h-16 bg-slate-950 border-b border-amber-500/20 flex items-center justify-between px-8 shadow-xl relative z-10">
-      
-      {/* LEFT SIDE: Management Console Title */}
-      <h1 className="text-xl font-extrabold text-white tracking-tight">
-        Management <span className="text-amber-500 font-light italic">Console</span>
-      </h1>
+  const handleLogout = () => {
+    // Logout logic: token clear pannuvatharku
+    console.log("Logging out...");
+    // localStorage.removeItem("token");
+    // window.location.href = "/login";
+  };
 
-      {/* RIGHT SIDE: Profile Section */}
-      <div className="flex items-center gap-4">
-        <div className="text-right hidden sm:block">
-          <p className="text-sm font-bold text-slate-100 leading-none">Admin User</p>
-          {/* Pink-ku pathila Amber text use panniruken */}
-          <p className="text-xs text-amber-500 font-semibold mt-1 uppercase tracking-tighter">
+  return (
+    <header className="h-16 bg-slate-950 border-b border-amber-500/20 flex items-center justify-end px-8 shadow-2xl relative z-50">
+      
+      {/* Right Side: User & Logout Only */}
+      <div className="flex items-center gap-6">
+        
+        {/* User Identity */}
+        <div className="text-right hidden sm:block border-r border-slate-800 pr-6">
+          <p className="text-white text-xs font-black uppercase tracking-wider leading-none mb-1">
+            Admin User
+          </p>
+          <p className="text-amber-500 text-[10px] font-bold uppercase tracking-widest leading-none">
             Super Admin
           </p>
         </div>
-        
-        {/* Profile Image with Amber Glow Effect */}
-        <div className="relative group cursor-pointer">
-          {/* Header-la irukura glow effect inge profile-ku match aagum */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-amber-400 rounded-full blur opacity-30 group-hover:opacity-100 transition duration-300"></div>
-          <img
-            src="https://i.pravatar.cc/40?img=32" 
-            alt="profile"
-            className="relative w-10 h-10 rounded-full border-2 border-slate-900 object-cover"
-          />
-        </div>
+
+        {/* Logout Button */}
+        <button 
+          onClick={handleLogout}
+          className="group flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-amber-500 border border-amber-500/30 hover:border-amber-600 text-amber-500 hover:text-slate-950 font-black uppercase text-[10px] tracking-[0.15em] rounded-xl transition-all duration-300 active:scale-95 shadow-lg hover:shadow-amber-500/20"
+        >
+          <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+          <span>Logout</span>
+        </button>
+
       </div>
-    </div>
+    </header>
   );
 };
 
