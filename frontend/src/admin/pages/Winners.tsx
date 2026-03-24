@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
+import { FaTrophy, FaSearch, FaSchool, FaPaperPlane } from "react-icons/fa";
+import React from "react";
 
 type Student = {
   id: number;
@@ -14,7 +16,6 @@ export default function Winners() {
   const [winners, setWinners] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Fetch students by event
   const fetchStudents = async () => {
     if (!eventId) return;
     try {
@@ -26,28 +27,26 @@ export default function Winners() {
     }
   };
 
-  // 🏆 Select winner
   const handleSelect = (studentId: number, prize: string) => {
-    const updated = winners.filter(w => w.student_id !== studentId);
-    updated.push({ student_id: studentId, prize });
-    setWinners(updated);
+    const exists = winners.find(w => w.student_id === studentId && w.prize === prize);
+    if (exists) {
+      setWinners(winners.filter(w => !(w.student_id === studentId && w.prize === prize)));
+    } else {
+      const updated = winners.filter(w => w.student_id !== studentId);
+      updated.push({ student_id: studentId, prize });
+      setWinners(updated);
+    }
   };
 
-  // 🚀 Submit winners + send certificates
   const submitWinners = async () => {
     if (!eventId || winners.length === 0) {
       alert("⚠️ Enter event ID and select at least one winner");
       return;
     }
-
     setLoading(true);
-
     try {
-      // 1️⃣ Assign winners
       await api.post("/event/assign-winners", { event_id: eventId, winners });
       alert("✅ Winners Assigned!");
-
-      // 2️⃣ Send certificates
       await api.get(`/event/${eventId}/certificate`);
       alert("📄 Certificates sent successfully!");
     } catch (error: any) {
@@ -59,77 +58,125 @@ export default function Winners() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">🏆 Assign Winners</h2>
+    <div className="min-h-screen bg-slate-50 p-4 md:p-10">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl shadow-slate-200/60 overflow-hidden border border-slate-100 relative">
+        
+        {/* Top Glow Accent */}
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600"></div>
 
-      {/* EVENT ID INPUT */}
-      <input
-        placeholder="Enter Event ID"
-        value={eventId}
-        onChange={(e) => setEventId(e.target.value)}
-        className="border p-2 mr-2"
-      />
-
-      <button
-        onClick={fetchStudents}
-        className="bg-blue-500 text-white px-4 py-2"
-      >
-        Load Students
-      </button>
-
-      {/* STUDENTS LIST */}
-      {Object.keys(students).map((school) => (
-        <div key={school} className="mt-6">
-          <h3 className="font-bold text-lg text-purple-600">{school}</h3>
-
-          {students[school].map((s: Student) => (
-            <div key={s.id} className="flex justify-between border p-2 mt-2">
-              <span>{s.name}</span>
-              <div className="space-x-2">
-  {["First", "Second", "Third"].map((p) => {
-    const selected = winners.find(
-      (w) => w.student_id === s.id && w.prize === p
-    );
-
-    return (
-      <button
-        key={p}
-        onClick={() => handleSelect(s.id, p)}
-        className={`px-3 py-1 rounded text-white 
-          ${
-            p === "First"
-              ? selected
-                ? "bg-yellow-700"
-                : "bg-yellow-500"
-              : p === "Second"
-              ? selected
-                ? "bg-gray-600"
-                : "bg-gray-400"
-              : selected
-              ? "bg-orange-700"
-              : "bg-orange-500"
-          }`}
-      >
-        {p === "First" && "🥇"}
-        {p === "Second" && "🥈"}
-        {p === "Third" && "🥉"} {p}
-      </button>
-    );
-  })}
-</div>
-            </div>
-          ))}
+        {/* HEADER SECTION */}
+        <div className="bg-slate-950 p-10 text-center border-b border-amber-500/10">
+          <div className="bg-amber-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+             {React.createElement(FaTrophy as any, { className: "text-amber-500 text-3xl" })}
+          </div>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+            Winner <span className="text-amber-500">Selection</span>
+          </h2>
+          <p className="mt-2 text-slate-400 text-sm font-medium uppercase tracking-widest">Assign prizes & issue digital certificates</p>
         </div>
-      ))}
 
-      {/* SUBMIT */}
-      <button
-        onClick={submitWinners}
-        disabled={loading}
-        className={`mt-6 px-6 py-2 text-white ${loading ? "bg-gray-400" : "bg-green-600"}`}
-      >
-        {loading ? "Processing..." : "Submit Winners"}
-      </button>
+        <div className="p-6 md:p-10">
+          {/* SEARCH BOX */}
+          <div className="flex flex-col md:flex-row gap-4 mb-10">
+            <div className="relative flex-1">
+               <span className="absolute inset-y-0 left-4 flex items-center text-slate-400">
+                  {React.createElement(FaSearch as any, { size: 16 })}
+               </span>
+               <input
+                 placeholder="ENTER EVENT ID (e.g. 101)"
+                 value={eventId}
+                 onChange={(e) => setEventId(e.target.value)}
+                 className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:border-amber-500 transition-all font-bold text-slate-700 uppercase tracking-widest text-sm"
+               />
+            </div>
+            <button
+              onClick={fetchStudents}
+              className="bg-slate-950 hover:bg-slate-900 text-amber-500 border border-amber-500/30 font-black px-10 py-4 rounded-2xl transition-all active:scale-95 shadow-xl shadow-amber-500/5 uppercase text-xs tracking-[0.2em]"
+            >
+              Load Data
+            </button>
+          </div>
+
+          {/* STUDENTS LIST */}
+          <div className="space-y-10">
+            {Object.keys(students).length === 0 && (
+               <div className="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Waiting for Event ID...</p>
+               </div>
+            )}
+
+            {Object.keys(students).map((school) => (
+              <div key={school} className="animate-fadeIn">
+                <h3 className="font-black text-sm text-slate-400 uppercase tracking-[0.3em] flex items-center mb-6">
+                  {React.createElement(FaSchool as any, { className: "mr-3 text-amber-500" })}
+                  {school}
+                </h3>
+
+                <div className="grid gap-4">
+                  {students[school].map((s: Student) => (
+                    <div key={s.id} className="group flex flex-col md:flex-row justify-between items-center bg-white border border-slate-100 p-5 rounded-2xl hover:border-amber-200 hover:shadow-lg transition-all">
+                      <div className="mb-4 md:mb-0 text-center md:text-left">
+                        <span className="block font-black text-slate-800 text-sm uppercase tracking-tight">{s.name}</span>
+                        <span className="text-[11px] font-medium text-slate-400">{s.email}</span>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        {[
+                          { p: "First", icon: "🥇", color: "bg-amber-500", ring: "ring-amber-100" },
+                          { p: "Second", icon: "🥈", color: "bg-slate-400", ring: "ring-slate-100" },
+                          { p: "Third", icon: "🥉", color: "bg-orange-600", ring: "ring-orange-100" }
+                        ].map((prizeObj) => {
+                          const isSelected = winners.find(w => w.student_id === s.id && w.prize === prizeObj.p);
+                          
+                          return (
+                            <button
+                              key={prizeObj.p}
+                              onClick={() => handleSelect(s.id, prizeObj.p)}
+                              className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border
+                                ${isSelected 
+                                  ? `${prizeObj.color} text-white border-transparent ring-4 ${prizeObj.ring} scale-105 shadow-lg shadow-black/10` 
+                                  : "bg-slate-50 text-slate-400 border-slate-100 hover:border-amber-200 hover:text-amber-600"}`}
+                            >
+                              <span className="text-sm">{prizeObj.icon}</span> {prizeObj.p}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SUBMIT SECTION */}
+          {Object.keys(students).length > 0 && (
+            <div className="mt-16 text-center border-t border-slate-100 pt-10">
+              <button
+                onClick={submitWinners}
+                disabled={loading}
+                className={`group px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all shadow-2xl
+                  ${loading 
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                    : "bg-slate-950 text-amber-500 border border-amber-500/30 hover:bg-slate-900 shadow-amber-500/20 active:scale-95"}`}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-3">
+                    <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                    Processing...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-3">
+                    {React.createElement(FaPaperPlane as any, { size: 14 })}
+                    Finalize & Send Certificates
+                  </span>
+                )}
+              </button>
+              <p className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest opacity-60">This action will trigger automated emails</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
