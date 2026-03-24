@@ -38,10 +38,14 @@ export default function EventsByCategory() {
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
   // TEAM POPUP
+  // const [showPopup, setShowPopup] = useState(false);
+  // const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  // const [teamName, setTeamName] = useState("");
+  // const [members, setMembers] = useState<string[]>([""]);
+
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [teamName, setTeamName] = useState("");
-  const [members, setMembers] = useState<string[]>([""]);
+const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+const [teamName, setTeamName] = useState("");
 
   useEffect(() => {
     api
@@ -64,39 +68,48 @@ export default function EventsByCategory() {
     return matchedKey ? videoMap[matchedKey] : sportsVideo;
   };
 
-  const handleSoloBooking = async (event: Event) => {
-    const studentId = localStorage.getItem("student_id");
+ const handleSoloBooking = async (event: Event) => {
+  const studentId = localStorage.getItem("student_id");
 
-    if (!studentId) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  console.log("localStorage student_id =", studentId);
+  console.log("clicked event =", event);
 
-    try {
-      setLoadingId(event.id);
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
 
-      const res = await api.post("/register-event", {
-        student_id: studentId,
-        event_id: event.id,
-        event_time: `${event.event_date} ${event.start_time}`,
-        amount: event.entry_fee || 0,
-      });
+  try {
+    setLoadingId(event.id);
 
-      navigate("/payment", {
-        state: {
-          isTeam: false,
-          event_student_id: res.data.event_student_id,
-          event_name: res.data.event_name || event.name,
-          amount: res.data.amount ?? event.entry_fee ?? 0,
-        },
-      });
-    } catch (error: any) {
-      alert(error?.response?.data?.message || "Please register");
-    } finally {
-      setLoadingId(null);
-    }
-  };
+    const payload = {
+      student_id: studentId,
+      event_id: event.id,
+      event_time: `${event.event_date} ${event.start_time}`,
+      amount: event.entry_fee || 0,
+    };
+
+    console.log("register payload =", payload);
+
+    const res = await api.post("/register-event", payload);
+
+ navigate("/payment", {
+  state: {
+    isTeam: false,
+    event_student_id: res.data.event_student_id,
+    event_name: res.data.event_name || event.name,
+    amount: res.data.amount ?? event.entry_fee ?? 0,
+  },
+});
+  
+  } catch (error: any) {
+    console.log("register error =", error?.response?.data);
+    alert(error?.response?.data?.message || "Please register");
+  } finally {
+    setLoadingId(null);
+  }
+};
 
 const openTeamPopup = (event: Event) => {
   const studentId = localStorage.getItem("student_id");
@@ -109,67 +122,63 @@ const openTeamPopup = (event: Event) => {
 
   setSelectedEvent(event);
   setTeamName("");
-  setMembers([""]);
-  console.log("popup opened");
   setShowPopup(true);
 };
-  const handleTeamSubmit = async () => {
-    const studentId = localStorage.getItem("student_id");
+const handleTeamSubmit = async () => {
+  const studentId = localStorage.getItem("student_id");
 
-    if (!studentId) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
 
-    if (!selectedEvent) {
-      alert("No event selected");
-      return;
-    }
+  if (!selectedEvent) {
+    alert("No event selected");
+    return;
+  }
 
-    if (!teamName.trim()) {
-      alert("Enter team name");
-      return;
-    }
+  if (!teamName.trim()) {
+    alert("Enter team name");
+    return;
+  }
 
-    const filteredMembers = members.filter((m) => m.trim() !== "");
+  try {
+    setLoadingId(selectedEvent.id);
 
-    if (filteredMembers.length === 0) {
-      alert("Enter at least one member");
-      return;
-    }
+    const payload = {
+      event_id: selectedEvent.id,
+      captain_id: Number(studentId),
+      team_name: teamName.trim(),
+      amount: selectedEvent.entry_fee || 0,
+    };
 
-    try {
-      setLoadingId(selectedEvent.id);
+    console.log("team payload =", payload);
 
-      const res = await api.post("/register-event", {
-        event_id: selectedEvent.id,
-        captain_id: studentId,
-        team_name: teamName,
-        members: [studentId, ...filteredMembers],
-        event_time: `${selectedEvent.event_date} ${selectedEvent.start_time}`,
-        amount: selectedEvent.entry_fee || 0,
-      });
+    const res = await api.post("/team-name", payload);
 
-      setShowPopup(false);
-      setTeamName("");
-      setMembers([""]);
+    console.log("team response =", res.data);
 
-      navigate("/payment", {
-        state: {
-          isTeam: true,
-          registrations: res.data.data || [],
-          team_name: teamName,
-          event_name: res.data.event_name || selectedEvent.name,
-          amount: res.data.amount ?? selectedEvent.entry_fee ?? 0,
-        },
-      });
-    } catch (error: any) {
-      alert(error?.response?.data?.message || "Please register");
-    } finally {
-      setLoadingId(null);
-    }
-  };
+    setShowPopup(false);
+    setTeamName("");
+
+    navigate("/payment", {
+      state: {
+        isTeam: true,
+        team_id: res.data.team_id,
+        team_name: res.data.team_name || teamName,
+        event_student_id: res.data.event_student_id,
+        event_name: res.data.event_name || selectedEvent.name,
+        amount: res.data.amount ?? selectedEvent.entry_fee ?? 0,
+      },
+    });
+  } catch (error: any) {
+    console.log("team error =", error?.response?.data);
+    alert(error?.response?.data?.message || "Team name save failed");
+  } finally {
+    setLoadingId(null);
+  }
+};
 
 const handleBookNow = (event: Event) => {
   console.log("clicked event =", event);
@@ -291,55 +300,34 @@ const handleBookNow = (event: Event) => {
         </div>
       </div>
 
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white p-5 rounded-xl w-96 relative">
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-2 right-4 text-gray-500 hover:text-black text-2xl"
-            >
-              &times;
-            </button>
+    {showPopup && (
+  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div className="bg-white p-5 rounded-xl w-96 relative">
+      <button
+        onClick={() => setShowPopup(false)}
+        className="absolute top-2 right-4 text-gray-500 hover:text-black text-2xl"
+      >
+        &times;
+      </button>
 
-            <h2 className="text-xl font-bold mb-3 text-center">Create Team</h2>
+      <h2 className="text-xl font-bold mb-3 text-center">Create Team</h2>
 
-            <input
-              placeholder="Team Name"
-              className="border p-2 w-full mb-3"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-            />
+      <input
+        placeholder="Enter Team Name"
+        className="border p-2 w-full mb-3"
+        value={teamName}
+        onChange={(e) => setTeamName(e.target.value)}
+      />
 
-            {members.map((m, i) => (
-              <input
-                key={i}
-                placeholder={`Member ${i + 1} Student ID`}
-                className="border p-2 w-full mb-2"
-                value={m}
-                onChange={(e) => {
-                  const newMembers = [...members];
-                  newMembers[i] = e.target.value;
-                  setMembers(newMembers);
-                }}
-              />
-            ))}
-
-            <button
-              onClick={() => setMembers([...members, ""])}
-              className="text-blue-500 text-sm mb-3"
-            >
-              + Add Member
-            </button>
-
-            <button
-              onClick={handleTeamSubmit}
-              className="bg-green-500 text-white w-full py-2 rounded font-bold"
-            >
-              Submit & Go Payment
-            </button>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={handleTeamSubmit}
+        className="bg-green-500 text-white w-full py-2 rounded font-bold"
+      >
+        Submit & Go Payment
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }

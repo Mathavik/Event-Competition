@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="ta">
 <head>
     <meta charset="UTF-8">
-    <title>Certificate</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Sport</title>
+    <!-- கூகுள் எழுத்துருக்கள் -->
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
         @page {
             size: A4;
@@ -43,8 +45,8 @@
             border: 4px solid #c9a646;
         }
 
-        /* ✅ INNER BORDER */
-        .inner-border {
+        /* மூலைகளில் உள்ள டிசைன்கள் (Shapes) */
+        .shape-top-left {
             position: absolute;
             top: 15mm;
             left: 15mm;
@@ -176,7 +178,6 @@
         }
     </style>
 </head>
-
 <body>
 
 <div class="certificate">
@@ -184,17 +185,29 @@
     <div class="outer-border"></div>
     <div class="inner-border"></div>
 
-    <div class="watermark">CERTIFIED</div>
+        <div class="content">
+            <div class="title-group">
+                <h1 class="main-title">Certificate</h1>
+                <p class="sub-title">of Sport</p>
+            </div>
 
-    <div class="org-name">Your Organization Name</div>
-    <div class="org-sub">Excellence in Education & Events</div>
+            <p class="presented-text">This Certificate is Proudly Presented To</p>
 
-    <div class="title">CERTIFICATE</div>
-    <div class="subtitle">OF ACHIEVEMENT</div>
+            <div class="recipient-name">Sara Bellum</div>
 
-    <p>This is to certify that</p>
+            <p class="description">
+                This sports certificate is a testament to your skill, hard work, and passion for sports. 
+                May it be a source of pride and motivation for you as you continue to excel.
+            </p>
 
-    <div class="name">{{ $student->name }}</div>
+            <!-- கோல்டன் சீல் -->
+            <div class="seal-wrapper">
+                <div class="gold-seal">
+                    <div class="seal-content">
+                        OFFICIAL<br>AWARD<br>2026
+                    </div>
+                </div>
+            </div>
 
     <p>has successfully achieved in</p>
 
