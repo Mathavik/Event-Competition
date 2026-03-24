@@ -7,208 +7,183 @@
     <!-- கூகுள் எழுத்துருக்கள் -->
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        /* A4 அளவு மற்றும் பொதுவான அமைப்புகள் */
         @page {
             size: A4;
             margin: 0;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact;
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background: #f0f0f0;
         }
 
-        /* முதன்மை கண்டெய்னர் */
-        .certificate-container {
+        /* ✅ A4 Perfect Size */
+        .certificate {
             width: 210mm;
             height: 297mm;
-            background: #fff;
+            background: #ffffff;
             position: relative;
+            box-sizing: border-box;
+            padding: 40px;
+            text-align: center;
             overflow: hidden;
-            border: 12px solid #1a3a6c; /* தடிமனான நீல பார்டர் */
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            page-break-after: avoid;
         }
 
-        /* நான்கு பக்க மெல்லிய உள் பார்டர் */
-        .inner-frame {
+        /* ✅ OUTER BORDER */
+        .outer-border {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-            border: 1px solid #1a3a6c;
-            pointer-events: none;
+            top: 10mm;
+            left: 10mm;
+            right: 10mm;
+            bottom: 10mm;
+            border: 4px solid #c9a646;
         }
 
         /* மூலைகளில் உள்ள டிசைன்கள் (Shapes) */
         .shape-top-left {
             position: absolute;
-            top: -40px;
-            left: -40px;
-            width: 180px;
-            height: 180px;
-            background: #1a3a6c;
-            border-radius: 50%;
-            z-index: 1;
+            top: 15mm;
+            left: 15mm;
+            right: 15mm;
+            bottom: 15mm;
+            border: 1px solid #1a237e;
         }
 
-        .shape-bottom-right {
+        .watermark {
             position: absolute;
-            bottom: -50px;
-            right: -50px;
-            width: 200px;
-            height: 200px;
-            background: #1a3a6c;
-            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 90px;
+            color: rgba(200, 160, 70, 0.08);
+            font-weight: bold;
+            z-index: 0;
+        }
+
+        .org-name {
+            font-size: 30px;
+            font-weight: bold;
+            color: #1a237e;
+            margin-top: 20px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .org-sub {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 25px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #1a237e;
+            letter-spacing: 2px;
+            margin: 20px 0 5px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 35px;
+            z-index: 1;
+            position: relative;
+        }
+
+        p {
+            font-size: 16px;
+            color: #333;
+            margin: 10px 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .name {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1a237e;
+            border-bottom: 2px solid #c9a646;
+            display: inline-block;
+            padding: 8px 60px;
+            margin: 25px 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .event {
+            font-size: 22px;
+            margin: 15px 0;
+            color: #333;
+            z-index: 1;
+            position: relative;
+        }
+
+        .prize {
+            font-size: 26px;
+            color: #c9a646;
+            font-weight: bold;
+            margin-top: 40px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 50px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
             z-index: 1;
         }
 
-        /* உள்ளடக்கங்கள் */
-        .content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 100px 50px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .sign-line {
+            width: 150px;
+            border-top: 1px solid #000;
+            margin-bottom: 5px;
         }
 
-        /* தலைப்பு பகுதி */
-        .title-group {
-            margin-top: 40px;
-        }
-
-        .main-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 58px;
-            font-weight: 800;
-            color: #1a3a6c;
-            letter-spacing: 5px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .sub-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            letter-spacing: 8px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        /* சான்றிதழ் விவரங்கள் */
-        .presented-text {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            color: #666;
-            margin-top: 80px;
-            font-weight: 400;
-        }
-
-        .recipient-name {
-            font-family: 'Playball', cursive;
-            font-size: 75px;
-            color: #1a3a6c;
-            margin: 20px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #ddd;
-            min-width: 500px;
-        }
-
-        .description {
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            line-height: 1.8;
-            color: #444;
-            max-width: 600px;
-            margin: 40px auto;
-        }
-
-        /* கோல்டன் சீல் (Seal) */
-        .seal-wrapper {
-            margin: 30px 0;
-        }
-
-        .gold-seal {
-            width: 130px;
-            height: 130px;
+        .seal {
+            position: absolute;
+            bottom: 90px;
+            right: 70px;
+            width: 70px;
+            height: 70px;
+            border: 2px double #c9a646;
             border-radius: 50%;
-            background: #fff;
-            border: 4px solid #d4af37;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
-
-        .gold-seal::after {
-            content: '';
-            position: absolute;
-            width: 110px;
-            height: 110px;
-            border: 2px solid #d4af37;
-            border-radius: 50%;
-        }
-
-        .seal-content {
-            font-family: 'Montserrat', sans-serif;
-            color: #d4af37;
-            font-weight: 800;
-            text-align: center;
-            font-size: 14px;
+            font-size: 10px;
+            color: #c9a646;
+            transform: rotate(-15deg);
             z-index: 2;
         }
 
-        /* கீழே உள்ள கையொப்பப் பகுதி */
-        .footer-section {
-            position: absolute;
-            bottom: 100px;
-            width: 80%;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .sig-box {
-            width: 200px;
-            text-align: center;
-        }
-
-        .sig-line {
-            border-top: 1.5px solid #333;
-            margin-bottom: 10px;
-        }
-
-        .sig-label {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: #333;
-            text-transform: uppercase;
+        /* ❌ prevent page break */
+        * {
+            page-break-inside: avoid;
         }
     </style>
 </head>
 <body>
 
-    <div class="certificate-container">
-        <!-- பார்டர்கள் மற்றும் டிசைன்கள் -->
-        <div class="inner-frame"></div>
-        <div class="shape-top-left"></div>
-        <div class="shape-bottom-right"></div>
+<div class="certificate">
+
+    <div class="outer-border"></div>
+    <div class="inner-border"></div>
 
         <div class="content">
             <div class="title-group">
@@ -234,19 +209,27 @@
                 </div>
             </div>
 
-            <!-- கையொப்பம் மற்றும் தேதி -->
-            <div class="footer-section">
-                <div class="sig-box">
-                    <div class="sig-line"></div>
-                    <span class="sig-label">DATE</span>
-                </div>
-                <div class="sig-box">
-                    <div class="sig-line"></div>
-                    <span class="sig-label">SIGNATURE</span>
-                </div>
-            </div>
+    <p>has successfully achieved in</p>
+
+    <div class="event">{{ $event->name }}</div>
+
+    <div class="prize">{{ $prize }} PRIZE WINNER</div>
+
+    <div class="footer">
+        <div>
+            <strong>Date:</strong>
+            {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
+        </div>
+
+        <div>
+            <div class="sign-line"></div>
+            Authorized Signature
         </div>
     </div>
+
+    <div class="seal">OFFICIAL</div>
+
+</div>
 
 </body>
 </html>
