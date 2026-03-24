@@ -235,4 +235,69 @@ public function downloadEventSchools($eventId)
 
         return $pdf->download('school_report.pdf');
     }
+    public function getEventStudents($eventId)
+{
+    $event = Event::with('students')->findOrFail($eventId);
+
+    $grouped = $event->students->groupBy('school_name');
+
+    return response()->json($grouped);
+}
+// 🏆 Assign Winners
+public function assignWinners(Request $request)
+{
+    $eventId = $request->event_id;
+    $winners = $request->winners;
+
+    foreach ($winners as $winner) {
+        DB::table('event_student')
+            ->where('event_id', $eventId)
+            ->where('student_id', $winner['student_id'])
+            ->update([
+                'prize' => $winner['prize'] // First / Second / Third
+            ]);
+    }
+
+    return response()->json([
+        'message' => 'Winners assigned successfully'
+    ]);
+}
+// 📄 Send Certificates to Winners
+public function sendCertificates($eventId)
+{
+    $event = Event::findOrFail($eventId);
+
+    $students = DB::table('students')
+        ->join('event_student', 'students.id', '=', 'event_student.student_id')
+        ->where('event_student.event_id', $eventId)
+        ->whereNotNull('event_student.prize')
+        ->select(
+            'students.id',
+            'students.name',
+            'students.email',
+            'event_student.prize'
+        )
+        ->get();
+
+    foreach ($students as $student) {
+
+        // 🔥 convert to object format
+        $studentObj = (object)[
+            'name' => $student->name
+        ];
+
+        $eventObj = (object)[
+            'name' => $event->name,
+            'event_date' => $event->event_date
+        ];
+
+        Mail::to($student->email)->send(
+            new WinnerMail($studentObj, $eventObj, $student->prize)
+        );
+    }
+
+    return response()->json([
+        'message' => 'Certificates sent successfully'
+    ]);
+}
 }
