@@ -53,7 +53,9 @@ Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/registrations', [StudentController::class, 'getRegistrations']);
-
+Route::post('/team-name', [TeamController::class, 'store']);
+Route::get('/team-names', [TeamController::class, 'index']);
+Route::get('/team-names/{eventId}', [TeamController::class, 'showByEvent']);
 Route::post('/team/register', [TeamController::class, 'registerTeam']);
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::post('/gallery', [GalleryController::class, 'store']);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ta">
 <head>
 <meta charset="UTF-8">
 <title>Certificate</title>
@@ -220,7 +220,6 @@ html, body {
 
 </style>
 </head>
-
 <body>
 
 <div class="certificate">
