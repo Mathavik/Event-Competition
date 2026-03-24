@@ -64,3 +64,11 @@ Route::get('/contacts', [ContactController::class, 'index']); // admin
 Route::get('/event/{id}/students', [EventController::class, 'getEventStudents']);
 Route::post('/event/assign-winners', [EventController::class, 'assignWinners']);
 Route::get('/event/{id}/certificate', [EventController::class, 'sendCertificates']);
+Route::get('/event/{id}/schools-students', [EventController::class, 'eventSchoolStudents']);
+Route::get('/event/{id}/schools-students/download', [EventController::class, 'downloadEventSchoolStudents']);
+
+Route::get('/event/{id}/schools', [EventController::class, 'eventSchoolsOnly']);
+Route::get('/event/{id}/schools/download', [EventController::class, 'downloadEventSchools']);
+
+Route::get('/school-report', [EventController::class, 'schoolWiseReport']);
+Route::get('/school-report/download', [EventController::class, 'downloadSchoolReport']);
