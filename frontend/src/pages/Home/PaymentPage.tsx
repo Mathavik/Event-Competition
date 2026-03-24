@@ -66,7 +66,7 @@ const PaymentPage: React.FC = () => {
       setMessage(isTeam ? "Team Booking Successfully ✅" : "Booking Successfully ✅");
 
       setTimeout(() => {
-        navigate("/success");
+        navigate("/");
       }, 1200);
     } catch (err: any) {
       console.log("payment error =", err?.response?.data || err.message);
