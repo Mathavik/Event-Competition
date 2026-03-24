@@ -56,19 +56,19 @@ class WinnerMail extends Mailable
     /**
      * Attach Certificate PDF
      */
-    public function attachments(): array
-    {
-        $pdf = Pdf::loadView('certificate', [
-            'student' => $this->student,
-            'event'   => $this->event,
-            'prize'   => $this->prize,
-        ])->setPaper('A4', 'portrait');
+   public function attachments(): array
+{
+    $pdf = Pdf::loadView('pdf.certificate', [
+        'student' => $this->student,
+        'event'   => $this->event,
+        'prize'   => $this->prize,
+    ])->setPaper('A4', 'portrait');
 
-        return [
-            Attachment::fromData(
-                fn () => $pdf->output(),
-                'certificate.pdf'
-            )->withMime('application/pdf'),
-        ];
-    }
+    return [
+        Attachment::fromData(
+            fn () => $pdf->output(),
+            'certificate.pdf'
+        )->withMime('application/pdf'),
+    ];
+}
 }
