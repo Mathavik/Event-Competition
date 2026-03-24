@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+
 interface FormData {
   name: string;
   email: string;
@@ -32,8 +33,25 @@ const StudentRegister: React.FC = () => {
 
   const [message, setMessage] = useState<string>("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      // Allow only numbers and limit to 10 digits
+      const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
+
+      setForm((prev) => ({
+        ...prev,
+        [name]: onlyNums,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +131,7 @@ const StudentRegister: React.FC = () => {
         />
 
         <input
-          type="text"
+          type="tel"
           name="phone"
           placeholder="Phone"
           value={form.phone}
