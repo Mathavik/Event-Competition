@@ -62,6 +62,20 @@ const StudentRegister: React.FC = () => {
         }
       }
     }
+      if (name === "phone") {
+    // Allow only numbers and limit to 10 digits
+    const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: onlyNums,
+    }));
+  } else {
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

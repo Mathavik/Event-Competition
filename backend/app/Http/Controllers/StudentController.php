@@ -43,7 +43,7 @@ public function getSchools(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:students',
+            'email' => 'required|email',
             'password' => 'required|min:6',
             'dob' => 'required|date',
             'school_code' => 'required'
