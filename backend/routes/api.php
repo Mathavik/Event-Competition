@@ -15,7 +15,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
 
-
+Route::get('/schools', [StudentController::class, 'getSchools']);
 
 // Get all events for a student
 Route::get('/student/{id}/events', [EventRegistrationsController::class, 'showEvents']);

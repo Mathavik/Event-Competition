@@ -17,6 +17,7 @@ interface FormData {
 }
 
 const StudentRegister: React.FC = () => {
+  const [schoolSuggestions, setSchoolSuggestions] = useState<any[]>([]);
   const navigate = useNavigate();
 
   const [form, setForm] = useState<FormData>({
@@ -35,18 +36,24 @@ const StudentRegister: React.FC = () => {
   const [acceptedRules, setAcceptedRules] = useState(false);
   const [message, setMessage] = useState<string>("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
+const handleChange = async (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
 
-    if (name === "phone") {
-      const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
-      setForm((prev) => ({ ...prev, [name]: onlyNums }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+  setForm((prev) => ({ ...prev, [name]: value }));
+
+  if (name === "school_name" && value.length > 2) {
+    try {
+      const res = await axios.get(
+        `http://127.0.0.1:8000/api/schools?q=${value}`
+      );
+      setSchoolSuggestions(res.data);
+    } catch (err) {
+      console.log(err);
     }
-  };
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,6 +109,31 @@ const StudentRegister: React.FC = () => {
         {message && (
           <p className="mb-4 text-center text-red-500">{message}</p>
         )}
+        {schoolSuggestions.length > 0 && (
+  <div className="border rounded bg-white max-h-40 overflow-y-auto mb-3">
+    {schoolSuggestions.map((school, index) => (
+      <div
+        key={index}
+        className="p-2 hover:bg-gray-200 cursor-pointer"
+        onClick={() => {
+          setForm((prev) => ({
+            ...prev,
+            school_name: school.school_name,
+            school_code: school.school_code,
+            city: school.city,
+             phone: school.phone,
+              email: school.email,
+          }));
+          setSchoolSuggestions([]);
+        }}
+      >
+        <div>
+  {school.school_name} ({school.city}) - {school.phone}
+</div>
+      </div>
+    ))}
+  </div>
+)}
         <input
           type="text"
           name="school_name"

@@ -23,6 +23,18 @@ public function getRegistrations()
 
     return response()->json($registrations);
 }
+public function getSchools(Request $request)
+{
+    $query = $request->input('q');
+
+    $schools = Student::where('school_name', 'LIKE', "%$query%")
+        ->select('school_name', 'school_code', 'city', 'phone', 'email')
+        ->distinct()
+        ->limit(10)
+        ->get();
+
+    return response()->json($schools);
+}
     public function store(Request $request)
     {
         $request->validate([
