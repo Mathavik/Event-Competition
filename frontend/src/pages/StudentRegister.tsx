@@ -134,23 +134,48 @@ const StudentRegister: React.FC = () => {
             ))}
           </div>
         )}
-        <input
-          type="text"
-          name="school_name"
-          placeholder="School Name"
-          value={form.school_name}
-          onChange={handleChange}
-          className="mb-3 w-full p-2 border rounded"
-        />
+        <div className="relative w-full mb-3">
+          <input
+            type="text"
+            name="school_name"
+            placeholder="School Name"
+            value={form.school_name}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+
+          {schoolSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 border rounded bg-white max-h-40 overflow-y-auto z-10 shadow-lg">
+              {schoolSuggestions.map((school, idx) => (
+                <div
+                  key={idx}
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => {
+                    setForm((prev) => ({
+                      ...prev,
+                      school_name: school.school_name,
+                      school_code: school.school_code,
+                      email: school.email,
+                      phone: school.phone,
+                      city: school.city,
+                    }));
+                    setSchoolSuggestions([]);
+                  }}
+                >
+                  {school.school_name} ({school.city}) - {school.phone}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <input
           type="text"
           name="school_code"
           placeholder="School Code"
           value={form.school_code}
-          onChange={handleChange}
-          className="mb-3 w-full p-2 border rounded"
-          required
+          readOnly
+          className="mb-3 w-full p-2 border rounded bg-gray-100"
         />
 
 
