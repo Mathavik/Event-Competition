@@ -12,6 +12,7 @@ import PaymentPage from "./pages/Home/PaymentPage";
 import Schedule from "./pages/Schedule/Schedule";
 import Gallery from "./pages/Gallery/Gallery";
 import Contact from "./pages/Contact/Contact";
+import AdsDisplay from "./pages/AdsDisplay/AdsDisplay";
 
 const AppContent = () => {
   const location = useLocation();
@@ -32,6 +33,8 @@ const AppContent = () => {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/gallery" element={<Gallery/>}/>
           <Route path="/contact" element={<Contact/>}/>
+          <Route path="/ads" element={<AdsDisplay/>}/>
+
         </Routes>
       </main>
       {!isAdmin && <Footer />}

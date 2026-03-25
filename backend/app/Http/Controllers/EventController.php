@@ -39,6 +39,7 @@ class EventController extends Controller
             'event_date'  => $request->event_date,
             'start_time'  => $request->start_time,
             'end_time'    => $request->end_time,
+            'booking_last_date' => $request->last_date,
         ]);
 
         return response()->json($event);
@@ -90,32 +91,43 @@ class EventController extends Controller
 
     // 🔥 Register Event
     public function registerEvent(Request $request)
-    {
-        $student = Student::findOrFail($request->student_id);
-        $event   = Event::findOrFail($request->event_id);
+{
+    $student = Student::findOrFail($request->student_id);
+    $event   = Event::findOrFail($request->event_id);
 
-        if ($student->events()->count() >= 5) {
-            return response()->json(['error' => 'Max 5 events only allowed'], 400);
-        }
+    // 🔥 Booking last date check
+$today = Carbon::today();
 
-        foreach ($student->events as $e) {
-            $start1 = Carbon::parse($e->event_date . ' ' . $e->start_time);
-            $end1   = Carbon::parse($e->event_date . ' ' . $e->end_time);
+if ($event->last_date && $today->gt(Carbon::parse($event->last_date))) {
+    return response()->json([
+        'message' => 'Booking closed! Last date over.'
+    ], 400);
+}
 
-            $start2 = Carbon::parse($event->event_date . ' ' . $event->start_time);
-            $end2   = Carbon::parse($event->event_date . ' ' . $event->end_time);
-
-            if ($start1->lt($end2) && $start2->lt($end1)) {
-                return response()->json(['error' => 'Time clash!'], 400);
-            }
-        }
-
-        $student->events()->attach($event->id, [
-            'event_time' => now()
-        ]);
-
-        return response()->json(['message' => 'Registered']);
+    // 🔥 Max 5 events
+    if ($student->events()->count() >= 5) {
+        return response()->json(['error' => 'Max 5 events only allowed'], 400);
     }
+
+    // 🔥 Time clash check
+    foreach ($student->events as $e) {
+        $start1 = Carbon::parse($e->event_date . ' ' . $e->start_time);
+        $end1   = Carbon::parse($e->event_date . ' ' . $e->end_time);
+
+        $start2 = Carbon::parse($event->event_date . ' ' . $event->start_time);
+        $end2   = Carbon::parse($event->event_date . ' ' . $event->end_time);
+
+        if ($start1->lt($end2) && $start2->lt($end1)) {
+            return response()->json(['error' => 'Time clash!'], 400);
+        }
+    }
+
+    $student->events()->attach($event->id, [
+        'event_time' => now()
+    ]);
+
+    return response()->json(['message' => 'Registered']);
+}
 
     // 🏫 Event → School + Students
     public function eventSchoolStudents($eventId)
@@ -299,5 +311,40 @@ public function sendCertificates($eventId)
     return response()->json([
         'message' => 'Certificates sent successfully'
     ]);
+}
+public function overallWinners()
+{
+    $data = DB::table('event_student as es')
+        ->join('students as s', 'es.student_id', '=', 's.id')
+        ->whereNotNull('es.prize')
+
+        ->select(
+            's.school_name',
+
+            DB::raw("
+                SUM(
+                    CASE 
+                        WHEN es.prize = 'First' THEN 5
+                        WHEN es.prize = 'Second' THEN 3
+                        WHEN es.prize = 'Third' THEN 1
+                        ELSE 0
+                    END
+                ) as total_points
+            "),
+
+            DB::raw("SUM(CASE WHEN es.prize = 'First' THEN 1 ELSE 0 END) as first_count"),
+            DB::raw("SUM(CASE WHEN es.prize = 'Second' THEN 1 ELSE 0 END) as second_count"),
+            DB::raw("SUM(CASE WHEN es.prize = 'Third' THEN 1 ELSE 0 END) as third_count")
+        )
+
+        ->groupBy('s.school_name')
+
+        ->orderByDesc('total_points')
+        ->orderByDesc('first_count')
+        ->orderByDesc('second_count')
+
+        ->get();
+
+    return response()->json($data);
 }
 }

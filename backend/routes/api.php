@@ -13,6 +13,8 @@ use App\Http\Controllers\PaymentController;
 
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AdvertisementController;
+
 
 
 // Get all events for a student
@@ -74,3 +76,11 @@ Route::get('/event/{id}/schools/download', [EventController::class, 'downloadEve
 
 Route::get('/school-report', [EventController::class, 'schoolWiseReport']);
 Route::get('/school-report/download', [EventController::class, 'downloadSchoolReport']);
+
+Route::post('/ads', [AdvertisementController::class, 'store']); // create
+Route::get('/ads/active', [AdvertisementController::class, 'activeAds']); // fetch
+Route::post('/ads/{id}', [AdvertisementController::class, 'update']); // update
+Route::delete('/ads/{id}', [AdvertisementController::class, 'destroy']); // delete
+Route::get('/overall-winners', [EventController::class, 'overallWinners']);
+Route::match(['post', 'put'], '/ads/{id}', [AdvertisementController::class, 'update']);
+// Route::post('/ads/{id}', [AdvertisementController::class, 'update']);

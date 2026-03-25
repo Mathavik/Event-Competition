@@ -51,6 +51,18 @@
   >
     School Reports
   </NavLink>
+  <NavLink 
+  to="/admin/ads" 
+  className={({ isActive }) => `${linkClass} ${isActive ? activeClass : hoverClass}`}
+>
+  📢 Advertisements
+</NavLink>
+<NavLink 
+  to="/admin/overall-winners" 
+  className={({ isActive }) => `${linkClass} ${isActive ? activeClass : hoverClass}`}
+>
+🏆 Overall Winners
+</NavLink>
         </nav>
         
         {/* Optional: Bottom decoration to match Header's glow */}
