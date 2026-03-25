@@ -20,6 +20,7 @@ type Event = {
   event_date: string;
   entry_fee: number;
   status: string;
+  booking_last_date: string;
 };
 
 type Category = {
@@ -46,6 +47,17 @@ export default function EventsByCategory() {
   const [showPopup, setShowPopup] = useState(false);
 const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 const [teamName, setTeamName] = useState("");
+const isBookingClosed = (event: Event) => {
+  if (!event.booking_last_date) return false;
+
+  const today = new Date();
+  const lastDate = new Date(event.booking_last_date);
+
+  today.setHours(0,0,0,0);
+  lastDate.setHours(0,0,0,0);
+
+  return today > lastDate;
+};
 
   useEffect(() => {
     api
@@ -181,12 +193,10 @@ event_name:  selectedEvent.name
 };
 
 const handleBookNow = (event: Event) => {
-  console.log("clicked event =", event);
-  console.log("event.type =", event.type);
-  console.log("normalized type =", event.type?.trim().toLowerCase());
 
-  if (event.status === "completed") {
-    alert("Registration closed for this event");
+  // 🔥 NEW: last date check
+  if (isBookingClosed(event)) {
+    alert("Booking closed for this event ❌");
     return;
   }
 
@@ -232,53 +242,38 @@ const handleBookNow = (event: Event) => {
               />
 
               <div className="p-4 text-center">
-                <h3 className="font-bold text-lg">{event.name}</h3>
+  <h3 className="font-bold text-lg">{event.name}</h3>
 
-                {/* <span
-                  className={`text-white text-xs px-2 py-1 rounded ${
-                    event.status === "completed"
-                      ? "bg-gray-500"
-                      : event.status === "ongoing"
-                      ? "bg-yellow-400"
-                      : "bg-red-500"
-                  }`}
-                >
-                  {event.status.toUpperCase()}
-                </span> */}
+  <p className="text-sm text-gray-500 mt-2">{event.age_group}</p>
 
-                <p className="text-sm text-gray-500 mt-2">{event.age_group}</p>
+  <p className="text-blue-500 text-sm mt-1">
+    ⏰{" "}
+    {new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}{" "}
+    -{" "}
+    {new Date(`1970-01-01T${event.end_time}`).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}
+  </p>
 
-                <p className="text-blue-500 text-sm mt-1">
-                  ⏰{" "}
-                  {new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString(
-                    [],
-                    {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}{" "}
-                  -{" "}
-                  {new Date(`1970-01-01T${event.end_time}`).toLocaleTimeString(
-                    [],
-                    {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}
-                </p>
+  {/* 🔥 NEW: Last Booking Date */}
+  <p className="text-xs text-red-500 mt-1">
+    📅 Last Date: {event.booking_last_date}
+  </p>
 
-                {/* <p className="text-xs text-gray-400">📅 {event.event_date}</p> */}
+  <p className="text-green-600 font-bold mt-1">
+    ₹ {event.entry_fee || 0}
+  </p>
 
-                <p className="text-green-600 font-bold mt-1">
-                  ₹ {event.entry_fee || 0}
-                </p>
-
-                <p className="text-xs text-purple-500 mt-1">{event.type}</p>
-              </div>
+  <p className="text-xs text-purple-500 mt-1">{event.type}</p>
+</div>
 
              <div className="p-3 flex justify-end">
   <button
-    disabled={event.status === "completed" || loadingId === event.id}
+    disabled={isBookingClosed(event) || loadingId === event.id}
     onClick={() => handleBookNow(event)}
     className={`px-3 py-1 rounded text-white ${
       event.status === "completed"
@@ -286,13 +281,13 @@ const handleBookNow = (event: Event) => {
         : "bg-green-500"
     }`}
   >
-    {loadingId === event.id
-      ? "Processing..."
-      : event.status === "completed"
-      ? "Closed"
-     : event.type && event.type.trim().toLowerCase().includes("team")
-? "Book Team"
-: "Book Now"}
+{loadingId === event.id
+  ? "Processing..."
+  : isBookingClosed(event)
+  ? "Closed"
+  : event.type && event.type.trim().toLowerCase().includes("team")
+  ? "Book Team"
+  : "Book Now"}
   </button>
 </div>
             </div>

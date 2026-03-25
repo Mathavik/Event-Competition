@@ -48,7 +48,7 @@ const Login: React.FC = () => {
                 onSubmit={handleSubmit}
                 className="bg-white p-8 rounded shadow-md w-full max-w-md"
             >
-                <h2 className="text-2xl font-bold mb-6 text-center">Student Login</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
                 <input
                     type="email"
