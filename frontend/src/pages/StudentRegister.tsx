@@ -42,15 +42,21 @@ const StudentRegister: React.FC = () => {
     const { name, value } = e.target;
 
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "school_name") {
+      if (value.trim().length === 0) {
+        setSchoolSuggestions([]);
+        return;
+      }
 
-    if (name === "school_name" && value.length > 0) {
-      try {
-        const res = await axios.get(
-          `http://127.0.0.1:8000/api/schools?q=${value}`
-        );
-        setSchoolSuggestions(res.data);
-      } catch (err) {
-        console.log(err);
+      if (value.length > 0) {
+        try {
+          const res = await axios.get(
+            `http://127.0.0.1:8000/api/schools?q=${value}`
+          );
+          setSchoolSuggestions(res.data);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
   };
@@ -109,7 +115,7 @@ const StudentRegister: React.FC = () => {
         {message && (
           <p className="mb-4 text-center text-red-500">{message}</p>
         )}
-      
+
         <div className="relative w-full mb-3">
           <input
             type="text"
