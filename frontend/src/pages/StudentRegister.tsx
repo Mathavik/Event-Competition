@@ -62,20 +62,20 @@ const StudentRegister: React.FC = () => {
         }
       }
     }
-      if (name === "phone") {
-    // Allow only numbers and limit to 10 digits
-    const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
+    if (name === "phone") {
+      // Allow only numbers and limit to 10 digits
+      const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: onlyNums,
-    }));
-  } else {
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
+      setForm((prev) => ({
+        ...prev,
+        [name]: onlyNums,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,7 +135,7 @@ const StudentRegister: React.FC = () => {
                 <div className="text-5xl mb-6">🎭</div>
                 <h1 className="text-3xl font-bold mb-2">GRAND COMPETITION</h1>
                 <p className="text-sm mb-6">EXCELLENCE • CULTURE • SPORTS</p>
-                
+
                 <div className="border-l-4 border-yellow-400 pl-4 mb-8">
                   <p className="text-sm opacity-90">Welcome to</p>
                   <h2 className="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
@@ -231,8 +231,10 @@ const StudentRegister: React.FC = () => {
                       name="school_code"
                       placeholder="School Code"
                       value={form.school_code}
-                      readOnly
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed text-sm"
+                      // readOnly
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm"
+
                     />
                   </div>
 
@@ -406,11 +408,10 @@ const StudentRegister: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!acceptedRules || isLoading}
-                  className={`w-full mt-4 py-2 rounded-lg text-white font-semibold transition-all duration-200 text-sm ${
-                    acceptedRules && !isLoading
+                  className={`w-full mt-4 py-2 rounded-lg text-white font-semibold transition-all duration-200 text-sm ${acceptedRules && !isLoading
                       ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-md hover:shadow-lg"
                       : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                    }`}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
