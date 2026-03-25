@@ -5,6 +5,8 @@ import logo from '../assets/logo.png';
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("token");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const studentName = localStorage.getItem("student_name");
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -28,13 +30,13 @@ const Header = () => {
               </div>
             </div> */}
             <div className="flex items-center space-x-3">
-  <img
-   src={logo} 
-    
-    alt="Event Logo"
-    className="h-18 w-auto object-contain"
-  />
-</div>
+              <img
+                src={logo}
+
+                alt="Event Logo"
+                className="h-18 w-auto object-contain"
+              />
+            </div>
           </div>
 
           {/* Desktop Nav */}
@@ -50,19 +52,30 @@ const Header = () => {
             ))}
 
             {isLoggedIn ? (
-              <button
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("student_name");
-                  localStorage.removeItem("student_id");
-                  window.location.reload();
-                }}
-                className="bg-red-500 px-5 py-2 rounded-full text-sm font-bold"
-              >
-                LOGOUT
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="bg-amber-500 px-5 py-2 rounded-full text-sm font-bold text-slate-900"
+                >
+                  {studentName || "Profile"}
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-slate-900 border border-slate-700 rounded-xl shadow-lg overflow-hidden">
+                    <button
+                      onClick={() => {
+                        localStorage.clear();
+                        window.location.reload();
+                      }}
+                      className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-800"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <a href="/register" className="bg-amber-500 px-5 py-2 rounded-full">
+              <a href="/login" className="bg-amber-500 px-5 py-2 rounded-full">
                 REGISTER NOW
               </a>
             )}
@@ -103,7 +116,7 @@ const Header = () => {
               </button>
             ) : (
               <a
-                href="/register"
+                href="/login"
                 className="block mt-4 bg-amber-500 text-slate-950 px-5 py-2 rounded-full font-bold text-sm text-center hover:bg-amber-400"
                 onClick={() => setIsOpen(false)}
               >

@@ -21,6 +21,7 @@ const Login: React.FC = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("student_name", student.name);
       localStorage.setItem("student_id", student.id);
+      localStorage.setItem("school_name", student.school_name);
 
       Swal.fire({
         icon: "success",
