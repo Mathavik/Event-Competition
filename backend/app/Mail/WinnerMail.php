@@ -56,13 +56,13 @@ class WinnerMail extends Mailable
     /**
      * Attach Certificate PDF
      */
-   public function attachments(): array
+ public function attachments(): array
 {
     $pdf = Pdf::loadView('pdf.certificate', [
         'student' => $this->student,
         'event'   => $this->event,
         'prize'   => $this->prize,
-    ])->setPaper('A4', 'portrait');
+    ])->setPaper('a4', 'landscape'); // ✅ 'portrait' ஐ 'landscape' ஆக மாற்றியுள்ளேன்
 
     return [
         Attachment::fromData(
@@ -71,4 +71,5 @@ class WinnerMail extends Mailable
         )->withMime('application/pdf'),
     ];
 }
+
 }
