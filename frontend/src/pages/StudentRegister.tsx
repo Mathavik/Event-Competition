@@ -18,6 +18,7 @@ interface FormData {
 
 const StudentRegister: React.FC = () => {
   const navigate = useNavigate();
+
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -31,6 +32,7 @@ const StudentRegister: React.FC = () => {
     city: "",
   });
 
+  const [acceptedRules, setAcceptedRules] = useState(false);
   const [message, setMessage] = useState<string>("");
 
   const handleChange = (
@@ -39,36 +41,33 @@ const StudentRegister: React.FC = () => {
     const { name, value } = e.target;
 
     if (name === "phone") {
-      // Allow only numbers and limit to 10 digits
       const onlyNums = value.replace(/[^0-9]/g, "").slice(0, 10);
-
-      setForm((prev) => ({
-        ...prev,
-        [name]: onlyNums,
-      }));
+      setForm((prev) => ({ ...prev, [name]: onlyNums }));
     } else {
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/students",
-        form,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+    if (!acceptedRules) {
+      Swal.fire({
+        icon: "warning",
+        title: "Accept Rules",
+        text: "Please accept Rules & Regulations to continue",
+      });
+      return;
+    }
 
-      // ✅ SUCCESS POPUP
+    try {
+      await axios.post("http://127.0.0.1:8000/api/students", form, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
       Swal.fire({
         icon: "success",
         title: "Registered Successfully 🎉",
@@ -82,7 +81,6 @@ const StudentRegister: React.FC = () => {
       }, 1500);
 
     } catch (err: any) {
-      // ❌ ERROR POPUP
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -90,25 +88,39 @@ const StudentRegister: React.FC = () => {
       });
     }
   };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Student Registration</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Student Registration
+        </h2>
 
-        {message && <p className="mb-4 text-center text-red-500">{message}</p>}
+        {message && (
+          <p className="mb-4 text-center text-red-500">{message}</p>
+        )}
+        <input
+          type="text"
+          name="school_name"
+          placeholder="School Name"
+          value={form.school_name}
+          onChange={handleChange}
+          className="mb-3 w-full p-2 border rounded"
+        />
 
         <input
           type="text"
-          name="name"
-          placeholder="Full Name"
-          value={form.name}
+          name="school_code"
+          placeholder="School Code"
+          value={form.school_code}
           onChange={handleChange}
           className="mb-3 w-full p-2 border rounded"
           required
         />
+
 
         <input
           type="email"
@@ -119,7 +131,15 @@ const StudentRegister: React.FC = () => {
           className="mb-3 w-full p-2 border rounded"
           required
         />
-
+        <input
+          type="text"
+          name="name"
+          placeholder="Student Name"
+          value={form.name}
+          onChange={handleChange}
+          className="mb-3 w-full p-2 border rounded"
+          required
+        />
         <input
           type="password"
           name="password"
@@ -148,7 +168,8 @@ const StudentRegister: React.FC = () => {
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-        <label className="mb-3 block text-gray-700">Date of Birth :</label>
+
+        <label className="mb-2 block text-gray-700">Date of Birth :</label>
         <input
           type="date"
           name="dob"
@@ -158,24 +179,7 @@ const StudentRegister: React.FC = () => {
           required
         />
 
-        <input
-          type="text"
-          name="school_name"
-          placeholder="School Name"
-          value={form.school_name}
-          onChange={handleChange}
-          className="mb-3 w-full p-2 border rounded"
-        />
 
-        <input
-          type="text"
-          name="school_code"
-          placeholder="School Code"
-          value={form.school_code}
-          onChange={handleChange}
-          className="mb-3 w-full p-2 border rounded"
-          required
-        />
 
         <input
           type="text"
@@ -194,10 +198,40 @@ const StudentRegister: React.FC = () => {
           onChange={handleChange}
           className="mb-5 w-full p-2 border rounded"
         />
+        <h3 className="font-bold mb-2">Rules & Regulations</h3>
+
+        {/* 🔥 Rules Section */}
+        <div className="mb-4 border p-3 rounded bg-gray-50 max-h-40 overflow-y-auto text-sm">
+          <ul className="list-disc pl-4 space-y-1">
+            <li>Maximum 5 events per student allowed</li>
+            <li>No time clash between events</li>
+            <li>Age eligibility must be followed</li>
+            <li>Only one participant per school per event</li>
+            <li>Team events require valid members</li>
+            <li>Once registered, cannot be cancelled</li>
+            <li>Event timings are subject to change on the day of the event</li>
+          </ul>
+        </div>
+
+        <div className="mb-4 flex items-center">
+          <input
+            type="checkbox"
+            checked={acceptedRules}
+            onChange={(e) => setAcceptedRules(e.target.checked)}
+            className="mr-2"
+          />
+          <label className="text-sm">
+            I agree to the Rules & Regulations
+          </label>
+        </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+          className={`w-full p-2 rounded text-white transition ${acceptedRules
+              ? "bg-blue-500 hover:bg-blue-600"
+              : "bg-gray-400 cursor-not-allowed"
+            }`}
+          disabled={!acceptedRules}
         >
           Register
         </button>
