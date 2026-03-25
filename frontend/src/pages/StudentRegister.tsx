@@ -109,31 +109,7 @@ const StudentRegister: React.FC = () => {
         {message && (
           <p className="mb-4 text-center text-red-500">{message}</p>
         )}
-        {schoolSuggestions.length > 0 && (
-          <div className="border rounded bg-white max-h-40 overflow-y-auto mb-3">
-            {schoolSuggestions.map((school, index) => (
-              <div
-                key={index}
-                className="p-2 hover:bg-gray-200 cursor-pointer"
-                onClick={() => {
-                  setForm((prev) => ({
-                    ...prev,
-                    school_name: school.school_name,
-                    school_code: school.school_code,
-                    city: school.city,
-                    phone: school.phone,
-                    email: school.email,
-                  }));
-                  setSchoolSuggestions([]);
-                }}
-              >
-                <div>
-                  {school.school_name} ({school.city}) - {school.phone}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      
         <div className="relative w-full mb-3">
           <input
             type="text"
