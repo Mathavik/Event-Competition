@@ -5,6 +5,10 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StudentRegisteredMail;
+use App\Models\Admin;
+use App\Notifications\StudentRegisteredNotification;
 
 class StudentController extends Controller
 {
@@ -65,6 +69,21 @@ public function getSchools(Request $request)
             'class' => $request->class,
             'city' => $request->city,
         ]);
+
+      $student = Student::latest()->first();
+
+$admins = Admin::all();
+
+foreach ($admins as $admin) {
+    $admin->notify(new StudentRegisteredNotification($student));
+}
+
+// send mail to all admins
+$admins = Admin::pluck('email');
+
+foreach ($admins as $email) {
+    Mail::to($email)->send(new StudentRegisteredMail($student));
+}
         
 
 return response()->json([

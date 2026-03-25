@@ -16,6 +16,31 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
 
 Route::get('/schools', [StudentController::class, 'getSchools']);
+// routes/api.php
+Route::get('/admin/notifications', function () {
+    $admin = \App\Models\Admin::first(); // or auth admin
+    return response()->json($admin->notifications);
+});
+
+Route::get('/admin/notifications/unread-count', function () {
+    $admin = \App\Models\Admin::first();
+    return response()->json([
+        'count' => $admin->unreadNotifications->count()
+    ]);
+});
+
+// use Illuminate\Support\Facades\Route;
+use App\Models\Admin;
+
+Route::post('/admin/notifications/read', function () {
+    $admin = Admin::first(); // later replace with auth()
+
+    $admin->unreadNotifications->markAsRead();
+
+    return response()->json([
+        'message' => 'Marked as read'
+    ]);
+});
 
 // Get all events for a student
 Route::get('/student/{id}/events', [EventRegistrationsController::class, 'showEvents']);
