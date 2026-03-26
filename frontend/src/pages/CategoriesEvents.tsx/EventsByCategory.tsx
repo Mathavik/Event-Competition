@@ -259,7 +259,7 @@ export default function EventsByCategory() {
 
                 {/* 🔥 NEW: Last Booking Date */}
                 <p className="text-xs text-red-500 mt-1">
-                  📅 Last Date: {event.booking_last_date}
+                  Register Last Date: {event.booking_last_date}
                 </p>
 
                 <p className="text-green-600 font-bold mt-1">

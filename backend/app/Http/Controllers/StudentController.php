@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Student;
@@ -12,33 +13,37 @@ use App\Notifications\StudentRegisteredNotification;
 
 class StudentController extends Controller
 {
-public function getRegistrations()
-{
-    
-    $registrations = DB::table('event_student') 
-        ->join('students', 'event_student.student_id', '=', 'students.id')
-        ->select(
-            'event_student.id',
-            'students.name',
-            'students.email',
-            'event_student.event_id'
-        )
-        ->get();
+    // ✅ GET REGISTRATIONS
+    public function getRegistrations()
+    {
+        $registrations = DB::table('event_student')
+            ->join('students', 'event_student.student_id', '=', 'students.id')
+            ->select(
+                'event_student.id',
+                'students.name',
+                'students.email',
+                'event_student.event_id'
+            )
+            ->get();
 
-    return response()->json($registrations);
-}
-public function getSchools(Request $request)
-{
-    $query = $request->input('q');
+        return response()->json($registrations);
+    }
 
-    $schools = Student::where('school_name', 'LIKE', "%$query%")
-        ->select('school_name', 'school_code', 'city', 'phone', 'email')
-        ->distinct()
-        ->limit(10)
-        ->get();
+    // ✅ SEARCH SCHOOLS
+    public function getSchools(Request $request)
+    {
+        $query = $request->input('q');
 
-    return response()->json($schools);
-}
+        $schools = Student::where('school_name', 'LIKE', "%$query%")
+            ->select('school_name', 'school_code', 'city', 'phone', 'email')
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        return response()->json($schools);
+    }
+
+    // ✅ STORE STUDENT
     public function store(Request $request)
     {
         $request->validate([
@@ -49,14 +54,11 @@ public function getSchools(Request $request)
             'school_code' => 'required'
         ]);
 
-//        if (!in_array($request->school_code, $allowedSchools)) {
-//     return response()->json(['error' => 'School not allowed'], 403);
-// }
-
-
+        // 🎯 AGE CALCULATION
         $age = Carbon::parse($request->dob)->age;
 
-        Student::create([
+        // ✅ CREATE STUDENT (IMPORTANT FIX)
+        $student = Student::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
@@ -70,24 +72,26 @@ public function getSchools(Request $request)
             'city' => $request->city,
         ]);
 
-      $student = Student::latest()->first();
+        // ✅ ADMIN NOTIFICATION
+        $admins = Admin::all();
+        foreach ($admins as $admin) {
+            $admin->notify(new StudentRegisteredNotification($student));
+        }
 
-$admins = Admin::all();
+        // ✅ MAIL TO STUDENT
+        Mail::to($student->email)
+            ->send(new StudentRegisteredMail($student));
 
-foreach ($admins as $admin) {
-    $admin->notify(new StudentRegisteredNotification($student));
-}
+        // ✅ MAIL TO ADMINS
+        $adminEmails = Admin::pluck('email');
+        foreach ($adminEmails as $email) {
+            Mail::to($email)
+                ->send(new StudentRegisteredMail($student));
+        }
 
-// send mail to all admins
-$admins = Admin::pluck('email');
-
-foreach ($admins as $email) {
-    Mail::to($email)->send(new StudentRegisteredMail($student));
-}
-        
-
-return response()->json([
-    'message' => 'Registered Successfully',
-    'status' => 'success'
-], 201);    }
+        return response()->json([
+            'message' => 'Registered Successfully',
+            'status' => 'success'
+        ], 201);
+    }
 }

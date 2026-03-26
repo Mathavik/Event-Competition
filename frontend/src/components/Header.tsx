@@ -6,7 +6,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("token");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const studentName = localStorage.getItem("student_name");
+  const schoolName = localStorage.getItem("school_name");
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -57,7 +57,7 @@ const Header = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="bg-amber-500 px-5 py-2 rounded-full text-sm font-bold text-slate-900"
                 >
-                  {studentName || "Profile"}
+                  {schoolName || "Profile"}
                 </button>
 
                 {isDropdownOpen && (
