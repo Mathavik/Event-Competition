@@ -11,11 +11,12 @@ body {
     padding: 0;
 }
 
+/* Container */
 .container {
     position: relative;
     width: 297mm;
     height: 210mm;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 /* Background */
@@ -30,64 +31,80 @@ body {
     position: absolute;
     width: 100%;
     text-align: center;
-    color: #000;
+    color: #222;
 }
 
 /* Title */
 .title {
-    top: 30mm;
-    font-size: 45px;
+    top: 25mm;
+    font-size: 50px;
     font-weight: bold;
-    letter-spacing: 5px;
+    letter-spacing: 6px;
 }
 
 /* Subtitle */
 .subtitle {
-    top: 50mm;
-    font-size: 18px;
-    letter-spacing: 3px;
+    top: 45mm;
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: #555;
 }
 
 /* Presented text */
 .presented {
     top: 70mm;
-    font-size: 20px;
+    font-size: 24px;
 }
+
+
+
+@font-face {
+    font-family: 'GreatVibes';
+    src: url('{{ public_path("fonts/GreatVibes-Regular.ttf") }}') format('truetype');
+}
+
+
 
 /* Name */
 .name {
     top: 85mm;
-    font-size: 40px;
+    font-size: 52px;
     font-weight: bold;
+    color: #b8860b;
+    letter-spacing: 3px;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
 }
 
 /* Description */
 .desc {
-    top: 110mm;
-    font-size: 18px;
-    width: 70%;
-    left: 15%;
-    line-height: 1.5;
+    top: 105mm;
+    font-size:22px;
+    width: 65%;
+    left: 17.5%;
+    line-height: 1.6;
 }
 
 /* Prize */
 .prize {
-    top: 140mm;
-    font-size: 24px;
+    top: 150mm;
+    font-size: 26px;
     font-weight: bold;
+    color: #b8860b;
+    letter-spacing: 2px;
 }
 
 /* Footer */
 .date {
     position: absolute;
-    bottom: 25mm;
+    bottom: 20mm;
     left: 40mm;
     font-size: 16px;
 }
 
 .sign {
     position: absolute;
-    bottom: 25mm;
+    bottom: 20mm;
     right: 40mm;
     font-size: 16px;
 }
@@ -99,36 +116,45 @@ body {
 
 <div class="container">
 
-    <!-- Background -->
-    <img src="{{ public_path('certificate.jpg') }}" class="bg">
+    <!-- Background Image -->
+    <img src="{{ public_path('certificate1.jpg') }}" class="bg">
 
-    <!-- Content -->
-    <div class="text title">CERTIFICATE</div>
 
-    <div class="text subtitle">OF ACHIEVEMENT</div>
 
+  
+
+    <!-- Presented -->
     <div class="text presented">
         Proudly Presented To
     </div>
 
+    <!-- Name -->
     <div class="text name">
-        {{ $student->name }}
+        {{ strtoupper($student->name) }}
     </div>
 
+    <!-- Description -->
     <div class="text desc">
-        In recognition of outstanding performance and successful participation in 
-        <b>{{ $event->name }}</b>. 
-        Your dedication and effort are truly appreciated and celebrated.
-    </div>
+    This certificate is proudly awarded to <b>{{ strtoupper($student->name) }}</b> 
+    in recognition of outstanding performance and successful participation in 
+    <b>{{ $event->name }}</b>.  
+    Your dedication, commitment, and excellence have set a remarkable example.  
+    We truly appreciate your hard work and wish you continued success in all your future endeavors.
+</div>
 
+    <!-- Prize (No ? issue) -->
+    @if(!empty($prize))
     <div class="text prize">
-        🏆 {{ $prize }} PRIZE
+        {{ strtoupper($prize) }} PRIZE
     </div>
+    @endif
 
+    <!-- Date -->
     <div class="date">
         Date: {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
     </div>
 
+    <!-- Signature -->
     <div class="sign">
         Signature
     </div>
