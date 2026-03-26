@@ -97,14 +97,24 @@ body {
     position: absolute;
     bottom: 20mm;
     left: 40mm;
-    font-size: 22px;
+    font-size: 26px;
 }
 
-.sign {
+.sign-center {
+    position: absolute;
+    bottom: 20mm;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 26px;
+}
+
+.sign-right {
     position: absolute;
     bottom: 20mm;
     right: 40mm;
-    font-size: 22px;
+    text-align: center;
+    font-size: 26px;
 }
 </style>
 
@@ -153,9 +163,16 @@ body {
     </div>
 
     <!-- Signature -->
-   <div class="sign">
+  <!-- Coordinator Signature (Center) -->
+<div class="sign-center">
     <img src="{{ public_path('signature.jpg') }}" style="height:40px;"><br>
-    Signature
+    Coordinator
+</div>
+
+<!-- Principal Signature (Right) -->
+<div class="sign-right">
+    <img src="{{ public_path('coordinator.jpg') }}" style="height:40px;"><br>
+    Principal
 </div>
 
 </div>
