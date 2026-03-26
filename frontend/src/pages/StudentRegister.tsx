@@ -79,50 +79,48 @@ const StudentRegister: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!acceptedRules) {
-      Swal.fire({
-        icon: "warning",
-        title: "Accept Rules",
-        text: "Please accept Rules & Regulations to continue",
-        confirmButtonColor: "#f59e0b",
-      });
-      return;
-    }
+  if (!acceptedRules) {
+    Swal.fire({
+      icon: "warning",
+      title: "Accept Rules",
+      text: "Please accept Rules & Regulations",
+    });
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      await axios.post("http://127.0.0.1:8000/api/students", form, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+  try {
+    const res = await axios.post(
+      "http://127.0.0.1:8000/api/students",
+      form
+    );
 
-      Swal.fire({
-        icon: "success",
-        title: "Registered Successfully 🎉",
-        text: "Redirecting to login...",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+    console.log("Response:", res.data); // 👈 debug
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-    } catch (err: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: err.response?.data?.error || "Something went wrong!",
-        confirmButtonColor: "#ef4444",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    Swal.fire({
+      icon: "success",
+      title: "Registered Successfully 🎉",
+      text: "Check your email for confirmation 📩",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    setTimeout(() => navigate("/login"), 2000);
+  } catch (err: any) {
+    console.log(err);
+
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: err.response?.data?.message || "Something went wrong",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
