@@ -1,151 +1,137 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <style>
-    /* 🔥 Fixes the Page Size strictly to A4 Landscape */
-    @page { size: A4 landscape; margin: 0; }
-    
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Helvetica', sans-serif;
-        background-color: #fff;
-    }
+@page { size: A4 landscape; margin: 0; }
 
-    /* 🔥 Main Container with Full Border */
-    .cert-body {
-        width: 297mm;
-        height: 210mm;
-        position: relative;
-        box-sizing: border-box;
-        border: 20px solid #1a237e; /* Royal Blue Outer */
-        background-color: #fdfdfd;
-    }
+body {
+    margin: 0;
+    padding: 0;
+}
 
-    /* Inner Gold Pattern Border */
-    .inner-frame {
-        position: absolute;
-        top: 10px; left: 10px; right: 10px; bottom: 10px;
-        border: 5px solid #c9a646; /* Gold Inner */
-        padding: 40px;
-        text-align: center;
-    }
+.container {
+    position: relative;
+    width: 297mm;
+    height: 210mm;
+    font-family: 'Arial', sans-serif;
+}
 
-    /* Corners Decoration */
-    .corner-decor {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        border: 10px solid #c9a646;
-    }
-    .tl { top: -20px; left: -20px; border-right: none; border-bottom: none; }
-    .br { bottom: -20px; right: -20px; border-left: none; border-top: none; }
+/* Background */
+.bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
 
-    /* Text Styling */
-    .main-head {
-        font-size: 60px;
-        color: #1a237e;
-        margin-top: 50px;
-        letter-spacing: 15px;
-        font-weight: bold;
-    }
+/* Common Text */
+.text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #000;
+}
 
-    .sub-head {
-        font-size: 20px;
-        color: #c9a646;
-        letter-spacing: 5px;
-        margin-bottom: 40px;
-    }
+/* Title */
+.title {
+    top: 30mm;
+    font-size: 45px;
+    font-weight: bold;
+    letter-spacing: 5px;
+}
 
-    .student-name {
-        font-size: 65px;
-        color: #1a237e;
-        margin: 20px 0;
-        font-weight: bold;
-        display: inline-block;
-        border-bottom: 3px double #c9a646;
-        padding: 0 50px;
-    }
+/* Subtitle */
+.subtitle {
+    top: 50mm;
+    font-size: 18px;
+    letter-spacing: 3px;
+}
 
-    .message {
-        font-size: 20px;
-        line-height: 1.6;
-        color: #444;
-        width: 70%;
-        margin: 20px auto;
-    }
+/* Presented text */
+.presented {
+    top: 70mm;
+    font-size: 20px;
+}
 
-    .event-tag {
-        font-weight: bold;
-        color: #1a237e;
-        font-size: 26px;
-    }
+/* Name */
+.name {
+    top: 85mm;
+    font-size: 40px;
+    font-weight: bold;
+}
 
-    .prize-box {
-        margin-top: 30px;
-        background: #1a237e;
-        color: #fff;
-        display: inline-block;
-        padding: 15px 50px;
-        font-size: 24px;
-        font-weight: bold;
-        border-radius: 5px;
-        box-shadow: 5px 5px 0px #c9a646;
-    }
+/* Description */
+.desc {
+    top: 110mm;
+    font-size: 18px;
+    width: 70%;
+    left: 15%;
+    line-height: 1.5;
+}
 
-    /* Footer Section */
-    .footer-table {
-        width: 100%;
-        position: absolute;
-        bottom: 80px;
-        left: 0;
-        padding: 0 100px;
-    }
+/* Prize */
+.prize {
+    top: 140mm;
+    font-size: 24px;
+    font-weight: bold;
+}
 
-    .sign-line {
-        border-top: 2px solid #333;
-        width: 200px;
-        margin: 0 auto 5px;
-    }
+/* Footer */
+.date {
+    position: absolute;
+    bottom: 25mm;
+    left: 40mm;
+    font-size: 16px;
+}
+
+.sign {
+    position: absolute;
+    bottom: 25mm;
+    right: 40mm;
+    font-size: 16px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="cert-body">
-    <div class="inner-frame">
-        <div class="corner-decor tl"></div>
-        <div class="corner-decor br"></div>
+<div class="container">
 
-        <div class="main-head">CERTIFICATE</div>
-        <div class="sub-head">OF EXCELLENCE</div>
+    <!-- Background -->
+    <img src="{{ public_path('certificate.jpg') }}" class="bg">
 
-        <p style="font-style: italic; font-size: 22px; color: #666;">This award is presented to</p>
+    <!-- Content -->
+    <div class="text title">CERTIFICATE</div>
 
-        <div class="student-name">{{ $student->name }}</div>
+    <div class="text subtitle">OF ACHIEVEMENT</div>
 
-        <p class="message">
-            In recognition of your exceptional achievement and victory in the 
-            <br> <span class="event-tag">{{ $event->name }}</span>
-        </p>
-
-        <div class="prize-box">
-            {{ $prize }} PRIZE
-        </div>
-
-        <table class="footer-table">
-            <tr>
-                <td align="left">
-                    <strong>Date:</strong> {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
-                </td>
-                <td align="right">
-                    <div class="sign-line"></div>
-                    <strong>AUTHORIZED SIGNATURE</strong>
-                </td>
-            </tr>
-        </table>
+    <div class="text presented">
+        Proudly Presented To
     </div>
+
+    <div class="text name">
+        {{ $student->name }}
+    </div>
+
+    <div class="text desc">
+        In recognition of outstanding performance and successful participation in 
+        <b>{{ $event->name }}</b>. 
+        Your dedication and effort are truly appreciated and celebrated.
+    </div>
+
+    <div class="text prize">
+        🏆 {{ $prize }} PRIZE
+    </div>
+
+    <div class="date">
+        Date: {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
+    </div>
+
+    <div class="sign">
+        Signature
+    </div>
+
 </div>
 
 </body>
