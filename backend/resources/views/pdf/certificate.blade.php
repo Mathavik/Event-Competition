@@ -63,8 +63,6 @@ body {
     src: url('{{ public_path("fonts/GreatVibes-Regular.ttf") }}') format('truetype');
 }
 
-
-
 /* Name */
 .name {
     top: 85mm;
@@ -99,14 +97,14 @@ body {
     position: absolute;
     bottom: 20mm;
     left: 40mm;
-    font-size: 16px;
+    font-size: 22px;
 }
 
 .sign {
     position: absolute;
     bottom: 20mm;
     right: 40mm;
-    font-size: 16px;
+    font-size: 22px;
 }
 </style>
 
@@ -155,9 +153,10 @@ body {
     </div>
 
     <!-- Signature -->
-    <div class="sign">
-        Signature
-    </div>
+   <div class="sign">
+    <img src="{{ public_path('signature.jpg') }}" style="height:40px;"><br>
+    Signature
+</div>
 
 </div>
 
