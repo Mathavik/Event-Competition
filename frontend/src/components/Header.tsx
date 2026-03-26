@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X, Trophy } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,7 @@ const Header = () => {
               />
             </div>
           </div>
+       
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
