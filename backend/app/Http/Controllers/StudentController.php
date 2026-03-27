@@ -94,4 +94,39 @@ class StudentController extends Controller
             'status' => 'success'
         ], 201);
     }
+public function getNotificationRegistrations()
+{
+    $notifications = DB::table('notifications')
+        ->where('type', 'App\Notifications\StudentRegisteredNotification')
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($notification) {
+            $data = json_decode($notification->data, true);
+            $studentId = $data['student_id'] ?? null;
+            
+            // Fetch school name directly from the students table using student_id
+            $schoolName = 'N/A';
+            if ($studentId) {
+                $student = DB::table('students')->where('id', $studentId)->first();
+                $schoolName = $student->school_name ?? 'N/A';
+            }
+
+            // Extract student name from the message if student_name key is missing
+            $studentName = $data['student_name'] ?? 'N/A';
+            if ($studentName === 'N/A' && isset($data['message'])) {
+                $parts = explode(' ', $data['message']);
+                $studentName = $parts[0]; 
+            }
+
+            return [
+                'id' => $notification->id,
+                'student_name' => ucfirst($studentName),
+                'school_name'  => $schoolName, // Now fetched from the students table
+                'type'         => 'New Registration',
+                'created_at'   => $notification->created_at
+            ];
+        });
+
+    return response()->json($notifications);
+}
 }

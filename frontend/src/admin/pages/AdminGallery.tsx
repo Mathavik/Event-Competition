@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
 import axios from "axios";
-import { FaCloudUploadAlt, FaImages } from "react-icons/fa";
+import { FaCloudUploadAlt, FaImages, FaCheckCircle } from "react-icons/fa";
 
 type Category = {
   id: number;
@@ -13,6 +13,7 @@ export default function AdminGallery() {
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
     axios
@@ -21,114 +22,107 @@ export default function AdminGallery() {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleUpload = async () => {
-    if (!image || !category) {
-      return alert("Please select both an image and a category");
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImage(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setPreview(null);
     }
+  };
 
+  const handleUpload = async () => {
+    if (!image || !category) return alert("Please select both an image and a category");
     setIsUploading(true);
     const formData = new FormData();
     formData.append("image", image);
     formData.append("category", category);
-
     try {
       await api.post("/gallery", formData);
-      alert("Gallery image uploaded successfully!");
-      setImage(null);
-      setCategory("");
+      alert("Success!");
+      setImage(null); setCategory(""); setPreview(null);
     } catch (error) {
-      alert("Upload failed. Please try again.");
+      alert("Upload failed.");
     } finally {
       setIsUploading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-slate-50 px-4 py-12">
-      
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl shadow-slate-200/60 overflow-hidden border border-slate-100 relative">
-        
-        {/* Top Glow Line */}
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600"></div>
+    <div className="h-screen bg-slate-950 flex items-center justify-center px-4 overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-amber-600/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-blue-600/10 rounded-full blur-[100px]"></div>
 
-        <div className="p-8 md:p-10">
-          {/* HEADER */}
-          <div className="text-center mb-8">
-            <div className="bg-slate-950 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg border border-amber-500/20">
-              {/* Using createElement to bypass JSX component type errors */}
-              {React.createElement(FaImages as any, { className: "text-amber-500 text-2xl" })}
+      <div className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl rounded-3xl border border-slate-800 shadow-2xl relative">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+
+        <div className="p-6 md:p-8">
+          {/* HEADER - Smaller sizes */}
+          <div className="text-center mb-6">
+            <div className="bg-slate-950 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xl border border-slate-800">
+              {React.createElement(FaImages as any, { className: "text-amber-500 text-xl" })}
             </div>
-            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
-              Upload Gallery <span className="text-amber-500">Image</span>
+            <h2 className="text-xl font-black text-white uppercase tracking-tighter">
+              Manage <span className="text-amber-500">Gallery</span>
             </h2>
-            <p className="text-slate-500 text-sm mt-1 font-medium">Add new memories to your event gallery</p>
           </div>
 
-          <div className="space-y-6">
-            {/* IMAGE UPLOAD AREA */}
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                Step 1: Select Visual
-              </label>
-              <div className="relative group border-2 border-dashed border-slate-200 rounded-2xl p-8 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer text-center">
-                <input
-                  type="file"
-                  onChange={(e) => setImage(e.target.files?.[0] || null)}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                {/* Fixed Icon Rendering */}
-                {React.createElement(FaCloudUploadAlt as any, { 
-                  className: "mx-auto text-4xl text-slate-300 group-hover:text-amber-500 transition-colors mb-2" 
-                })}
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                  {image ? image.name : "Drag & Drop or Click to Browse"}
-                </p>
-                {image && (
-                    <p className="mt-2 text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded-full inline-block">
-                        Ready to upload
-                    </p>
+          <div className="space-y-4">
+            {/* STEP 1: UPLOAD - Compact height */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">01 Asset Selection</label>
+              <div className={`relative border-2 border-dashed rounded-2xl transition-all duration-300 ${preview ? 'p-2 border-amber-500/50' : 'p-4 border-slate-800 bg-slate-950/30'}`}>
+                <input type="file" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                {preview ? (
+                  <div className="h-24 w-full rounded-xl overflow-hidden shadow-lg">
+                    <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="text-center py-2">
+                    {React.createElement(FaCloudUploadAlt as any, { className: "mx-auto text-3xl text-slate-700 mb-1" })}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Click to Browse</p>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* CATEGORY SELECT */}
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                Step 2: Assign Category
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all appearance-none cursor-pointer"
-              >
-                <option value="">Choose category...</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+            {/* STEP 2: CATEGORY - Compact padding */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">02 Classification</label>
+              <div className="relative">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-bold text-slate-300 outline-none focus:border-amber-500 appearance-none cursor-pointer"
+                >
+                  <option value="">Choose category...</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600 text-[10px]">▼</div>
+              </div>
             </div>
 
-            {/* ACTION BUTTON */}
+            {/* BUTTON - Reduced padding */}
             <button
               onClick={handleUpload}
               disabled={isUploading}
-              className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-[0.2em] transition-all duration-300 shadow-xl flex items-center justify-center gap-3 ${
-                isUploading 
-                ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
-                : "bg-slate-950 text-amber-500 border border-amber-500/30 hover:bg-slate-900 shadow-amber-500/10 active:scale-95"
+              className={`w-full py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] transition-all duration-500 ${
+                isUploading ? "bg-slate-800 text-slate-500" : "bg-amber-600 text-white hover:bg-amber-500 shadow-lg"
               }`}
             >
-              {isUploading ? "Uploading..." : "Start Upload"}
+              {isUploading ? "Processing..." : "Finalize Upload"}
             </button>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-50 text-center">
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide">
-              Max file size: 5MB • Supported: JPG, PNG, WEBP
-            </p>
-          </div>
+          <p className="mt-6 text-[9px] text-slate-600 font-bold uppercase tracking-widest text-center">
+            Max 5MB • JPG/PNG/WEBP
+          </p>
         </div>
       </div>
     </div>

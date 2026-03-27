@@ -25,10 +25,12 @@ class StudentRegisteredNotification extends Notification
     }
 
     public function toDatabase($notifiable)
-    {
-        return [
-            'message' =>   $this->student->name . ' has registered for an event.',
-            'student_id' => $this->student->id
-        ];
-    }
+{
+    return [
+        'student_id'   => $this->student->id,
+        'student_name' => $this->student->name, // Adding this key
+        'school_name'  => $this->student->school_name, // Adding this key
+        'message'      => $this->student->name . ' from ' . $this->student->school_name . ' registered.'
+    ];
+}
 }

@@ -71,6 +71,7 @@ class EventController extends Controller
             'event_date'  => $request->event_date ?? $event->event_date,
             'start_time'  => $request->start_time ?? $event->start_time,
             'end_time'    => $request->end_time ?? $event->end_time,
+            'is_visible' => $request->is_visible ?? $event->is_visible,
         ]);
 
         return response()->json([

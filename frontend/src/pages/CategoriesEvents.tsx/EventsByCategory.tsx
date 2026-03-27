@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "../../api";
 
 // 🎥 Videos
@@ -30,10 +30,15 @@ type Category = {
   image: string;
   events: Event[];
 };
-
+type PaymentState = {
+  event: Event;
+  isTeam: boolean;
+};
 export default function EventsByCategory() {
+  // const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation() as { state: PaymentState };
 
   const [category, setCategory] = useState<Category | null>(null);
   const [loadingId, setLoadingId] = useState<number | null>(null);
@@ -191,31 +196,66 @@ export default function EventsByCategory() {
   };
 
   const handleBookNow = (event: Event) => {
+  if (isBookingClosed(event)) {
+    alert("Booking closed ❌");
+    return;
+  }
 
-    // 🔥 NEW: last date check
-    if (isBookingClosed(event)) {
-      alert("Booking closed for this event ❌");
-      return;
-    }
 
-    const studentId = localStorage.getItem("student_id");
+  const studentId = localStorage.getItem("student_id");
 
-    if (!studentId) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  if (!studentId) {
+    alert("Please login first!");
+    navigate("/login");
+    return;
+  }
 
-    if (event.type && event.type.trim().toLowerCase().includes("team")) {
-      openTeamPopup(event);
-    } else {
-      handleSoloBooking(event);
-    }
-  };
+  navigate("/payment", {
+    state: {
+      event,
+      isTeam: event.type?.toLowerCase().includes("team"),
+    },
+  });
+};
 
   if (!category) {
     return <div className="text-center mt-20">Loading...</div>;
   }
+  const handlePaymentSuccess = async () => {
+  const { event, isTeam } = location.state;
+  const studentId = localStorage.getItem("student_id");
+
+  try {
+    if (isTeam) {
+      // TEAM API
+      const res = await api.post("/team-name", {
+        event_id: event.id,
+        captain_id: Number(studentId),
+        team_name: localStorage.getItem("school_name"),
+        event_name: event.name,
+      });
+
+      console.log("Team booking success", res.data);
+
+    } else {
+      // SOLO API
+      const res = await api.post("/register-event", {
+        student_id: studentId,
+        event_id: event.id,
+        event_time: `${event.event_date} ${event.start_time}`,
+        amount: event.entry_fee || 0,
+      });
+
+      console.log("Solo booking success", res.data);
+    }
+
+    alert("Booking confirmed ✅");
+
+  } catch (err) {
+    console.error(err);
+    alert("Booking failed after payment ❌");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">

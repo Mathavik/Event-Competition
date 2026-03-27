@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
+import { FaEdit, FaTrash, FaFileDownload, FaSchool, FaPlus, FaSearch } from "react-icons/fa";
+import React from "react";
 
 type Event = {
   id?: number;
@@ -8,6 +10,7 @@ type Event = {
   type: string;
   age_group: string;
   image?: string;
+  is_visible?: number;
 };
 
 export default function Events() {
@@ -19,6 +22,7 @@ export default function Events() {
     name: "",
     type: "",
     age_group: "",
+    is_visible: 1,
   });
 
   const [isEdit, setIsEdit] = useState(false);
@@ -27,7 +31,7 @@ export default function Events() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   const fetchEvents = () => {
     api.get("/events").then((res) => setEvents(res.data));
@@ -48,14 +52,16 @@ export default function Events() {
   );
 
   const handleSubmit = () => {
+
     const formData = new FormData();
     formData.append("category_id", String(form.category_id));
     formData.append("name", form.name);
     formData.append("type", form.type);
     formData.append("age_group", form.age_group);
+    formData.append("is_visible", String(form.is_visible ?? 1));
     if (file) formData.append("image", file);
 
-    const request = isEdit 
+    const request = isEdit
       ? api.post(`/events/${form.id}?_method=PUT`, formData)
       : api.post("/events", formData);
 
@@ -67,6 +73,22 @@ export default function Events() {
       console.error(err);
       alert("Something went wrong!");
     });
+  };
+  const toggleVisibility = (event: Event) => {
+    const formData = new FormData();
+
+    formData.append(
+      "is_visible",
+      event.is_visible === 1 ? "0" : "1"
+    );
+
+    api.post(`/events/${event.id}?_method=PUT`, formData)
+      .then(() => {
+        fetchEvents();
+      })
+      .catch(() => {
+        alert("Failed to update visibility");
+      });
   };
 
   const handleEdit = (event: Event) => {
@@ -103,25 +125,26 @@ export default function Events() {
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-slate-950 min-h-screen text-slate-200">
+
       {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Events Management</h1>
-          <p className="text-slate-500 text-sm">Create, edit and manage your competition events.</p>
+          <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+            Events <span className="text-amber-500">Management</span>
+          </h1>
+          <p className="text-slate-500 text-sm mt-1 font-medium">Create and oversee all competition categories.</p>
         </div>
-        
+
         <div className="flex w-full md:w-auto gap-3">
-          <div className="relative flex-1 md:w-72">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+          <div className="relative flex-1 md:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
+              {React.createElement(FaSearch as any, { size: 14 })}
             </span>
             <input
               type="text"
-              placeholder="Search events..."
-              className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl w-full focus:ring-2 focus:ring-amber-500 outline-none shadow-sm transition-all bg-white"
+              placeholder="Filter events..."
+              className="pl-11 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl w-full focus:ring-2 focus:ring-amber-500/50 outline-none text-white shadow-2xl transition-all placeholder:text-slate-600 font-bold text-sm"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -130,186 +153,224 @@ export default function Events() {
             />
           </div>
 
-          <button 
+          <button
             onClick={() => setShowModal(true)}
-            className="bg-slate-950 text-amber-500 border border-amber-500/30 px-5 py-2.5 rounded-xl hover:bg-slate-900 transition flex items-center gap-2 whitespace-nowrap shadow-lg font-bold uppercase text-xs tracking-widest"
+            className="bg-amber-600 text-white px-6 py-3 rounded-2xl hover:bg-amber-500 transition-all flex items-center gap-3 shadow-lg shadow-amber-600/20 font-black uppercase text-[10px] tracking-widest whitespace-nowrap active:scale-95"
           >
-            <span className="text-lg">+</span> Add Event
+            {React.createElement(FaPlus as any)} Add Event
           </button>
         </div>
       </div>
 
       {/* TABLE SECTION */}
-      <div className="overflow-hidden bg-white shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-100">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-950 text-amber-500 uppercase text-[11px] font-bold tracking-widest">
-            <tr>
-              <th className="p-5">ID</th>
-              <th className="p-5">Image</th>
-              <th className="p-5">Event Name</th>
-              <th className="p-5">Type</th>
-              <th className="p-5">Age Group</th>
-              <th className="p-5 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {currentEvents.length > 0 ? (
-              currentEvents.map((e) => (
-                <tr key={e.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="p-5 text-slate-500 font-mono text-xs">{e.id}</td>
-                  <td className="p-5">
-                    {e.image ? (
-                      <img 
-                        src={`http://127.0.0.1:8000/upload/events/${e.image}`} 
-                        className="w-12 h-12 object-cover rounded-lg shadow-md border border-slate-200 group-hover:scale-110 transition-transform" 
-                        alt={e.name} 
-                      />
-                    ) : (
-                      <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] text-slate-400 border border-dashed border-slate-300">No Image</div>
-                    )}
-                  </td>
-                  <td className="p-5 font-bold text-slate-800">{e.name}</td>
-                  <td className="p-5 text-slate-600">
-                    <span className="bg-slate-100 px-2 py-1 rounded text-xs font-medium uppercase">{e.type}</span>
-                  </td>
-                  <td className="p-5 text-slate-600 font-medium italic">{e.age_group}</td>
-                  <td className="p-5 space-x-2 text-center">
-
-  {/* ✏️ EDIT */}
-  <button 
-    onClick={() => handleEdit(e)} 
-    className="text-blue-600 hover:text-blue-800 font-bold text-xs uppercase"
-  >
-    Edit
-  </button>
-
-  {/* ❌ DELETE */}
-  <button 
-    onClick={() => confirmDelete(e.id!)} 
-    className="text-red-500 hover:text-red-700 font-bold text-xs uppercase"
-  >
-    Delete
-  </button>
-
-  {/* 📄 FULL REPORT */}
-  <button
-    onClick={() =>
-      window.open(
-        `http://localhost:8000/api/event/${e.id}/schools-students/download`,
-        "_blank"
-      )
-    }
-    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-[10px] font-bold"
-  >
-    Full Report
-  </button>
-
-  {/* 🏫 SCHOOL LIST */}
-  <button
-    onClick={() =>
-      window.open(
-        `http://localhost:8000/api/event/${e.id}/schools/download`,
-        "_blank"
-      )
-    }
-    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold"
-  >
-    Schools
-  </button>
-
-</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="p-20 text-center">
-                  <div className="flex flex-col items-center opacity-40">
-                    <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                    <p className="font-medium">No events found matching your search.</p>
-                  </div>
-                </td>
+      <div className="bg-slate-900/50 backdrop-blur-md rounded-[2rem] border border-slate-800 shadow-3xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-800 bg-slate-900/80">
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Asset</th>
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Details</th>
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Group</th>
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Visible</th>
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-800/50">
+              {currentEvents.length > 0 ? (
+                currentEvents.map((e) => (
+                 <tr key={e.id} className="hover:bg-white/[0.02] transition-colors group">
+
+  {/* ASSET */}
+  <td className="p-6">
+  {e.image ? (
+    <img
+      src={`http://localhost:8000/upload/events/${e.image}`}
+      alt="event"
+      className="w-16 h-16 object-cover rounded-xl border border-slate-700"
+    />
+  ) : (
+    <span className="text-slate-500 text-sm font-bold">
+      No Image
+    </span>
+  )}
+</td>
+
+  {/* DETAILS */}
+  <td className="p-6">
+    <div className="font-black text-white text-lg tracking-tight uppercase group-hover:text-amber-500 transition-colors">
+      {e.name}
+    </div>
+    <div className="flex items-center gap-2 mt-1">
+      <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md font-black uppercase tracking-widest border border-slate-700">
+        {e.type}
+      </span>
+      <span className="text-[10px] text-slate-600 font-bold">
+        ID: {e.id}
+      </span>
+    </div>
+  </td>
+
+  {/* GROUP */}
+  <td className="p-6">
+    <span className="text-amber-500/80 font-black italic text-sm">
+      {e.age_group}
+    </span>
+  </td>
+
+  {/* VISIBLE */}
+  <td className="p-6 text-center">
+    <button
+      onClick={() => toggleVisibility(e)}
+      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase ${
+        e.is_visible
+          ? "bg-green-500/20 text-green-400"
+          : "bg-red-500/20 text-red-400"
+      }`}
+    >
+      {e.is_visible ? "Visible" : "Hidden"}
+    </button>
+  </td>
+
+  {/* ACTIONS */}
+  <td className="p-6">
+    <div className="flex items-center justify-center gap-3">
+
+      <button
+        onClick={() => handleEdit(e)}
+        className="p-3 bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
+      >
+        {React.createElement(FaEdit as any, { size: 14 })}
+      </button>
+
+      <button
+        onClick={() => confirmDelete(e.id!)}
+        className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+      >
+        {React.createElement(FaTrash as any, { size: 14 })}
+      </button>
+
+      <div className="w-[1px] h-8 bg-slate-800 mx-1"></div>
+
+      <button
+        onClick={() =>
+          window.open(`http://localhost:8000/api/event/${e.id}/schools-students/download`, "_blank")
+        }
+        className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        {React.createElement(FaFileDownload as any)} Report
+      </button>
+
+      <button
+        onClick={() =>
+          window.open(`http://localhost:8000/api/event/${e.id}/schools/download`, "_blank")
+        }
+        className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        {React.createElement(FaSchool as any)} Schools
+      </button>
+
+    </div>
+  </td>
+
+</tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="p-20 text-center">
+                    <p className="text-slate-600 font-black uppercase tracking-widest">No matching events found</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* PAGINATION */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8 gap-3">
+        <div className="flex justify-center mt-10 gap-3">
           {Array.from({ length: totalPages }, (_, i) => (
             <button key={i} onClick={() => setCurrentPage(i + 1)}
-              className={`w-10 h-10 rounded-full font-bold transition-all shadow-sm ${currentPage === i + 1 ? "bg-slate-950 text-amber-500 border border-amber-500/50 scale-110" : "bg-white text-slate-400 hover:bg-slate-100 border border-slate-200"}`}>
+              className={`w-12 h-12 rounded-2xl font-black transition-all ${currentPage === i + 1 ? "bg-amber-600 text-white shadow-lg shadow-amber-600/30 scale-110" : "bg-slate-900 text-slate-500 hover:bg-slate-800 border border-slate-800"}`}>
               {i + 1}
             </button>
           ))}
         </div>
       )}
 
-      {/* --- ADD/EDIT MODAL --- */}
+      {/* MODAL - Design matching your Upload Page */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 z-[999]">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative border border-slate-100 overflow-hidden">
-             {/* Modal Header Glow */}
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600"></div>
-            
-            <h2 className="text-2xl font-black mb-6 text-slate-900 flex justify-between items-center">
-              {isEdit ? "Update Event" : "Create Event"}
-              <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full uppercase tracking-tighter">Admin Only</span>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 z-[999]">
+          <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] w-full max-w-lg p-10 shadow-3xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+
+            <h2 className="text-2xl font-black mb-8 text-white uppercase tracking-tighter italic">
+              {isEdit ? "Update" : "New"} <span className="text-amber-500">Event</span>
             </h2>
 
-            <div className="space-y-5">
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category Index</label>
-                <input name="category_id" onChange={handleChange} value={form.category_id} className="w-full border-2 border-slate-100 p-3 rounded-xl mt-1 focus:border-amber-500 focus:ring-0 outline-none transition-all bg-slate-50 font-bold"/>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Event Name</label>
-                <input name="name" onChange={handleChange} value={form.name} className="w-full border-2 border-slate-100 p-3 rounded-xl mt-1 focus:border-amber-500 focus:ring-0 outline-none transition-all"/>
-              </div>
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type</label>
-                  <input name="type" onChange={handleChange} value={form.type} placeholder="e.g. Solo" className="w-full border-2 border-slate-100 p-3 rounded-xl mt-1 focus:border-amber-500 focus:ring-0 outline-none transition-all"/>
+                <div className="col-span-1">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Category ID</label>
+                  <input name="category_id" onChange={handleChange} value={form.category_id} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
                 </div>
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Age Group</label>
-                  <input name="age_group" onChange={handleChange} value={form.age_group} placeholder="e.g. 10-15" className="w-full border-2 border-slate-100 p-3 rounded-xl mt-1 focus:border-amber-500 focus:ring-0 outline-none transition-all"/>
+                <div className="col-span-1">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Type (Solo/Group)</label>
+                  <input name="type" onChange={handleChange} value={form.type} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
                 </div>
               </div>
+
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cover Image</label>
-                <div className="mt-1 flex items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50 hover:bg-slate-100 transition-colors relative">
-                    <input type="file" onChange={(e) => setFile(e.target.files?.[0])} className="absolute inset-0 opacity-0 cursor-pointer"/>
-                    <p className="text-xs text-slate-500 font-medium">{file ? file.name : "Click to upload image"}</p>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Event Name</label>
+                <input name="name" onChange={handleChange} value={form.name} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Age Group (e.g. 10-15)</label>
+                <input name="age_group" onChange={handleChange} value={form.age_group} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                  Cover Image
+                </label>
+
+                <div className="mt-2 relative border-2 border-dashed border-slate-800 rounded-2xl p-6 bg-slate-950/50 text-center hover:border-amber-500/50 transition-all cursor-pointer">
+                  <input
+                    type="file"
+                    onChange={(e) => setFile(e.target.files?.[0])}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <p className="text-xs text-slate-400 font-bold uppercase">
+                    {file ? file.name : "Select Asset"}
+                  </p>
                 </div>
               </div>
+
             </div>
-            
+
             <div className="flex justify-end mt-10 gap-4">
-              <button onClick={closeModal} className="px-5 py-2.5 text-slate-400 font-bold text-xs uppercase hover:text-slate-600 transition">Discard</button>
-              <button onClick={handleSubmit} className="bg-slate-950 text-amber-500 border border-amber-500/30 px-8 py-2.5 rounded-xl hover:bg-slate-900 shadow-xl shadow-amber-500/10 transition font-black uppercase text-xs tracking-widest">
-                {isEdit ? "Confirm Update" : "Save Event"}
+              <button onClick={closeModal} className="px-6 py-3 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition">Cancel</button>
+              <button onClick={handleSubmit} className="bg-amber-600 text-white px-10 py-4 rounded-2xl hover:bg-amber-500 shadow-xl shadow-amber-600/20 transition-all font-black uppercase text-[10px] tracking-widest">
+                {isEdit ? "Update Event" : "Save Changes"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- DELETE MODAL --- */}
+      {/* DELETE MODAL */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-[999]">
-          <div className="bg-white rounded-3xl p-10 max-w-sm w-full text-center shadow-2xl border-t-4 border-red-500">
-            <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 z-[999]">
+          <div className="bg-slate-900 rounded-[2.5rem] p-12 max-w-sm w-full text-center border border-slate-800 shadow-3xl">
+            <div className="bg-red-500/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 border border-red-500/20">
+              {React.createElement(FaTrash as any, { className: "text-red-500 text-3xl" })}
             </div>
-            <h2 className="text-2xl font-black text-slate-900">Danger Zone</h2>
-            <p className="text-slate-500 mt-3 font-medium">This action will permanently delete the event record.</p>
-            <div className="flex flex-col gap-3 mt-8">
-              <button onClick={handleDelete} className="w-full py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-black uppercase text-xs tracking-widest shadow-lg shadow-red-500/20">Delete Permanently</button>
-              <button onClick={() => setShowDeleteModal(false)} className="w-full py-3 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-200 transition font-bold uppercase text-xs">Keep Event</button>
+            <h2 className="text-2xl font-black text-white uppercase italic">Confirm <span className="text-red-500">Delete</span></h2>
+            <p className="text-slate-500 mt-4 font-medium leading-relaxed">This action will permanently wipe this event from the database.</p>
+            <div className="flex flex-col gap-3 mt-10">
+              <button onClick={handleDelete} className="w-full py-4 bg-red-600 text-white rounded-2xl hover:bg-red-500 transition-all font-black uppercase text-[10px] tracking-[0.2em]">Delete Now</button>
+              <button onClick={() => setShowDeleteModal(false)} className="w-full py-4 bg-slate-800 text-slate-400 rounded-2xl hover:bg-slate-700 transition font-black uppercase text-[10px] tracking-widest">Retain Data</button>
             </div>
           </div>
         </div>
