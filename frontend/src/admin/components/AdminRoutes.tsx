@@ -11,6 +11,7 @@
   import CreateAd from "./CreateAd";
   import OverallWinners from "../pages/OverallWinners";
 import AdminLogin from "./AdminLogin";
+import CertificateSettings from "../pages/CertificateSettings";
 
   const AdminRoutes: React.FC = () => {
   return (
@@ -30,6 +31,8 @@ import AdminLogin from "./AdminLogin";
               <Route path="adminEvents" element={<Events />} />
               <Route path="adminGallery" element={<AdminGallery />} />
               <Route path="registrations" element={<Registrations />} />
+              <Route path="certificate" element={<CertificateSettings />} />
+
               <Route path="winners" element={<Winners />} />
               <Route path="school-report" element={<SchoolReport />} />
               <Route path="ads" element={<CreateAd />} />

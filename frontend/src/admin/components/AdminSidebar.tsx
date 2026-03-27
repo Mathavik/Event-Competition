@@ -42,6 +42,14 @@ const AdminSidebar: React.FC = () => {
           Registrations
         </NavLink>
 
+
+<NavLink to="/admin/certificate" className={({ isActive }) => `${linkClass} ${isActive ? activeClass : hoverClass}`}>
+         Certificate setting
+        </NavLink>
+        <NavLink
+          to="/admin/school-report"
+          className={({ isActive }) => `${linkClass} ${isActive ? activeClass : hoverClass}`}
+        ></NavLink>
         <NavLink to="/admin/winners" className={({ isActive }) => `${linkClass} ${isActive ? activeClass : hoverClass}`}>
           Winners
         </NavLink>
