@@ -1,125 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 
 <style>
+@page { size: A4 landscape; margin: 0; }
+
 body {
-    font-family: DejaVu Sans, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-/* MAIN */
-.certificate {
+/* Container */
+.container {
+    position: relative;
+    width: 297mm;
+    height: 210mm;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+/* Background */
+.bg {
+    position: absolute;
     width: 100%;
-    border: 10px solid #1a237e;
-    padding: 20px;
+    height: 100%;
 }
 
-/* INNER */
-.inner {
-    border: 2px solid #c9a646;
-    padding: 30px;
+/* Common Text */
+.text {
+    position: absolute;
+    width: 100%;
     text-align: center;
+    color: #222;
 }
 
-/* TEXT */
+/* Title */
 .title {
-    font-size: 40px;
+    top: 25mm;
+    font-size: 50px;
     font-weight: bold;
-    color: #1a237e;
+    letter-spacing: 6px;
 }
 
+/* Subtitle */
 .subtitle {
-    font-size: 16px;
-    color: #c9a646;
-    margin-bottom: 20px;
+    top: 45mm;
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: #555;
 }
 
+/* Presented text */
+.presented {
+    top: 70mm;
+    font-size: 24px;
+}
+
+
+
+@font-face {
+    font-family: 'GreatVibes';
+    src: url('{{ public_path("fonts/GreatVibes-Regular.ttf") }}') format('truetype');
+}
+
+/* Name */
 .name {
-    font-size: 36px;
+    top: 85mm;
+    font-size: 52px;
     font-weight: bold;
-    margin: 20px 0;
-    border-bottom: 2px solid #c9a646;
-    display: inline-block;
-    padding: 5px 20px;
+    color: #b8860b;
+    letter-spacing: 3px;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
 }
 
-.event {
-    margin: 15px 0;
+/* Description */
+.desc {
+    top: 105mm;
+    font-size:22px;
+    width: 65%;
+    left: 17.5%;
+    line-height: 1.6;
 }
 
+/* Prize */
 .prize {
-    margin: 20px 0;
-    font-size: 22px;
+    top: 150mm;
+    font-size: 26px;
     font-weight: bold;
+    color: #b8860b;
+    letter-spacing: 2px;
 }
 
-/* TABLE footer (IMPORTANT instead of flex) */
-.footer {
-    width: 100%;
-    margin-top: 40px;
+/* Footer */
+.date {
+    position: absolute;
+    bottom: 20mm;
+    left: 40mm;
+    font-size: 26px;
 }
 
-.footer td {
-    width: 50%;
-    font-size: 14px;
+.sign-center {
+    position: absolute;
+    bottom: 20mm;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 26px;
 }
 
-.signature-line {
-    border-top: 1px solid black;
-    width: 150px;
-    margin-top: 30px;
+.sign-right {
+    position: absolute;
+    bottom: 20mm;
+    right: 40mm;
+    text-align: center;
+    font-size: 26px;
 }
 
+.logo {
+    position: absolute;
+    top: 2mm;      /* innum mela */
+    left: -2mm;
+    height: 95px;
+}
 </style>
 
 </head>
 
 <body>
 
-<table class="certificate" cellpadding="0" cellspacing="0">
-<tr>
-<td>
+<div class="container">
 
-    <div class="inner">
+    <!-- Background Image -->
+    <img src="{{ public_path('certificate2.jpg') }}" class="bg">
 
-        <div class="title">CERTIFICATE</div>
-        <div class="subtitle">OF EXCELLENCE</div>
+    <!-- Logo -->
+<img src="{{ public_path('logo.png') }}" class="logo">
 
-        <p>This award is proudly presented to</p>
 
-        <div class="name">
-            {{ strtoupper($student->name ?? 'MATHAVI') }}
-        </div>
+  
 
-        <p class="event">
-            For outstanding achievement in <br>
-            <b>{{ $event->name ?? 'SQUASH CHAMPIONSHIP' }}</b>
-        </p>
-
-        <div class="prize">
-            {{ strtoupper($prize ?? 'FIRST') }} PRIZE
-        </div>
-
-        <table class="footer">
-            <tr>
-                <td align="left">
-                    Date:<br>
-                    {{ isset($event->event_date) ? \Carbon\Carbon::parse($event->event_date)->format('d F Y') : '10 April 2026' }}
-                </td>
-
-                <td align="right">
-                    <!-- <div class="signature-line"></div> -->
-                    Authorized Signature
-                </td>
-            </tr>
-        </table>
-
+    <!-- Presented -->
+    <div class="text presented">
+        Proudly Presented To
     </div>
 
-</td>
-</tr>
-</table>
+    <!-- Name -->
+    <div class="text name">
+        {{ strtoupper($student->name) }}
+    </div>
+
+    <!-- Description -->
+    <div class="text desc">
+    This certificate is proudly awarded to <b>{{ strtoupper($student->name) }}</b> 
+    in recognition of outstanding performance and successful participation in 
+    <b>{{ $event->name }}</b>.  
+    Your dedication, commitment, and excellence have set a remarkable example.  
+    We truly appreciate your hard work and wish you continued success in all your future endeavors.
+</div>
+
+    <!-- Prize (No ? issue) -->
+    @if(!empty($prize))
+    <div class="text prize">
+        {{ strtoupper($prize) }} PRIZE
+    </div>
+    @endif
+
+    <!-- Date -->
+    <div class="date">
+        Date: {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
+    </div>
+
+    <!-- Signature -->
+  <!-- Coordinator Signature (Center) -->
+<div class="sign-center">
+    <img src="{{ public_path('signature.jpg') }}" style="height:40px;"><br>
+    Coordinator
+</div>
+
+<!-- Principal Signature (Right) -->
+<div class="sign-right">
+    <img src="{{ public_path('coordinator.jpg') }}" style="height:40px;"><br>
+    Principal
+</div>
+
+</div>
 
 </body>
 </html>
