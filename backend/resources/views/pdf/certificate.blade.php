@@ -11,22 +11,19 @@ body {
     padding: 0;
 }
 
-/* Container */
 .container {
     position: relative;
     width: 297mm;
-    height: 210mm;
+    height: 210mm; 
     font-family: 'Georgia', 'Times New Roman', serif;
 }
 
-/* Background */
 .bg {
     position: absolute;
     width: 100%;
     height: 100%;
 }
 
-/* Common Text */
 .text {
     position: absolute;
     width: 100%;
@@ -34,36 +31,11 @@ body {
     color: #222;
 }
 
-/* Title */
-.title {
-    top: 25mm;
-    font-size: 50px;
-    font-weight: bold;
-    letter-spacing: 6px;
-}
-
-/* Subtitle */
-.subtitle {
-    top: 45mm;
-    font-size: 20px;
-    letter-spacing: 4px;
-    color: #555;
-}
-
-/* Presented text */
 .presented {
     top: 70mm;
     font-size: 24px;
 }
 
-
-
-@font-face {
-    font-family: 'GreatVibes';
-    src: url('{{ public_path("fonts/GreatVibes-Regular.ttf") }}') format('truetype');
-}
-
-/* Name */
 .name {
     top: 85mm;
     font-size: 52px;
@@ -74,7 +46,6 @@ body {
     text-transform: uppercase;
 }
 
-/* Description */
 .desc {
     top: 105mm;
     font-size:22px;
@@ -83,16 +54,13 @@ body {
     line-height: 1.6;
 }
 
-/* Prize */
 .prize {
     top: 150mm;
     font-size: 26px;
     font-weight: bold;
     color: #b8860b;
-    letter-spacing: 2px;
 }
 
-/* Footer */
 .date {
     position: absolute;
     bottom: 20mm;
@@ -102,26 +70,26 @@ body {
 
 .sign-center {
     position: absolute;
-    bottom: 20mm;
+    bottom: 25mm;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    font-size: 26px;
+    font-size: 18px;
 }
 
 .sign-right {
     position: absolute;
-    bottom: 20mm;
+    bottom: 25mm;
     right: 40mm;
     text-align: center;
-    font-size: 26px;
+    font-size: 18px;
 }
 
 .logo {
     position: absolute;
-    top: 2mm;      /* innum mela */
-    left: -2mm;
-    height: 95px;
+    top: 5mm;
+    left: 10mm;
+    height: 70px; /* 👈 small logo */
 }
 </style>
 
@@ -129,60 +97,67 @@ body {
 
 <body>
 
+@php
+$setting = \App\Models\CertificateSetting::first();
+$bg = $setting->background_image ?? null;
+$logo = $setting->logo ?? null;
+$coord = $setting->coordinator_signature ?? null;
+$principal = $setting->principal_signature ?? null;
+@endphp
+
 <div class="container">
 
-    <!-- Background Image -->
-    <img src="{{ public_path('certificate2.jpg') }}" class="bg">
+    <!-- ✅ Background -->
+    @if($bg)
+        <img src="{{ public_path('storage/'.$bg) }}?v={{ time() }}" class="bg">
+    @endif
 
-    <!-- Logo -->
-<img src="{{ public_path('logo.png') }}" class="logo">
+    <!-- ✅ Logo -->
+    @if($logo)
+        <img src="{{ public_path('storage/'.$logo) }}?v={{ time() }}" class="logo">
+    @endif
 
-
-  
-
-    <!-- Presented -->
+    <!-- Text -->
     <div class="text presented">
         Proudly Presented To
     </div>
 
-    <!-- Name -->
     <div class="text name">
         {{ strtoupper($student->name) }}
     </div>
 
-    <!-- Description -->
     <div class="text desc">
-    This certificate is proudly awarded to <b>{{ strtoupper($student->name) }}</b> 
-    in recognition of outstanding performance and successful participation in 
-    <b>{{ $event->name }}</b>.  
-    Your dedication, commitment, and excellence have set a remarkable example.  
-    We truly appreciate your hard work and wish you continued success in all your future endeavors.
-</div>
+        This certificate is proudly awarded to <b>{{ strtoupper($student->name) }}</b> 
+        in recognition of outstanding performance and successful participation in 
+        <b>{{ $event->name }}</b>.  
+        Your dedication and excellence are appreciated.
+    </div>
 
-    <!-- Prize (No ? issue) -->
     @if(!empty($prize))
     <div class="text prize">
         {{ strtoupper($prize) }} PRIZE
     </div>
     @endif
 
-    <!-- Date -->
     <div class="date">
         Date: {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
     </div>
 
-    <!-- Signature -->
-  <!-- Coordinator Signature (Center) -->
-<div class="sign-center">
-    <img src="{{ public_path('signature.jpg') }}" style="height:40px;"><br>
-    Coordinator
-</div>
+    <!-- ✅ Coordinator -->
+    @if($coord)
+    <div class="sign-center">
+        <img src="{{ public_path('storage/'.$coord) }}?v={{ time() }}" style="height:50px;"><br>
+        Coordinator
+    </div>
+    @endif
 
-<!-- Principal Signature (Right) -->
-<div class="sign-right">
-    <img src="{{ public_path('coordinator.jpg') }}" style="height:40px;"><br>
-    Principal
-</div>
+    <!-- ✅ Principal -->
+    @if($principal)
+    <div class="sign-right">
+        <img src="{{ public_path('storage/'.$principal) }}?v={{ time() }}" style="height:50px;"><br>
+        Principal
+    </div>
+    @endif
 
 </div>
 

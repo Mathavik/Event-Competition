@@ -14,6 +14,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\Admin\CertificateController;
 
 Route::get('/schools', [StudentController::class, 'getSchools']);
 // routes/api.php
@@ -109,3 +110,12 @@ Route::delete('/ads/{id}', [AdvertisementController::class, 'destroy']); // dele
 Route::get('/overall-winners', [EventController::class, 'overallWinners']);
 Route::match(['post', 'put'], '/ads/{id}', [AdvertisementController::class, 'update']);
 // Route::post('/ads/{id}', [AdvertisementController::class, 'update']);
+
+
+
+
+
+Route::get('/admin/certificate', [CertificateController::class, 'index']);
+Route::post('/admin/certificate', [CertificateController::class, 'store']);
+Route::post('/admin/certificate/update', [CertificateController::class, 'update']);
+Route::delete('/admin/certificate/delete', [CertificateController::class, 'destroy']);
