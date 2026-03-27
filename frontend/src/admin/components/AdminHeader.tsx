@@ -12,9 +12,9 @@ const AdminHeader: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("admin");
-    navigate("/adminlogin");
+    localStorage.removeItem("admin_email");
+    // localStorage.removeItem("admin");
+    navigate("/admin/adminlogin");
   };
 
   // 🔔 Fetch notifications
