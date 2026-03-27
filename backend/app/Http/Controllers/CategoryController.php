@@ -42,7 +42,9 @@ public function store(Request $request)
     // 📌 Show single category
     public function show($id)
 {
-    $category = Category::with('events')->findOrFail($id);
+    $category = Category::with(['events' => function ($query) {
+    $query->where('is_visible', 1);
+}])->findOrFail($id);
 
     $category->events->map(function ($event) {
 

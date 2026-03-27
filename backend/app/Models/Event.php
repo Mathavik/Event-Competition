@@ -17,7 +17,8 @@ class Event extends Model
         'entry_fee',
         'event_date',
         'start_time',
-        'end_time'
+        'end_time',
+        'is_visible',
     ];
 
     // protected $appends = ['image_url'];
