@@ -31,6 +31,68 @@ public function registerEvent(Request $request)
             ], 400);
         }
 
+        $errors = [];
+
+        foreach ($request->members as $studentId) {
+
+            $student = Student::findOrFail($studentId);
+
+            // Max 5 events
+            $count = DB::table('event_student')
+                ->where('student_id', $studentId)
+                ->count();
+
+            if ($count >= 5) {
+                $errors[] = "Student $studentId: Max 5 events only";
+            }
+
+            // Time clash
+            $exists = DB::table('event_student')
+                ->where('student_id', $studentId)
+                ->where('event_time', $request->event_time)
+                ->exists();
+
+            if ($exists) {
+                $errors[] = "Student $studentId: Time clash";
+            }
+
+            // Age check
+            $allowed = array_map('trim', explode(',', $event->age_group));
+
+            if (!in_array('All Ages', $allowed)) {
+                $valid = false;
+
+                foreach ($allowed as $group) {
+                    if ($group == 'U16' && $student->age <= 16) $valid = true;
+                    if ($group == 'U18' && $student->age <= 18) $valid = true;
+                    if ($group == 'U19' && $student->age <= 19) $valid = true;
+                }
+
+                if (!$valid) {
+                    $errors[] = "Student $studentId: Not eligible";
+                }
+            }
+
+            // School rule
+            $alreadyExists = DB::table('event_student')
+                ->join('students', 'event_student.student_id', '=', 'students.id')
+                ->where('event_student.event_id', $event->id)
+                ->where('students.school_code', $student->school_code)
+                ->exists();
+
+            if ($alreadyExists) {
+                $errors[] = "Student $studentId: Only one per school allowed";
+            }
+        }
+
+        // 🔥 RETURN ALL ERRORS
+        if (!empty($errors)) {
+            return response()->json([
+                'message' => implode(', ', $errors),
+                'errors' => $errors
+            ], 400);
+        }
+
         DB::beginTransaction();
 
         try {
@@ -38,68 +100,6 @@ public function registerEvent(Request $request)
 
             foreach ($request->members as $studentId) {
 
-                $student = Student::findOrFail($studentId);
-
-                // Max 5 events per student
-                $count = DB::table('event_student')
-                    ->where('student_id', $studentId)
-                    ->count();
-
-                if ($count >= 5) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Max 5 events only for student ' . $studentId
-                    ], 400);
-                }
-
-                // Time clash
-                $exists = DB::table('event_student')
-                    ->where('student_id', $studentId)
-                    ->where('event_time', $request->event_time)
-                    ->exists();
-
-                if ($exists) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Time clash for student ' . $studentId
-                    ], 400);
-                }
-
-                // Age check
-                $allowed = array_map('trim', explode(',', $event->age_group));
-
-                if (!in_array('All Ages', $allowed)) {
-                    $valid = false;
-
-                    foreach ($allowed as $group) {
-                        if ($group == 'U16' && $student->age <= 16) $valid = true;
-                        if ($group == 'U18' && $student->age <= 18) $valid = true;
-                        if ($group == 'U19' && $student->age <= 19) $valid = true;
-                    }
-
-                    if (!$valid) {
-                        DB::rollBack();
-                        return response()->json([
-                            'message' => 'Student ' . $studentId . ' not eligible'
-                        ], 400);
-                    }
-                }
-
-                // School rule
-                $alreadyExists = DB::table('event_student')
-                    ->join('students', 'event_student.student_id', '=', 'students.id')
-                    ->where('event_student.event_id', $event->id)
-                    ->where('students.school_code', $student->school_code)
-                    ->exists();
-
-                if ($alreadyExists) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Only one student per school allowed'
-                    ], 400);
-                }
-
-                // event_student create only
                 $eventStudentId = DB::table('event_student')->insertGetId([
                     'student_id' => $studentId,
                     'event_id' => $event->id,
@@ -118,7 +118,7 @@ public function registerEvent(Request $request)
             DB::commit();
 
             return response()->json([
-                'message' => 'Team registered successfully. Proceed to payment.',
+                'message' => 'Team registered successfully',
                 'data' => $created,
                 'event_name' => $event->name,
                 'amount' => $request->amount ?? 100.00
@@ -135,20 +135,25 @@ public function registerEvent(Request $request)
     }
 
     // ================= SOLO EVENT =================
-    $student = Student::findOrFail($request->student_id);
 
+    $student = Student::findOrFail($request->student_id);
+    $errors = [];
+
+    // Max 5 events
     if ($student->events()->count() >= 5) {
-        return response()->json(['message' => 'Max 5 events only'], 400);
+        $errors[] = 'Max 5 events only';
     }
 
+    // Time clash
     $exists = $student->events()
         ->wherePivot('event_time', $request->event_time)
         ->exists();
 
     if ($exists) {
-        return response()->json(['message' => 'Time clash!'], 400);
+        $errors[] = 'Time clash!';
     }
 
+    // Age check
     $allowed = array_map('trim', explode(',', $event->age_group));
 
     if (!in_array('All Ages', $allowed)) {
@@ -161,17 +166,24 @@ public function registerEvent(Request $request)
         }
 
         if (!$valid) {
-            return response()->json(['message' => 'Not eligible'], 400);
+            $errors[] = 'Not eligible';
         }
     }
 
+    // School rule
     $alreadyExists = $event->students()
         ->where('school_code', $student->school_code)
         ->exists();
 
     if ($alreadyExists) {
+        $errors[] = 'Only one student per school allowed';
+    }
+
+    // 🔥 RETURN ALL ERRORS
+    if (!empty($errors)) {
         return response()->json([
-            'message' => 'Only one student per school allowed in this event'
+            'message' => implode(', ', $errors),
+            'errors' => $errors
         ], 400);
     }
 
@@ -190,7 +202,7 @@ public function registerEvent(Request $request)
         DB::commit();
 
         return response()->json([
-            'message' => 'Registered successfully. Proceed to payment.',
+            'message' => 'Registered successfully',
             'event_student_id' => $eventStudentId,
             'event_name' => $event->name,
             'amount' => $request->amount ?? 100.00

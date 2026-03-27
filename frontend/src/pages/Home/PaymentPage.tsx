@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
+// interface PaymentPageState {
+//   isTeam?: boolean;
+//   event_student_id?: number;
+//   event_name?: string;
+//   amount?: number;
+//   team_name?: string;
+//   team_id?: number;
+// }
 interface PaymentPageState {
-  isTeam?: boolean;
-  event_student_id?: number;
-  event_name?: string;
-  amount?: number;
-  team_name?: string;
-  team_id?: number;
+  event: any;
+  isTeam: boolean;
 }
-
 const PaymentPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,55 +29,96 @@ const PaymentPage: React.FC = () => {
   useEffect(() => {
     console.log("payment page state =", state);
   }, [state]);
+  const getErrorMessage = (err: any) => {
+    return (
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Something went wrong ❌"
+    );
+  };
+ const handlePayment = async () => {
+  setLoading(true);
+  setMessage("");
 
-  const handlePayment = async () => {
-    setLoading(true);
-    setMessage("");
+  try {
+    const studentId = localStorage.getItem("student_id");
+    const { event, isTeam } = state;
 
-    try {
-      if (!state?.event_student_id) {
-        setMessage("event_student_id missing");
-        setLoading(false);
+    if (!event) {
+      toast.error("Event data missing ❌");
+      return;
+    }
+
+    if (!studentId) {
+      toast.error("Please login first ❌");
+      return;
+    }
+
+    let eventStudentId = null;
+
+    // ✅ TEAM BOOKING
+    if (isTeam) {
+      try {
+        const res = await axios.post("http://127.0.0.1:8000/api/team-name", {
+          event_id: event.id,
+          captain_id: Number(studentId),
+          team_name: localStorage.getItem("school_name"),
+          event_name: event.name,
+        });
+
+        eventStudentId = res.data.event_student_id;
+
+      } catch (err: any) {
+        toast.error("Team Booking Error: " + getErrorMessage(err));
         return;
       }
+    } 
+    
+    // ✅ SOLO BOOKING
+    else {
+      try {
+        const res = await axios.post("http://127.0.0.1:8000/api/register-event", {
+          student_id: studentId,
+          event_id: event.id,
+          event_time: `${event.event_date} ${event.start_time}`,
+          amount: event.entry_fee || 0,
+        });
 
-      const payload = {
-        event_student_id: Number(state.event_student_id),
+        eventStudentId = res.data.event_student_id;
+
+      } catch (err: any) {
+        toast.error("Booking Error: " + getErrorMessage(err));
+        return;
+      }
+    }
+
+    // ✅ PAYMENT
+    try {
+      await axios.post("http://127.0.0.1:8000/api/payments", {
+        event_student_id: eventStudentId,
         payment_id: "PAY" + Date.now(),
         payment_type: paymentType,
-        amount: Number(state.amount || 0),
+        amount: event.entry_fee || 0,
         payment_status: "paid",
         payment_date: new Date().toISOString().slice(0, 19).replace("T", " "),
         transaction_id: "TXN" + Date.now(),
-      };
+      });
 
-      console.log("payment payload =", payload);
+      toast.success("Booking + Payment Success ✅");
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/payments",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
+      setTimeout(() => navigate("/"), 1500);
 
-      console.log("payment response =", res.data);
-
-      setMessage(isTeam ? "Team Booking Successfully ✅" : "Booking Successfully ✅");
-
-      setTimeout(() => {
-        navigate("/");
-      }, 1200);
     } catch (err: any) {
-      console.log("payment error =", err?.response?.data || err.message);
-      setMessage(err.response?.data?.message || "Payment failed");
-    } finally {
-      setLoading(false);
+      toast.error("Payment Error: " + getErrorMessage(err));
     }
-  };
+
+  } catch (err: any) {
+    toast.error(getErrorMessage(err));
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -93,17 +137,17 @@ const PaymentPage: React.FC = () => {
           </p>
 
           <p className="mb-2">
-            <strong>Event Name:</strong> {state?.event_name || "N/A"}
+            <strong>Event Name:</strong> {state?.event?.name}
           </p>
 
           {isTeam && (
             <p className="mb-2">
-              <strong>Team Name:</strong> {state?.team_name || "N/A"}
+              <strong>Team Name:</strong> {localStorage.getItem("school_name")}
             </p>
           )}
 
           <p className="mb-4">
-            <strong>Amount:</strong> ₹{state?.amount || 0}
+            <strong>Amount:</strong> ₹{state?.event?.entry_fee || 0}
           </p>
         </div>
 
