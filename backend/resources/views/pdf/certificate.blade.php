@@ -116,6 +116,13 @@ body {
     text-align: center;
     font-size: 26px;
 }
+
+.logo {
+    position: absolute;
+    top: 2mm;      /* innum mela */
+    left: -2mm;
+    height: 95px;
+}
 </style>
 
 </head>
@@ -125,8 +132,10 @@ body {
 <div class="container">
 
     <!-- Background Image -->
-    <img src="{{ public_path('certificate1.jpg') }}" class="bg">
+    <img src="{{ public_path('certificate2.jpg') }}" class="bg">
 
+    <!-- Logo -->
+<img src="{{ public_path('logo.png') }}" class="logo">
 
 
   

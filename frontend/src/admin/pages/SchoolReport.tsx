@@ -8,7 +8,8 @@ import {
   TrendingUp,
   Award,
   FileText,
-  Loader2
+  Loader2,
+  Search
 } from "lucide-react";
 
 type SchoolData = {
@@ -44,12 +45,10 @@ const SchoolReport = () => {
     window.open("http://localhost:8000/api/school-report/download", "_blank");
   };
 
-  // Filter data based on search
   const filteredData = data.filter((item) =>
     item.school_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sort data
   const sortedData = [...filteredData].sort((a, b) => {
     let comparison = 0;
     if (sortBy === "name") {
@@ -62,10 +61,8 @@ const SchoolReport = () => {
     return sortOrder === "asc" ? comparison : -comparison;
   });
 
-  // Statistics
   const totalStudents = data.reduce((sum, item) => sum + item.total_students, 0);
   const totalEvents = data.reduce((sum, item) => sum + item.total_events, 0);
-  const averageStudentsPerSchool = data.length > 0 ? Math.round(totalStudents / data.length) : 0;
 
   const handleSort = (column: "name" | "students" | "events") => {
     if (sortBy === column) {
@@ -77,206 +74,145 @@ const SchoolReport = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-slate-950 p-6 text-slate-200">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="mb-10">
+          <div className="flex items-center justify-between flex-wrap gap-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
-                School Reports
+              <h1 className="text-4xl font-black text-white uppercase tracking-tighter">
+                School <span className="text-amber-500">Analytics</span>
               </h1>
-              <p className="text-gray-600 mt-2">
-                Comprehensive overview of school participation and achievements
+              <p className="text-slate-500 mt-2 font-medium italic">
+                Comprehensive overview of school participation and achievements.
               </p>
             </div>
             <button
               onClick={downloadPDF}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="bg-amber-600 hover:bg-amber-500 text-white px-8 py-4 rounded-2xl flex items-center gap-3 transition-all duration-300 shadow-xl shadow-amber-600/20 font-black uppercase text-[10px] tracking-widest active:scale-95"
             >
-              <Download size={20} />
-              <span className="font-semibold">Download PDF Report</span>
+              <Download size={18} />
+              Generate PDF Report
             </button>
           </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-md p-6 border-l-4 border-amber-500 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Total Schools</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">{data.length}</p>
-              </div>
-              <div className="bg-amber-100 p-3 rounded-full">
-                <School className="text-amber-600" size={28} />
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                <School size={80} className="text-amber-500" />
             </div>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Registered Institutions</p>
+            <p className="text-4xl font-black text-white tracking-tight">{data.length.toString().padStart(2, '0')}</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Total Students</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">{totalStudents.toLocaleString()}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Users className="text-blue-600" size={28} />
-              </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                <Users size={80} className="text-blue-500" />
             </div>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Engaged Students</p>
+            <p className="text-4xl font-black text-white tracking-tight">{totalStudents.toLocaleString()}</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Total Events</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">{totalEvents.toLocaleString()}</p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Calendar className="text-green-600" size={28} />
-              </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                <Calendar size={80} className="text-emerald-500" />
             </div>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Active Event Tracks</p>
+            <p className="text-4xl font-black text-white tracking-tight">{totalEvents.toLocaleString()}</p>
           </div>
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1 w-full">
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-[2rem] p-6 mb-10 shadow-2xl">
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            <div className="relative flex-1 w-full group">
+              <Search className="absolute left-4 top-4 text-slate-600 group-focus-within:text-amber-500 transition-colors" size={20} />
               <input
                 type="text"
-                placeholder="🔍 Search school by name..."
+                placeholder="SEARCH INSTITUTION BY NAME..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-6 text-white font-bold text-xs tracking-widest outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-700 uppercase"
               />
-              <svg
-                className="absolute left-3 top-3.5 h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
             </div>
-            <div className="flex gap-2">
-              <div className="bg-gray-100 rounded-lg p-1">
+            
+            <div className="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+              {(["name", "students", "events"] as const).map((tab) => (
                 <button
-                  onClick={() => handleSort("name")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === "name"
-                      ? "bg-amber-500 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-200"
+                  key={tab}
+                  onClick={() => handleSort(tab)}
+                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    sortBy === tab
+                      ? "bg-amber-600 text-white shadow-lg"
+                      : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
-                  School {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                  {tab} {sortBy === tab && (sortOrder === "asc" ? "↑" : "↓")}
                 </button>
-                <button
-                  onClick={() => handleSort("students")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === "students"
-                      ? "bg-amber-500 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  Students {sortBy === "students" && (sortOrder === "asc" ? "↑" : "↓")}
-                </button>
-                <button
-                  onClick={() => handleSort("events")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === "events"
-                      ? "bg-amber-500 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  Events {sortBy === "events" && (sortOrder === "asc" ? "↑" : "↓")}
-                </button>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-[2.5rem] overflow-hidden shadow-3xl">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className="animate-spin text-amber-500 mb-4" size={48} />
-              <p className="text-gray-500">Loading school data...</p>
+            <div className="flex flex-col items-center justify-center py-32">
+              <Loader2 className="animate-spin text-amber-500 mb-6" size={48} />
+              <p className="text-slate-600 font-black uppercase text-[10px] tracking-[0.3em]">Accessing Data Core...</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                      <th className="p-4 text-left text-sm font-semibold text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <School size={16} />
-                          School Name
-                        </div>
-                      </th>
-                      <th className="p-4 text-center text-sm font-semibold text-gray-600">
-                        <div className="flex items-center justify-center gap-2">
-                          <Users size={16} />
-                          Total Students
-                        </div>
-                      </th>
-                      <th className="p-4 text-center text-sm font-semibold text-gray-600">
-                        <div className="flex items-center justify-center gap-2">
-                          <Calendar size={16} />
-                          Total Events
-                        </div>
-                      </th>
-                      <th className="p-4 text-center text-sm font-semibold text-gray-600">
-                        <div className="flex items-center justify-center gap-2">
-                          <TrendingUp size={16} />
-                          Performance
-                        </div>
-                      </th>
+                    <tr className="bg-slate-900/80 border-b border-slate-800">
+                      <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">School Identity</th>
+                      <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Population</th>
+                      <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Event Quota</th>
+                      <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Participation</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-800/50">
                     {sortedData.length > 0 ? (
                       sortedData.map((item, index) => {
-                        const participationRate = item.total_events > 0 
+                        const participationRate = totalStudents > 0 
                           ? Math.round((item.total_students / totalStudents) * 100) 
                           : 0;
                         
                         return (
-                          <tr
-                            key={index}
-                            className="border-b border-gray-100 hover:bg-amber-50 transition-colors duration-200"
-                          >
-                            <td className="p-4 font-medium text-gray-800">
-                              <div className="flex items-center gap-2">
-                                <Award size={16} className="text-amber-500" />
-                                {item.school_name}
+                          <tr key={index} className="hover:bg-white/[0.02] transition-colors group">
+                            <td className="p-6">
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-amber-500 border border-slate-700 transition-colors">
+                                  <Award size={18} />
+                                </div>
+                                <span className="font-black text-white uppercase text-sm tracking-tight group-hover:text-amber-500 transition-colors">
+                                  {item.school_name}
+                                </span>
                               </div>
                             </td>
-                            <td className="p-4 text-center">
-                              <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">
+                            <td className="p-6 text-center">
+                              <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-4 py-1.5 rounded-xl text-xs font-black">
                                 {item.total_students.toLocaleString()}
                               </span>
                             </td>
-                            <td className="p-4 text-center">
-                              <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+                            <td className="p-6 text-center">
+                              <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-1.5 rounded-xl text-xs font-black">
                                 {item.total_events.toLocaleString()}
                               </span>
                             </td>
-                            <td className="p-4 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                <div className="w-24 bg-gray-200 rounded-full h-2">
+                            <td className="p-6">
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="w-32 bg-slate-950 rounded-full h-1.5 border border-slate-800 p-[1px]">
                                   <div
-                                    className="bg-gradient-to-r from-amber-400 to-amber-500 h-2 rounded-full transition-all duration-500"
+                                    className="bg-gradient-to-r from-amber-600 to-amber-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
                                     style={{ width: `${participationRate}%` }}
                                   />
                                 </div>
-                                <span className="text-xs text-gray-500">{participationRate}%</span>
+                                <span className="text-[10px] text-slate-600 font-black tracking-widest">{participationRate}%</span>
                               </div>
                             </td>
                           </tr>
@@ -284,13 +220,10 @@ const SchoolReport = () => {
                       })
                     ) : (
                       <tr>
-                        <td colSpan={4} className="p-12 text-center">
-                          <div className="flex flex-col items-center gap-3">
-                            <FileText size={48} className="text-gray-300" />
-                            <p className="text-gray-500 font-medium">No schools found</p>
-                            <p className="text-gray-400 text-sm">
-                              {searchTerm ? "Try adjusting your search" : "No data available"}
-                            </p>
+                        <td colSpan={4} className="p-32 text-center">
+                          <div className="flex flex-col items-center gap-4 opacity-20">
+                            <FileText size={60} className="text-slate-600" />
+                            <p className="font-black uppercase text-xs tracking-[0.4em]">No Records Found</p>
                           </div>
                         </td>
                       </tr>
@@ -301,20 +234,18 @@ const SchoolReport = () => {
 
               {/* Footer Summary */}
               {sortedData.length > 0 && (
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                  <div className="flex flex-wrap justify-between items-center text-sm text-gray-600">
-                    <div>
-                      Showing <strong>{sortedData.length}</strong> of <strong>{data.length}</strong> schools
+                <div className="bg-slate-900/50 px-8 py-5 border-t border-slate-800 flex flex-wrap justify-between items-center">
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                    Showing {sortedData.length} of {data.length} Institutions
+                  </p>
+                  <div className="flex gap-6">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Student Vol.</span>
                     </div>
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-blue-100 rounded-full"></div>
-                        <span>Students Count</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-green-100 rounded-full"></div>
-                        <span>Events Count</span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Event Cap.</span>
                     </div>
                   </div>
                 </div>
