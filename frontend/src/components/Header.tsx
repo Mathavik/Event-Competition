@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Menu, X, Trophy } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X } from 'lucide-react';
 import logo from '../assets/logo.png';
-import { Link } from 'react-router-dom';
 
-const Header = () => {
+const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isLoggedIn = !!localStorage.getItem("token");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<string>('');
+
+  const isLoggedIn = !!localStorage.getItem("token");
   const schoolName = localStorage.getItem("school_name");
 
   const navItems = [
@@ -17,6 +18,32 @@ const Header = () => {
     { name: 'Contact', href: '/contact' },
   ];
 
+  // Countdown function
+  const getTimeLeft = (eventDate: string): string => {
+    const now = new Date().getTime();
+    const event = new Date(eventDate).getTime();
+    const diff = event - now;
+
+    if (diff <= 0) return "Event Started 🔴";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s left`;
+  };
+
+  // Update countdown every second
+  useEffect(() => {
+    const mainEventDate = "2026-04-10T09:00:00"; // Your event date
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeLeft(mainEventDate));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <header className="bg-slate-950 text-white shadow-2xl sticky top-0 z-50 border-b border-amber-500/30">
       <nav className="container mx-auto px-6 py-4">
@@ -24,22 +51,8 @@ const Header = () => {
 
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            {/* <div className="relative">
-              <div className="absolute -inset-1 bg-amber-500 rounded-full blur opacity-25"></div>
-              <div className="relative bg-slate-900 p-2 rounded-full border border-amber-500/50">
-                <Trophy className="text-amber-500" size={24} />
-              </div>
-            </div> */}
-            <div className="flex items-center space-x-3">
-              <img
-                src={logo}
-
-                alt="Event Logo"
-                className="h-18 w-auto object-contain"
-              />
-            </div>
+            <img src={logo} alt="Event Logo" className="h-18 w-auto object-contain" />
           </div>
-       
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
@@ -53,6 +66,12 @@ const Header = () => {
               </a>
             ))}
 
+            {/* Countdown */}
+            <div className="ml-6 px-4 py-2 bg-amber-500 text-slate-900 rounded-full font-bold text-sm">
+              {timeLeft}
+            </div>
+
+            {/* Profile / Login */}
             {isLoggedIn ? (
               <div className="relative">
                 <button
@@ -84,10 +103,7 @@ const Header = () => {
           </div>
 
           {/* Mobile Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden text-amber-500"
-          >
+          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-amber-500">
             {isOpen ? <X size={30} /> : <Menu size={30} />}
           </button>
         </div>
@@ -105,26 +121,6 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-
-            {isLoggedIn ? (
-              <button
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.reload();
-                }}
-                className="block mt-4 bg-red-500 text-white px-5 py-2 rounded-full font-bold text-sm w-full"
-              >
-                LOGOUT
-              </button>
-            ) : (
-              <a
-                href="/login"
-                className="block mt-4 bg-amber-500 text-slate-950 px-5 py-2 rounded-full font-bold text-sm text-center hover:bg-amber-400"
-                onClick={() => setIsOpen(false)}
-              >
-                REGISTER NOW
-              </a>
-            )}
           </div>
         )}
       </nav>
