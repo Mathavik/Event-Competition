@@ -110,7 +110,6 @@ Route::delete('/ads/{id}', [AdvertisementController::class, 'destroy']); // dele
 Route::get('/overall-winners', [EventController::class, 'overallWinners']);
 Route::match(['post', 'put'], '/ads/{id}', [AdvertisementController::class, 'update']);
 // Route::post('/ads/{id}', [AdvertisementController::class, 'update']);
-<<<<<<< HEAD
 
 
 
@@ -120,6 +119,4 @@ Route::get('/admin/certificate', [CertificateController::class, 'index']);
 Route::post('/admin/certificate', [CertificateController::class, 'store']);
 Route::post('/admin/certificate/update', [CertificateController::class, 'update']);
 Route::delete('/admin/certificate/delete', [CertificateController::class, 'destroy']);
-=======
 Route::get('/admin/notification-data', [StudentController::class, 'getNotificationRegistrations']);
->>>>>>> 4a946a1984cfd934473aa72e66c4008491a058cc
