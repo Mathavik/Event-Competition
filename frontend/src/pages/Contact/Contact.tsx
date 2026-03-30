@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../../api";
-import { Mail, MessageSquare, User, Send, MapPin, Phone } from "lucide-react"; // Optional: npm i lucide-react
+import { Mail, MessageSquare, User, Send, MapPin, Phone } from "lucide-react"; 
 
 export default function Contact() {
   const [form, setForm] = useState({

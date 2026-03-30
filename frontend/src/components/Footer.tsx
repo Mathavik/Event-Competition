@@ -1,18 +1,28 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Trophy, Clock } from 'lucide-react';
-
+import logo from '../assets/logo.png';
 const Footer = () => {
   return (
     <footer className="bg-slate-950 text-slate-400 pt-16 border-t border-slate-900">
       <div className="container mx-auto px-6 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           
-          {/* Brand Info */}
+          {/* Brand Info - Logo Section */}
           <div className="space-y-6">
-            <h2 className="text-white text-2xl font-black italic">GRAND <span className="text-amber-500">2024</span></h2>
+            {/* Logo Image */}
+            <div className="flex items-center">
+              <img
+                              src={logo}
+              
+                              alt="Event Logo"
+                              className="h-18 w-auto object-contain"
+                            />
+            </div>
+
             <p className="text-sm leading-relaxed">
               Southern India's most prestigious cultural and sporting event. Dedicated to discovering and nurturing the stars of tomorrow.
             </p>
+            
             <div className="flex space-x-4">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:border-amber-500 hover:text-amber-500 transition-all">
