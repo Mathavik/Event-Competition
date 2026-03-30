@@ -15,6 +15,8 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/schools', [StudentController::class, 'getSchools']);
 // routes/api.php
@@ -120,3 +122,6 @@ Route::post('/admin/certificate', [CertificateController::class, 'store']);
 Route::post('/admin/certificate/update', [CertificateController::class, 'update']);
 Route::delete('/admin/certificate/delete', [CertificateController::class, 'destroy']);
 Route::get('/admin/notification-data', [StudentController::class, 'getNotificationRegistrations']);
+
+Route::get('/chart-data', [DashboardController::class, 'getChartData']);
+Route::get('/dashboard-counts', [DashboardController::class, 'getCounts']);
