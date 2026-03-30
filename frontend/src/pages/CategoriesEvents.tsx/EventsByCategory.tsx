@@ -7,6 +7,7 @@ import sportsVideo from "../../assets/sports.mp4";
 import performingVideo from "../../assets/Classical.mp4";
 import artsVideo from "../../assets/Visual.mp4";
 import funVideo from "../../assets/Visual.mp4";
+import axiosInstance from "../../axiosInstance";
 
 type Event = {
   id: number;
@@ -194,68 +195,88 @@ export default function EventsByCategory() {
       setLoadingId(null);
     }
   };
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [schoolName, setSchoolName] = useState("");
+    const [studentId, setStudentId] = useState("");
 
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const res = await axiosInstance.get("/me");
+      // setIsLoggedIn(true);
+      setSchoolName(res.data.school_name);
+      setStudentId(res.data.id);
+
+    } catch {
+      // setIsLoggedIn(false);
+    }
+  };
+
+  // HttpOnly token cookie can't be read from document.cookie,
+  // so call /me directly and let the backend validate the session.
+  checkAuth();
+}, []);
   const handleBookNow = (event: Event) => {
-  if (isBookingClosed(event)) {
-    alert("Booking closed ❌");
-    return;
-  }
+    if (isBookingClosed(event)) {
+      alert("Booking closed ❌");
+      return;
+    }
 
 
-  const studentId = localStorage.getItem("student_id");
+    // const studentId = localStorage.getItem("student_id");
 
-  if (!studentId) {
-    alert("Please login first!");
-    navigate("/login");
-    return;
-  }
+    if (!studentId) {
+      alert("Please login first!");
+      navigate("/login");
+      return;
+    }
 
-  navigate("/payment", {
-    state: {
-      event,
-      isTeam: event.type?.toLowerCase().includes("team"),
-    },
-  });
-};
+    navigate("/payment", {
+      state: {
+        event,
+        isTeam: event.type?.toLowerCase().includes("team"),
+      },
+    });
+  };
 
   if (!category) {
     return <div className="text-center mt-20">Loading...</div>;
   }
   const handlePaymentSuccess = async () => {
-  const { event, isTeam } = location.state;
-  const studentId = localStorage.getItem("student_id");
+    const { event, isTeam } = location.state;
+    const studentId = localStorage.getItem("student_id");
 
-  try {
-    if (isTeam) {
-      // TEAM API
-      const res = await api.post("/team-name", {
-        event_id: event.id,
-        captain_id: Number(studentId),
-        team_name: localStorage.getItem("school_name"),
-        event_name: event.name,
-      });
+    try {
+      if (isTeam) {
+        // TEAM API
+        const res = await api.post("/team-name", {
+          event_id: event.id,
+          captain_id: Number(studentId),
+          team_name: localStorage.getItem("school_name"),
+          event_name: event.name,
+        });
 
-      console.log("Team booking success", res.data);
+        console.log("Team booking success", res.data);
 
-    } else {
-      // SOLO API
-      const res = await api.post("/register-event", {
-        student_id: studentId,
-        event_id: event.id,
-        event_time: `${event.event_date} ${event.start_time}`,
-        amount: event.entry_fee || 0,
-      });
+      } else {
+        // SOLO API
+        const res = await api.post("/register-event", {
+          student_id: studentId,
+          event_id: event.id,
+          event_time: `${event.event_date} ${event.start_time}`,
+          amount: event.entry_fee || 0,
+        });
 
-      console.log("Solo booking success", res.data);
+        console.log("Solo booking success", res.data);
+      }
+
+      alert("Booking confirmed ✅");
+
+    } catch (err) {
+      console.error(err);
+      alert("Booking failed after payment ❌");
     }
-
-    alert("Booking confirmed ✅");
-
-  } catch (err) {
-    console.error(err);
-    alert("Booking failed after payment ❌");
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">

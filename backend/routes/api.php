@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminAuthController;
@@ -16,6 +17,28 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
 
 Route::get('/schools', [StudentController::class, 'getSchools']);
+
+Route::middleware('auth.custom')->group(function () {
+    Route::get('/categories', function (Request $request) {
+        return "Protected data";
+    });
+});
+use Illuminate\Http\Request; 
+Route::middleware('auth.custom')->get('/me', function (Request $request) {
+    $token = $request->cookie('token');
+
+    if (!$token) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+
+    $student = \App\Models\Student::where('api_token', $token)->first();
+
+    if (!$student) {
+        return response()->json(['error' => 'Invalid token'], 401);
+    }
+
+    return $student;
+});
 // routes/api.php
 Route::get('/admin/notifications', function () {
     $admin = \App\Models\Admin::first(); // or auth admin

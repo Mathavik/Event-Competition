@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, X, Trophy } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../axiosInstance';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isLoggedIn = !!localStorage.getItem("token");
+  // const isLoggedIn = !!localStorage.getItem("token");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const schoolName = localStorage.getItem("school_name");
+  // const schoolName = localStorage.getItem("school_name");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [schoolName, setSchoolName] = useState("");
 
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const res = await axiosInstance.get("/me");
+      setIsLoggedIn(true);
+      setSchoolName(res.data.school_name);
+    } catch {
+      setIsLoggedIn(false);
+    }
+  };
+
+  // HttpOnly token cookie can't be read from document.cookie,
+  // so call /me directly and let the backend validate the session.
+  checkAuth();
+}, []);
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'Events', href: '/categories' },
@@ -39,7 +57,7 @@ const Header = () => {
               />
             </div>
           </div>
-       
+
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
@@ -65,9 +83,20 @@ const Header = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-slate-900 border border-slate-700 rounded-xl shadow-lg overflow-hidden">
                     <button
-                      onClick={() => {
-                        localStorage.clear();
-                        window.location.reload();
+                      onClick={async () => {
+                        try {
+                          await axiosInstance.post("/logout");
+                          setIsLoggedIn(false);
+                          setSchoolName("");
+                          setIsDropdownOpen(false);
+                          localStorage.removeItem("student_name");
+                          localStorage.removeItem("student_id");
+                          localStorage.removeItem("school_name");
+                          // 🔥 force re-check
+                          await axiosInstance.get("/me").catch(() => { });
+                        } catch (err) {
+                          console.error("Logout failed");
+                        }
                       }}
                       className="w-full text-left px-4 py-2 text-red-400 hover:bg-slate-800"
                     >
@@ -108,9 +137,18 @@ const Header = () => {
 
             {isLoggedIn ? (
               <button
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.reload();
+                onClick={async () => {
+                  try {
+                    await axiosInstance.post("/logout");
+                    setIsLoggedIn(false);
+                    setSchoolName("");
+                    setIsOpen(false); // mobile menu close
+                    localStorage.removeItem("student_name");
+                    localStorage.removeItem("student_id");
+                    localStorage.removeItem("school_name");
+                  } catch (err) {
+                    console.error("Logout failed");
+                  }
                 }}
                 className="block mt-4 bg-red-500 text-white px-5 py-2 rounded-full font-bold text-sm w-full"
               >
