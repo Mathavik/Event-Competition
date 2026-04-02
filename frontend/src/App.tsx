@@ -15,6 +15,7 @@ import Contact from "./pages/Contact/Contact";
 import AdsDisplay from "./pages/AdsDisplay/AdsDisplay";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ScrollToTop from "./components/ScrollToTop";
 const AppContent = () => {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
@@ -48,6 +49,7 @@ const AppContent = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AppContent />
     </Router>
   );
