@@ -146,5 +146,7 @@ Route::post('/admin/certificate/update', [CertificateController::class, 'update'
 Route::delete('/admin/certificate/delete', [CertificateController::class, 'destroy']);
 Route::get('/admin/notification-data', [StudentController::class, 'getNotificationRegistrations']);
 
+
 Route::get('/chart-data', [DashboardController::class, 'getChartData']);
 Route::get('/dashboard-counts', [DashboardController::class, 'getCounts']);
+Route::get('/school-student-report/download', [EventController::class, 'downloadSchoolStudentReport']);
