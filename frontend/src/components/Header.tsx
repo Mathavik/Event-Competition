@@ -18,21 +18,21 @@ const Header: React.FC = () => {
   // const isLoggedIn = !!localStorage.getItem("token");
   // const schoolName = localStorage.getItem("school_name");
 
-useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      const res = await axiosInstance.get("/me");
-      setIsLoggedIn(true);
-      setSchoolName(res.data.school_name);
-    } catch {
-      setIsLoggedIn(false);
-    }
-  };
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axiosInstance.get("/me");
+        setIsLoggedIn(true);
+        setSchoolName(res.data.school_name);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
 
-  // HttpOnly token cookie can't be read from document.cookie,
-  // so call /me directly and let the backend validate the session.
-  checkAuth();
-}, []);
+    // HttpOnly token cookie can't be read from document.cookie,
+    // so call /me directly and let the backend validate the session.
+    checkAuth();
+  }, []);
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'Events', href: '/categories' },
@@ -81,13 +81,13 @@ useEffect(() => {
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href} // 'href' badhula 'to' podanum
                 className="text-sm font-semibold text-slate-300 hover:text-amber-500 transition-all duration-300 uppercase tracking-widest"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
 
             {/* Countdown */}
@@ -131,9 +131,9 @@ useEffect(() => {
                 )}
               </div>
             ) : (
-              <a href="/login" className="bg-amber-500 px-5 py-2 rounded-full">
+              <Link to="/login" className="bg-amber-500 px-5 py-2 rounded-full text-slate-900 font-bold">
                 REGISTER NOW
-              </a>
+              </Link>
             )}
           </div>
 
@@ -147,14 +147,14 @@ useEffect(() => {
         {isOpen && (
           <div className="lg:hidden mt-6 bg-slate-900 rounded-2xl p-4 border border-slate-800">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href} // change href to to
                 className="block py-3 px-4 text-slate-300 hover:text-amber-500 font-bold border-b border-slate-800 last:border-0"
                 onClick={() => setIsOpen(false)}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
 
             {isLoggedIn ? (
@@ -177,13 +177,13 @@ useEffect(() => {
                 LOGOUT
               </button>
             ) : (
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="block mt-4 bg-amber-500 text-slate-950 px-5 py-2 rounded-full font-bold text-sm text-center hover:bg-amber-400"
                 onClick={() => setIsOpen(false)}
               >
                 REGISTER NOW
-              </a>
+              </Link>
             )}
           </div>
         )}
