@@ -9,40 +9,72 @@ use Illuminate\Http\Request;
 class CertificateController extends Controller
 {
     // 📄 VIEW (show current settings)
-    public function index()
-    {
-        $setting = CertificateSetting::first();
-        return view('admin.certificate.index', compact('setting'));
-    }
+public function index()
+{
+    return response()->json(CertificateSetting::first());
+}
 
     // 💾 STORE (create / update same)
-    public function store(Request $request)
-    {
-        $setting = CertificateSetting::first();
+public function store(Request $request)
+{
+    $setting = CertificateSetting::first();
 
-        $data = [];
+    // 🆕 FIRST TIME CREATE
+    if (!$setting) {
 
+        $setting = new CertificateSetting();
+
+        // ✅ FIRST TIME ONLY BG SAVE
         if ($request->hasFile('background')) {
-            $data['background_image'] = $request->file('background')->store('certificates', 'public');
-        }
-
-        if ($request->hasFile('principal_sign')) {
-            $data['principal_signature'] = $request->file('principal_sign')->store('certificates', 'public');
-        }
-
-        if ($request->hasFile('coordinator_sign')) {
-            $data['coordinator_signature'] = $request->file('coordinator_sign')->store('certificates', 'public');
+            $setting->background_image = $request->file('background')->store('certificates', 'public');
         }
 
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('certificates', 'public');
+            $setting->logo = $request->file('logo')->store('certificates', 'public');
         }
+if ($request->hasFile('principal_sign')) {
+    $file = $request->file('principal_sign');
+    $path = $file->store('certificates', 'public');
 
-        CertificateSetting::updateOrCreate(['id' => 1], $data);
+    $setting->principal_signature = $path;
+}
 
-        return back()->with('success', 'Saved Successfully');
+      if ($request->hasFile('coordinator_sign')) {
+    $file = $request->file('coordinator_sign');
+    $path = $file->store('certificates', 'public');
+
+    $setting->coordinator_signature = $path;
+}
+
+        $setting->save();
+
+        return response()->json([
+            'success' => 'Created First Time'
+        ]);
     }
 
+    // 🔒 BG UPDATE BLOCK
+    // ❌ background skip pannrom
+
+    // ✅ UPDATE ONLY THESE
+    if ($request->hasFile('logo')) {
+        $setting->logo = $request->file('logo')->store('certificates', 'public');
+    }
+
+    if ($request->hasFile('principal_sign')) {
+        $setting->principal_signature = $request->file('principal_sign')->store('certificates', 'public');
+    }
+
+    if ($request->hasFile('coordinator_sign')) {
+        $setting->coordinator_signature = $request->file('coordinator_sign')->store('certificates', 'public');
+    }
+
+    $setting->save();
+
+    return response()->json([
+        'success' => 'Updated Successfully'
+    ]);
+}
     // ✏️ EDIT
     public function edit()
     {

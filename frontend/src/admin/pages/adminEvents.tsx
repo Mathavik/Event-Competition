@@ -10,6 +10,7 @@ type Event = {
   type: string;
   age_group: string;
   image?: string;
+  is_visible?: number;
 };
 
 export default function Events() {
@@ -21,6 +22,7 @@ export default function Events() {
     name: "",
     type: "",
     age_group: "",
+    is_visible: 1,
   });
 
   const [isEdit, setIsEdit] = useState(false);
@@ -50,14 +52,16 @@ export default function Events() {
   );
 
   const handleSubmit = () => {
+
     const formData = new FormData();
     formData.append("category_id", String(form.category_id));
     formData.append("name", form.name);
     formData.append("type", form.type);
     formData.append("age_group", form.age_group);
+    formData.append("is_visible", String(form.is_visible ?? 1));
     if (file) formData.append("image", file);
 
-    const request = isEdit 
+    const request = isEdit
       ? api.post(`/events/${form.id}?_method=PUT`, formData)
       : api.post("/events", formData);
 
@@ -69,6 +73,22 @@ export default function Events() {
       console.error(err);
       alert("Something went wrong!");
     });
+  };
+  const toggleVisibility = (event: Event) => {
+    const formData = new FormData();
+
+    formData.append(
+      "is_visible",
+      event.is_visible === 1 ? "0" : "1"
+    );
+
+    api.post(`/events/${event.id}?_method=PUT`, formData)
+      .then(() => {
+        fetchEvents();
+      })
+      .catch(() => {
+        alert("Failed to update visibility");
+      });
   };
 
   const handleEdit = (event: Event) => {
@@ -106,7 +126,7 @@ export default function Events() {
 
   return (
     <div className="p-6 bg-slate-950 min-h-screen text-slate-200">
-      
+
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div>
@@ -115,7 +135,7 @@ export default function Events() {
           </h1>
           <p className="text-slate-500 text-sm mt-1 font-medium">Create and oversee all competition categories.</p>
         </div>
-        
+
         <div className="flex w-full md:w-auto gap-3">
           <div className="relative flex-1 md:w-80">
             <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
@@ -133,7 +153,7 @@ export default function Events() {
             />
           </div>
 
-          <button 
+          <button
             onClick={() => setShowModal(true)}
             className="bg-amber-600 text-white px-6 py-3 rounded-2xl hover:bg-amber-500 transition-all flex items-center gap-3 shadow-lg shadow-amber-600/20 font-black uppercase text-[10px] tracking-widest whitespace-nowrap active:scale-95"
           >
@@ -151,63 +171,108 @@ export default function Events() {
                 <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Asset</th>
                 <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Details</th>
                 <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Group</th>
+                <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Visible</th>
                 <th className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {currentEvents.length > 0 ? (
                 currentEvents.map((e) => (
-                  <tr key={e.id} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="p-6">
-                      {e.image ? (
-                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl group-hover:border-amber-500/50 transition-colors">
-                          <img 
-                            src={`http://127.0.0.1:8000/upload/events/${e.image}`} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                            alt={e.name} 
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-[8px] text-slate-600 border border-slate-700 uppercase font-black">Null</div>
-                      )}
-                    </td>
-                    <td className="p-6">
-                      <div className="font-black text-white text-lg tracking-tight uppercase group-hover:text-amber-500 transition-colors">{e.name}</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md font-black uppercase tracking-widest border border-slate-700">{e.type}</span>
-                        <span className="text-[10px] text-slate-600 font-bold">ID: {e.id}</span>
-                      </div>
-                    </td>
-                    <td className="p-6">
-                      <span className="text-amber-500/80 font-black italic text-sm">{e.age_group}</span>
-                    </td>
-                    <td className="p-6">
-                      <div className="flex items-center justify-center gap-3">
-                        {/* EDIT */}
-                        <button onClick={() => handleEdit(e)} className="p-3 bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500 hover:text-white transition-all">
-                          {React.createElement(FaEdit as any, { size: 14 })}
-                        </button>
-                        
-                        {/* DELETE */}
-                        <button onClick={() => confirmDelete(e.id!)} className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                          {React.createElement(FaTrash as any, { size: 14 })}
-                        </button>
+                 <tr key={e.id} className="hover:bg-white/[0.02] transition-colors group">
 
-                        <div className="w-[1px] h-8 bg-slate-800 mx-1"></div>
+  {/* ASSET */}
+  <td className="p-6">
+  {e.image ? (
+    <img
+      src={`http://localhost:8000/upload/events/${e.image}`}
+      alt="event"
+      className="w-16 h-16 object-cover rounded-xl border border-slate-700"
+    />
+  ) : (
+    <span className="text-slate-500 text-sm font-bold">
+      No Image
+    </span>
+  )}
+</td>
 
-                        {/* REPORTS */}
-                        <button onClick={() => window.open(`http://localhost:8000/api/event/${e.id}/schools-students/download`, "_blank")} 
-                          className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest">
-                          {React.createElement(FaFileDownload as any)} Report
-                        </button>
-                        
-                        <button onClick={() => window.open(`http://localhost:8000/api/event/${e.id}/schools/download`, "_blank")} 
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest">
-                          {React.createElement(FaSchool as any)} Schools
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+  {/* DETAILS */}
+  <td className="p-6">
+    <div className="font-black text-white text-lg tracking-tight uppercase group-hover:text-amber-500 transition-colors">
+      {e.name}
+    </div>
+    <div className="flex items-center gap-2 mt-1">
+      <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md font-black uppercase tracking-widest border border-slate-700">
+        {e.type}
+      </span>
+      <span className="text-[10px] text-slate-600 font-bold">
+        ID: {e.id}
+      </span>
+    </div>
+  </td>
+
+  {/* GROUP */}
+  <td className="p-6">
+    <span className="text-amber-500/80 font-black italic text-sm">
+      {e.age_group}
+    </span>
+  </td>
+
+  {/* VISIBLE */}
+  <td className="p-6 text-center">
+    <button
+      onClick={() => toggleVisibility(e)}
+      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase ${
+        e.is_visible
+          ? "bg-green-500/20 text-green-400"
+          : "bg-red-500/20 text-red-400"
+      }`}
+    >
+      {e.is_visible ? "Visible" : "Hidden"}
+    </button>
+  </td>
+
+  {/* ACTIONS */}
+  <td className="p-6">
+    <div className="flex items-center justify-center gap-3">
+
+      <button
+        onClick={() => handleEdit(e)}
+        className="p-3 bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
+      >
+        {React.createElement(FaEdit as any, { size: 14 })}
+      </button>
+
+      <button
+        onClick={() => confirmDelete(e.id!)}
+        className="p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+      >
+        {React.createElement(FaTrash as any, { size: 14 })}
+      </button>
+
+      <div className="w-[1px] h-8 bg-slate-800 mx-1"></div>
+
+      <button
+        onClick={() =>
+          window.open(`http://localhost:8000/api/event/${e.id}/schools-students/download`, "_blank")
+        }
+        className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        {React.createElement(FaFileDownload as any)} Report
+      </button>
+
+      <button
+        onClick={() =>
+          window.open(`http://localhost:8000/api/event/${e.id}/schools/download`, "_blank")
+        }
+        className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        {React.createElement(FaSchool as any)} Schools
+      </button>
+
+    </div>
+  </td>
+
+</tr>
                 ))
               ) : (
                 <tr>
@@ -238,7 +303,7 @@ export default function Events() {
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 z-[999]">
           <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] w-full max-w-lg p-10 shadow-3xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
-            
+
             <h2 className="text-2xl font-black mb-8 text-white uppercase tracking-tighter italic">
               {isEdit ? "Update" : "New"} <span className="text-amber-500">Event</span>
             </h2>
@@ -247,33 +312,43 @@ export default function Events() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Category ID</label>
-                  <input name="category_id" onChange={handleChange} value={form.category_id} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all"/>
+                  <input name="category_id" onChange={handleChange} value={form.category_id} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
                 </div>
                 <div className="col-span-1">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Type (Solo/Group)</label>
-                  <input name="type" onChange={handleChange} value={form.type} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all"/>
+                  <input name="type" onChange={handleChange} value={form.type} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
                 </div>
               </div>
 
               <div>
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Event Name</label>
-                <input name="name" onChange={handleChange} value={form.name} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all"/>
+                <input name="name" onChange={handleChange} value={form.name} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
               </div>
 
               <div>
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Age Group (e.g. 10-15)</label>
-                <input name="age_group" onChange={handleChange} value={form.age_group} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all"/>
+                <input name="age_group" onChange={handleChange} value={form.age_group} className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl mt-2 text-white font-bold outline-none focus:border-amber-500 transition-all" />
               </div>
 
               <div>
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Cover Image</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                  Cover Image
+                </label>
+
                 <div className="mt-2 relative border-2 border-dashed border-slate-800 rounded-2xl p-6 bg-slate-950/50 text-center hover:border-amber-500/50 transition-all cursor-pointer">
-                    <input type="file" onChange={(e) => setFile(e.target.files?.[0])} className="absolute inset-0 opacity-0 cursor-pointer z-10"/>
-                    <p className="text-xs text-slate-400 font-bold uppercase">{file ? file.name : "Select Asset"}</p>
+                  <input
+                    type="file"
+                    onChange={(e) => setFile(e.target.files?.[0])}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <p className="text-xs text-slate-400 font-bold uppercase">
+                    {file ? file.name : "Select Asset"}
+                  </p>
                 </div>
               </div>
+
             </div>
-            
+
             <div className="flex justify-end mt-10 gap-4">
               <button onClick={closeModal} className="px-6 py-3 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition">Cancel</button>
               <button onClick={handleSubmit} className="bg-amber-600 text-white px-10 py-4 rounded-2xl hover:bg-amber-500 shadow-xl shadow-amber-600/20 transition-all font-black uppercase text-[10px] tracking-widest">

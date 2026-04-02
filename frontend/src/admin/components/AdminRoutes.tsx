@@ -11,9 +11,8 @@ import SchoolReport from "../pages/SchoolReport";
 import CreateAd from "./CreateAd";
 import OverallWinners from "../pages/OverallWinners";
 import AdminLogin from "./AdminLogin";
-import AdminRegistrationsPage from "../pages/AdminRegistrationsPage";
+import CertificateSettings from "../pages/CertificateSettings";
 import AdminProtectedRoute from "./AdminProtectedRoute";
-
 const AdminRoutes: React.FC = () => {
   return (
     <Routes>
@@ -24,22 +23,23 @@ const AdminRoutes: React.FC = () => {
       <Route
         path="*"
         element={
-          <AdminProtectedRoute>
+         <AdminProtectedRoute>
             <AdminLayout>
-              <Routes>
-                <Route index element={<Navigate to="admindashboard" replace />} />
-                <Route path="admindashboard" element={<Dashboard />} />
-                <Route path="categories" element={<Categories />} />
-                <Route path="adminEvents" element={<Events />} />
-                <Route path="adminGallery" element={<AdminGallery />} />
-                <Route path="registrations" element={<Registrations />} />
-                <Route path="winners" element={<Winners />} />
-                <Route path="school-report" element={<SchoolReport />} />
-                <Route path="ads" element={<CreateAd />} />
-                <Route path="overall-winners" element={<OverallWinners />} />
-                <Route path="adminregistrationspage" element={<AdminRegistrationsPage />} />
-              </Routes>
-            </AdminLayout>
+            <Routes>
+              <Route index element={<Navigate to="admindashboard" replace />} />
+              <Route path="admindashboard" element={<Dashboard />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="adminEvents" element={<Events />} />
+              <Route path="adminGallery" element={<AdminGallery />} />
+              <Route path="registrations" element={<Registrations />} />
+              <Route path="certificate" element={<CertificateSettings />} />
+
+              <Route path="winners" element={<Winners />} />
+              <Route path="school-report" element={<SchoolReport />} />
+              <Route path="ads" element={<CreateAd />} />
+              <Route path="overall-winners" element={<OverallWinners />} />
+            </Routes>
+        </AdminLayout>
           </AdminProtectedRoute>
         }
       />
