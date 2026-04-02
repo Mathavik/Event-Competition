@@ -149,4 +149,4 @@ Route::get('/admin/notification-data', [StudentController::class, 'getNotificati
 
 Route::get('/chart-data', [DashboardController::class, 'getChartData']);
 Route::get('/dashboard-counts', [DashboardController::class, 'getCounts']);
-Route::get('/school-student-report/download', [EventController::class, 'downloadSchoolStudentReport']);
+Route::get('/school-student-report/download', [EventController::class, 'downloadSchoolStudentReport']); 

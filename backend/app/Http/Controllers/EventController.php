@@ -389,7 +389,7 @@ public function downloadSchoolStudentReport(Request $request)
 
     $grouped = $data->groupBy('school_name');
 
-    $pdf = Pdf::loadView('pdf.school-report', compact('grouped'));
+    $pdf = Pdf::loadView('pdf.school-student-report', compact('grouped'));
 
     return $pdf->download($school ? $school . '-report.pdf' : 'school-report.pdf');
 }
