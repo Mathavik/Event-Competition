@@ -151,11 +151,12 @@ $principalSrc = $inlineImageSrc($principal);
 
     <div class="text desc">
         @if($is_team_event)
-            This certificate is proudly awarded to the team 
-            <b>{{ strtoupper($student->student_name) }}</b> 
-            for exceptional participation in the event 
-            <b>{{ $student->event_name }}</b>.  
-            The dedication and teamwork are highly appreciated.
+            This certificate is proudly awarded to 
+            <b>{{ strtoupper($student->student_name) }}</b>
+            for participating as a member of the team 
+            <b>{{ strtoupper($student->team_name ?? '') }}</b>
+            in the event <b>{{ $student->event_name }}</b>.
+            Your dedication and teamwork are highly appreciated.
         @else
             This certificate is proudly awarded to 
             <b>{{ strtoupper($student->student_name) }}</b> 

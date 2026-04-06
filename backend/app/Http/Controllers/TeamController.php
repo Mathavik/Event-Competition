@@ -43,6 +43,17 @@ class TeamController extends Controller
                 ], 400);
             }
 
+            // ✅ Normalize and sanitize the members array
+            $members = array_values(array_filter(array_map(function ($member) {
+                return trim($member);
+            }, $request->members)));
+
+            // Remove any duplicate names and remove captain name if entered by mistake
+            $captainName = DB::table('students')->where('id', $request->captain_id)->value('name');
+            $members = array_unique(array_filter($members, function ($member) use ($captainName) {
+                return strcasecmp($member, $captainName) !== 0;
+            }));
+
             // ✅ Enforce exact team size from event type
             $requiredMembers = null;
             if (!empty($event->type) && preg_match('/Team\s*\((\d+)\s*players only\)/i', $event->type, $match)) {
@@ -50,7 +61,7 @@ class TeamController extends Controller
                 $requiredMembers = max($teamSize - 1, 0);
             }
 
-            if ($requiredMembers !== null && count($request->members) !== $requiredMembers) {
+            if ($requiredMembers !== null && count($members) !== $requiredMembers) {
                 return response()->json([
                     'message' => "This event requires exactly {$requiredMembers} team member(s) besides the captain ❌"
                 ], 400);
@@ -62,7 +73,7 @@ class TeamController extends Controller
                 'event_name' => $event->name,
                 'captain_id' => $request->captain_id,
                 'team_name'  => $request->team_name,
-                'members'    => json_encode($request->members),
+                'members'    => json_encode(array_values($members)),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

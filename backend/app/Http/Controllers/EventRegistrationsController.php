@@ -275,23 +275,55 @@ public function getStudentsByEvent($eventId)
 public function downloadCertificate($eventId, $school)
 {
     $event = Event::findOrFail($eventId);
-    // Check if event type contains "Team" (handles "Team", "Team (7 players only)", etc)
     $is_team_event = stripos($event->type, 'team') !== false;
 
     if ($is_team_event) {
-        // 🏆 TEAM EVENT - Show school name only (one cert per team/school)
-        $students = DB::table('students')
-            ->join('event_student', 'students.id', '=', 'event_student.student_id')
-            ->join('events', 'event_student.event_id', '=', 'events.id')
-            ->where('event_student.event_id', $eventId)
+        // 🏆 TEAM EVENT - Generate certificate for each team member using teams.members JSON
+        $teams = DB::table('teams')
+            ->join('students', 'teams.captain_id', '=', 'students.id')
+            ->join('events', 'teams.event_id', '=', 'events.id')
+            ->where('teams.event_id', $eventId)
             ->where('students.school_name', $school)
             ->select(
-                DB::raw("'" . addslashes($school) . "' as student_name"),
-                DB::raw("'" . addslashes($event->name) . "' as event_name"),
-                DB::raw("'" . $event->event_date . "' as event_date")
+                'teams.team_name',
+                'teams.members',
+                'students.name as captain_name',
+                'events.name as event_name',
+                'events.event_date as event_date'
             )
-            ->limit(1)
             ->get();
+
+        $students = collect();
+
+        foreach ($teams as $team) {
+            $members = json_decode($team->members, true) ?: [];
+            $captainName = trim($team->captain_name);
+
+            $members = array_values(array_unique(array_filter(array_map('trim', $members), function ($member) use ($captainName) {
+                return $member !== '' && strcasecmp($member, $captainName) !== 0;
+            })));
+
+            // Add captain certificate
+            $students->push((object)[
+                'student_name' => $captainName,
+                'event_name' => $team->event_name,
+                'event_date' => $team->event_date,
+                'team_name' => $team->team_name,
+            ]);
+
+            foreach ($members as $memberName) {
+                $students->push((object)[
+                    'student_name' => $memberName,
+                    'event_name' => $team->event_name,
+                    'event_date' => $team->event_date,
+                    'team_name' => $team->team_name,
+                ]);
+            }
+        }
+
+        $students = $students->unique(function ($item) {
+            return strtolower(trim($item->student_name)) . '|' . strtolower(trim($item->team_name ?? '')) . '|' . strtolower(trim($item->event_name));
+        })->values();
     } else {
         // 🎓 SOLO EVENT - Show individual student names (each student gets cert)
         $students = DB::table('event_student')
