@@ -1,202 +1,185 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Participation Certificates</title>
-    <style>
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
+<meta charset="UTF-8">
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Georgia', 'Times New Roman', serif;
-        }
+<style>
+@page { size: A4 landscape; margin: 0; }
 
-        .certificate {
-            position: relative;
-            width: 297mm;
-            height: 210mm;
-            overflow: hidden;
-            page-break-after: always;
-            color: #222;
-        }
+body {
+    margin: 0;
+    padding: 0;
+}
 
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
+.container {
+    position: relative;
+    width: 297mm;
+    height: 210mm; 
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
 
-        .content {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: 100%;
-        }
+.bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
 
-        .logo {
-            position: absolute;
-            top: 10mm;
-            left: 10mm;
-            height: 25mm;
-            z-index: 3;
-        }
+/* 🔥 SAME DESIGN AS WINNER */
+.logo {
+    position: absolute;
+    top: 5mm;
+    left: 10mm;
+    height: 70px;
+}
 
-        .title {
-            position: absolute;
-            top: 62mm;
-            width: 100%;
-            text-align: center;
-            font-size: 28px;
-            letter-spacing: 2px;
-            z-index: 3;
-        }
+.text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #222;
+}
 
-        .name {
-            position: absolute;
-            top: 82mm;
-            width: 100%;
-            text-align: center;
-            font-size: 44px;
-            font-weight: bold;
-            color: #b8860b;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            z-index: 3;
-        }
+/* 🎯 CONTENT ALIGNMENT */
+.presented {
+    top: 75mm;
+    font-size: 22px;
+}
 
-        .description {
-            position: absolute;
-            top: 105mm;
-            width: 68%;
-            left: 16%;
-            font-size: 18px;
-            line-height: 1.6;
-            text-align: center;
-            z-index: 3;
-        }
+.name {
+    top: 92mm;
+    font-size: 48px;
+    font-weight: bold;
+    color: #b8860b;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
 
-        .event-name {
-            position: absolute;
-            top: 128mm;
-            width: 100%;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: #2d3748;
-            z-index: 3;
-        }
+.desc {
+    top: 115mm;
+    font-size: 20px;
+    width: 65%;
+    left: 17.5%;
+    line-height: 1.7;
+}
 
-        .date {
-            position: absolute;
-            bottom: 20mm;
-            left: 30mm;
-            font-size: 18px;
-            z-index: 3;
-        }
+.event {
+    top: 140mm;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-        .sign-left,
-        .sign-right {
-            position: absolute;
-            bottom: 20mm;
-            text-align: center;
-            font-size: 16px;
-            z-index: 3;
-        }
+/* 📅 DATE */
+.date {
+    position: absolute;
+    bottom: 20mm;
+    left: 40mm;
+    font-size: 20px;
+}
 
-        .sign-left {
-            left: 45mm;
-        }
+/* ✍️ SAME SIGNATURE POSITION AS WINNER */
+.sign-center {
+    position: absolute;
+    bottom: 25mm;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 16px;
+}
 
-        .sign-right {
-            right: 45mm;
-        }
+.sign-right {
+    position: absolute;
+    bottom: 25mm;
+    right: 40mm;
+    text-align: center;
+    font-size: 16px;
+}
+</style>
 
-        .sign-image {
-            height: 20mm;
-            display: block;
-            margin: 0 auto 4px;
-        }
-    </style>
 </head>
+
 <body>
 
 @php
-    $setting = \App\Models\CertificateSetting::first();
-    $bg = $setting->background_image ?? null;
-    $logo = $setting->logo ?? null;
-    $coord = $setting->coordinator_signature ?? null;
-    $principal = $setting->principal_signature ?? null;
+$setting = \App\Models\CertificateSetting::first();
 
-    $inlineImageSrc = function ($path) {
-        if (!$path) {
-            return null;
-        }
+$bg = $setting->background_image ?? null;
+$logo = $setting->logo ?? null;
+$coord = $setting->coordinator_signature ?? null;
+$principal = $setting->principal_signature ?? null;
 
-        $fullPath = storage_path('app/public/' . $path);
-        if (!file_exists($fullPath)) {
-            return null;
-        }
+$inlineImageSrc = function ($path) {
+    if (!$path) return null;
 
-        $type = pathinfo($fullPath, PATHINFO_EXTENSION);
-        $data = base64_encode(file_get_contents($fullPath));
-        return 'data:image/' . $type . ';base64,' . $data;
-    };
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) return null;
 
-    $bgSrc = $inlineImageSrc($bg);
-    $logoSrc = $inlineImageSrc($logo);
-    $coordSrc = $inlineImageSrc($coord);
-    $principalSrc = $inlineImageSrc($principal);
+    $type = pathinfo($fullPath, PATHINFO_EXTENSION);
+    $data = base64_encode(file_get_contents($fullPath));
+
+    return 'data:image/' . $type . ';base64,' . $data;
+};
+
+$bgSrc = $inlineImageSrc($bg);
+$logoSrc = $inlineImageSrc($logo);
+$coordSrc = $inlineImageSrc($coord);
+$principalSrc = $inlineImageSrc($principal);
 @endphp
 
 @foreach($students as $student)
-    <div class="certificate">
-        @if($bgSrc)
-            <img src="{{ $bgSrc }}" class="background">
-        @endif
+<div class="container">
 
-        <div class="content">
-            @if($logoSrc)
-                <img src="{{ $logoSrc }}" class="logo">
-            @endif
+    <!-- ✅ Background -->
+    @if($bgSrc)
+        <img src="{{ $bgSrc }}" class="bg">
+    @endif
 
-            <div class="title">Participation Certificate</div>
+    <!-- ✅ Logo (same as winner) -->
+    @if($logoSrc)
+        <img src="{{ $logoSrc }}" class="logo">
+    @endif
 
-            <div class="name">{{ strtoupper($student->student_name) }}</div>
-
-            <div class="description">
-                This certificate is proudly awarded to <strong>{{ strtoupper($student->student_name) }}</strong>
-                for participating in the event <strong>{{ $student->event_name }}</strong>.
-                Your dedication and participation are highly appreciated.
-            </div>
-
-            <div class="event-name">{{ $student->event_name }}</div>
-
-            <div class="date">
-                Date: {{ \Carbon\Carbon::parse($student->event_date)->format('d-m-Y') }}
-            </div>
-
-            @if($coordSrc)
-                <div class="sign-left">
-                    <img src="{{ $coordSrc }}" class="sign-image">
-                    Coordinator
-                </div>
-            @endif
-
-            @if($principalSrc)
-                <div class="sign-right">
-                    <img src="{{ $principalSrc }}" class="sign-image">
-                    Principal
-                </div>
-            @endif
-        </div>
+    <!-- 🎯 CONTENT CHANGE ONLY -->
+    <div class="text presented">
+        Proudly Presented To
     </div>
+
+    <div class="text name">
+        {{ strtoupper($student->student_name) }}
+    </div>
+
+    <div class="text desc">
+        This certificate is proudly awarded to 
+        <b>{{ strtoupper($student->student_name) }}</b> 
+        for participating in the event 
+        <b>{{ $student->event_name }}</b>.  
+        Your dedication and participation are highly appreciated.
+    </div>
+
+    <div class="text event">
+        {{ $student->event_name }}
+    </div>
+
+    <div class="date">
+        Date: {{ \Carbon\Carbon::parse($student->event_date)->format('d-m-Y') }}
+    </div>
+
+    <!-- ✅ Coordinator (same position) -->
+    @if($coordSrc)
+    <div class="sign-center">
+        <img src="{{ $coordSrc }}" style="height:50px;"><br>
+        Coordinator
+    </div>
+    @endif
+
+    <!-- ✅ Principal (same position) -->
+    @if($principalSrc)
+    <div class="sign-right">
+        <img src="{{ $principalSrc }}" style="height:50px;"><br>
+        Principal
+    </div>
+    @endif
+
+</div>
 @endforeach
 
 </body>
