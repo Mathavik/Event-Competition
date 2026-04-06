@@ -16,7 +16,7 @@ const PaymentPage: React.FC = () => {
 
   const [paymentType, setPaymentType] = useState<string>("online");
   const [loading, setLoading] = useState<boolean>(false);
-  const [teamName, setTeamName] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>(() => localStorage.getItem("school_name") || "");
   const [teamMembers, setTeamMembers] = useState<string[]>([""]); // Start with one empty member
   const [maxTeamSize, setMaxTeamSize] = useState<number>(7); // Default to 7
 
@@ -80,7 +80,7 @@ const PaymentPage: React.FC = () => {
         const requiredMemberCount = Math.max(maxTeamSize - 1, 0); // Captain is already included
 
         if (!submittedTeamName) {
-          toast.error("Please enter a team name or use your school name ❌");
+          toast.error("School name is required for team registration ❌");
           return;
         }
 
@@ -153,18 +153,13 @@ const PaymentPage: React.FC = () => {
               )}
               <DetailRow icon={<Calendar size={18}/>} label="Event Date" value={state?.event?.event_date || "N/A"} />
               
-              {/* Team Name Input */}
+              {/* Team Name Display */}
               {isTeam && (
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-600">Team Name</label>
-                  <input
-                    type="text"
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    placeholder="Enter your team name or leave blank to use school name"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] outline-none transition-all"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Leave blank to use your registered school name as the team name.</p>
+                  <div className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 text-[#001F3F] font-semibold">
+                    {teamName || localStorage.getItem("school_name") || "School name not available"}
+                  </div>
                 </div>
               )}
 
