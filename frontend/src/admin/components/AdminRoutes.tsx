@@ -14,6 +14,7 @@ import AdminLogin from "./AdminLogin";
 import CertificateSettings from "../pages/CertificateSettings";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminRegistrationsPage from "../pages/AdminRegistrationsPage";
+import ParticipationCertificate from "../pages/ParticipationCertificate";
 const AdminRoutes: React.FC = () => {
   return (
     <Routes>
@@ -40,6 +41,8 @@ const AdminRoutes: React.FC = () => {
               <Route path="ads" element={<CreateAd />} />
               <Route path="overall-winners" element={<OverallWinners />} />
                <Route path="adminregistrationspage" element={<AdminRegistrationsPage />} />
+
+               <Route path="participation-certificate" element={<ParticipationCertificate />} />
             </Routes>
         </AdminLayout>
           </AdminProtectedRoute>

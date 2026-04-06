@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Event;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventRegistrationsController extends Controller
 {
@@ -234,5 +235,55 @@ public function checkRegistration(Request $request)
         'registered' => !!$registration,
         'registration' => $registration
     ]);
+}
+
+public function getSchools()
+{
+    $schools = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->select('students.school_name')
+        ->distinct()
+        ->pluck('school_name');
+
+    return response()->json($schools);
+}
+
+public function getEventsBySchool($school)
+{
+    $events = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->join('events', 'event_student.event_id', '=', 'events.id')
+        ->where('students.school_name', $school)
+        ->select('events.id', 'events.name')
+        ->distinct()
+        ->get();
+
+    return response()->json($events);
+}
+public function getStudentsByEvent($eventId)
+{
+    $students = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->where('event_student.event_id', $eventId)
+        ->select('students.name', 'students.id')
+        ->get();
+
+    return response()->json($students);
+}
+
+
+public function downloadCertificate($eventId, $school)
+{
+    $students = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->join('events', 'event_student.event_id', '=', 'events.id')
+        ->where('event_student.event_id', $eventId)
+        ->where('students.school_name', $school)
+        ->select('students.name as student_name', 'events.name as event_name')
+        ->get();
+
+    $pdf = Pdf::loadView('pdf.participationCertificate', compact('students'));
+
+    return $pdf->download('participation_certificates.pdf');
 }
 }
