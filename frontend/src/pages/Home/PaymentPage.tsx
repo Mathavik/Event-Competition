@@ -16,8 +16,46 @@ const PaymentPage: React.FC = () => {
 
   const [paymentType, setPaymentType] = useState<string>("online");
   const [loading, setLoading] = useState<boolean>(false);
+  const [teamName, setTeamName] = useState<string>("");
+  const [teamMembers, setTeamMembers] = useState<string[]>([""]); // Start with one empty member
+  const [maxTeamSize, setMaxTeamSize] = useState<number>(7); // Default to 7
 
   const isTeam = state?.isTeam === true;
+
+  // Extract team size from event type
+  React.useEffect(() => {
+    if (isTeam && state?.event?.type) {
+      const match = state.event.type.match(/Team \((\d+) players only\)/);
+      if (match) {
+        const size = parseInt(match[1]);
+        setMaxTeamSize(size);
+        // Initialize team members array with empty strings
+        setTeamMembers(new Array(size - 1).fill("")); // -1 because captain is already included
+      }
+    }
+  }, [isTeam, state?.event?.type]);
+
+  // Handle team member input change
+  const handleMemberChange = (index: number, value: string) => {
+    const newMembers = [...teamMembers];
+    newMembers[index] = value;
+    setTeamMembers(newMembers);
+  };
+
+  // Add new team member
+  const addTeamMember = () => {
+    if (teamMembers.length < maxTeamSize - 1) { // -1 for captain
+      setTeamMembers([...teamMembers, ""]);
+    }
+  };
+
+  // Remove team member
+  const removeTeamMember = (index: number) => {
+    if (teamMembers.length > 1) {
+      const newMembers = teamMembers.filter((_, i) => i !== index);
+      setTeamMembers(newMembers);
+    }
+  };
 
   const handlePayment = async () => {
     setLoading(true);
@@ -37,11 +75,26 @@ const PaymentPage: React.FC = () => {
       let eventStudentId = null;
 
       if (isTeam) {
+        const submittedTeamName = teamName.trim() || localStorage.getItem("school_name") || "";
+        const validMembers = teamMembers.filter(member => member.trim() !== "");
+        const requiredMemberCount = Math.max(maxTeamSize - 1, 0); // Captain is already included
+
+        if (!submittedTeamName) {
+          toast.error("Please enter a team name or use your school name ❌");
+          return;
+        }
+
+        if (validMembers.length !== requiredMemberCount) {
+          toast.error(`Please add exactly ${requiredMemberCount} team members for this event ❌`);
+          return;
+        }
+
         const res = await axios.post("http://127.0.0.1:8000/api/team-name", {
           event_id: event.id,
           captain_id: Number(studentId),
-          team_name: localStorage.getItem("school_name"),
+          team_name: submittedTeamName,
           event_name: event.name,
+          members: validMembers, // Send team members
         });
         eventStudentId = res.data.event_student_id;
       } else {
@@ -99,6 +152,71 @@ const PaymentPage: React.FC = () => {
                 <DetailRow icon={<Building2 size={18}/>} label="School / Organization" value={localStorage.getItem("school_name") || "N/A"} />
               )}
               <DetailRow icon={<Calendar size={18}/>} label="Event Date" value={state?.event?.event_date || "N/A"} />
+              
+              {/* Team Name Input */}
+              {isTeam && (
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-slate-600">Team Name</label>
+                  <input
+                    type="text"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                    placeholder="Enter your team name or leave blank to use school name"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] outline-none transition-all"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Leave blank to use your registered school name as the team name.</p>
+                </div>
+              )}
+
+              {/* Team Members Input */}
+              {isTeam && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-slate-600">
+                      Team Members ({teamMembers.filter(m => m.trim()).length + 1}/{maxTeamSize})
+                    </label>
+                    {teamMembers.length < maxTeamSize - 1 && (
+                      <button
+                        type="button"
+                        onClick={addTeamMember}
+                        className="text-sm bg-[#001F3F] text-white px-3 py-1 rounded-md hover:bg-[#fecb00] hover:text-[#001F3F] transition-colors"
+                      >
+                        + Add Member
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Captain (current user) */}
+                  <div className="flex items-center gap-3 p-3 bg-slate-100 rounded-lg">
+                    <Users size={16} className="text-[#001F3F]" />
+                    <span className="text-sm font-medium text-[#001F3F]">Captain: {localStorage.getItem("student_name") || "You"}</span>
+                    <span className="text-xs bg-[#fecb00] text-[#001F3F] px-2 py-1 rounded-full">Captain</span>
+                  </div>
+
+                  {/* Team Members */}
+                  {teamMembers.map((member, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={member}
+                        onChange={(e) => handleMemberChange(index, e.target.value)}
+                        placeholder={`Team Member ${index + 1}`}
+                        className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#001F3F] focus:border-[#001F3F] outline-none transition-all"
+                        required
+                      />
+                      {teamMembers.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeTeamMember(index)}
+                          className="text-red-500 hover:text-red-700 p-2"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="mt-10 p-5 bg-slate-100 rounded-2xl border border-slate-200">
