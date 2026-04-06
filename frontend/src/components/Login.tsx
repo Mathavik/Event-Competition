@@ -26,38 +26,46 @@ const Login: React.FC = () => {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await axiosInstance.post("/login", { email, password });
-      const { token, student } = res.data;
+  e.preventDefault();
+  setLoading(true);
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("student_name", student.name);
-      localStorage.setItem("student_id", student.id);
-      localStorage.setItem("school_name", student.school_name);
+  try {
+    const res = await axiosInstance.post("/login", { email, password });
 
-      Swal.fire({
-        icon: "success",
-        title: "Welcome Back!",
-        text: `Hello ${student.name}, taking you to categories...`,
-        timer: 2000,
-        showConfirmButton: false,
-        timerProgressBar: true,
-      });
+    const { student } = res.data;
 
-      setTimeout(() => navigate("/categories"), 2000);
-    } catch (err: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: err.response?.data?.error || "Invalid credentials.",
-        confirmButtonColor: "#6366f1",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ store basic info
+    localStorage.setItem("student_name", student.name);
+    localStorage.setItem("student_id", student.id);
+    localStorage.setItem("school_name", student.school_name);
+
+    // 🔥 ADD THIS PART (VERY IMPORTANT)
+    // await axiosInstance.get("/me");
+
+    Swal.fire({
+      icon: "success",
+      title: "Welcome Back!",
+      text: `Hello ${student.name}, taking you to categories...`,
+      timer: 2000,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+
+    // 🔥 IMPORTANT CHANGE
+    setTimeout(() => {
+      window.location.href = "/categories"; // instead of navigate()
+    }, 2000);
+
+  } catch (err: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: err.response?.data?.error || "Invalid credentials.",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="relative flex justify-center items-center min-h-screen bg-[#0f172a] overflow-hidden">

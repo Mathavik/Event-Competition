@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\WinnerMail;
 
+
 class EventController extends Controller
 {
     // 📌 Get all events
@@ -347,5 +348,49 @@ public function overallWinners()
         ->get();
 
     return response()->json($data);
+}
+public function schoolStudentReport()
+{
+    $data = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->join('events', 'event_student.event_id', '=', 'events.id')
+        ->select(
+            'students.name as student_name',
+            'students.school_name',
+            'events.name as event_name'
+        )
+        ->orderBy('students.school_name')
+        ->get();
+
+    return response()->json($data);
+}
+
+// use Barryvdh\DomPDF\Facade\Pdf;
+
+public function downloadSchoolStudentReport(Request $request)
+{
+    $school = $request->query('school'); // 🔥 முக்கியம்
+
+    $query = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->join('events', 'event_student.event_id', '=', 'events.id')
+        ->select(
+            'students.name as student_name',
+            'students.school_name',
+            'events.name as event_name'
+        );
+
+    // 🔥 FILTER APPLY
+    if ($school) {
+        $query->where('students.school_name', $school);
+    }
+
+    $data = $query->orderBy('students.school_name')->get();
+
+    $grouped = $data->groupBy('school_name');
+
+    $pdf = Pdf::loadView('pdf.school-student-report', compact('grouped'));
+
+    return $pdf->download($school ? $school . '-report.pdf' : 'school-report.pdf');
 }
 }

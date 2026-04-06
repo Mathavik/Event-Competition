@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminAuthController;
@@ -15,8 +16,32 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/schools', [StudentController::class, 'getSchools']);
+
+Route::middleware('auth.custom')->group(function () {
+    Route::get('/categories', function (Request $request) {
+        return "Protected data";
+    });
+});
+use Illuminate\Http\Request; 
+Route::middleware('auth.custom')->get('/me', function (Request $request) {
+    $token = $request->cookie('token');
+
+    if (!$token) {
+        return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+
+    $student = \App\Models\Student::where('api_token', $token)->first();
+
+    if (!$student) {
+        return response()->json(['error' => 'Invalid token'], 401);
+    }
+
+    return $student;
+});
 // routes/api.php
 Route::get('/admin/notifications', function () {
     $admin = \App\Models\Admin::first(); // or auth admin
@@ -120,3 +145,8 @@ Route::post('/admin/certificate', [CertificateController::class, 'store']);
 Route::post('/admin/certificate/update', [CertificateController::class, 'update']);
 Route::delete('/admin/certificate/delete', [CertificateController::class, 'destroy']);
 Route::get('/admin/notification-data', [StudentController::class, 'getNotificationRegistrations']);
+
+
+Route::get('/chart-data', [DashboardController::class, 'getChartData']);
+Route::get('/dashboard-counts', [DashboardController::class, 'getCounts']);
+Route::get('/school-student-report/download', [EventController::class, 'downloadSchoolStudentReport']); 

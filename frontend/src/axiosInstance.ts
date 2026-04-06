@@ -1,10 +1,14 @@
 import axios from 'axios';
+
+const backendHost = window.location.hostname === 'localhost' ? 'localhost' : '127.0.0.1';
 const axiosInstance = axios.create({
-  // Keep baseURL as server root — route paths in the frontend include `/api` already.
-  baseURL: 'http://127.0.0.1:8000/api',
+  // Use the same hostname as the frontend origin when possible,
+  // so the cookie remains same-site and is sent correctly.
+  baseURL: `http://${backendHost}:8000/api`,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 
