@@ -279,7 +279,11 @@ public function downloadCertificate($eventId, $school)
         ->join('events', 'event_student.event_id', '=', 'events.id')
         ->where('event_student.event_id', $eventId)
         ->where('students.school_name', $school)
-        ->select('students.name as student_name', 'events.name as event_name')
+        ->select(
+            'students.name as student_name',
+            'events.name as event_name',
+            'events.event_date as event_date'
+        )
         ->get();
 
     $pdf = Pdf::loadView('pdf.participationCertificate', compact('students'));
