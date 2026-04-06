@@ -274,20 +274,43 @@ public function getStudentsByEvent($eventId)
 
 public function downloadCertificate($eventId, $school)
 {
-    $students = DB::table('event_student')
-        ->join('students', 'event_student.student_id', '=', 'students.id')
-        ->join('events', 'event_student.event_id', '=', 'events.id')
-        ->where('event_student.event_id', $eventId)
-        ->where('students.school_name', $school)
-        ->select(
-            'students.name as student_name',
-            'events.name as event_name',
-            'events.event_date as event_date'
-        )
-        ->get();
+    $event = Event::findOrFail($eventId);
+    // Check if event type contains "Team" (handles "Team", "Team (7 players only)", etc)
+    $is_team_event = stripos($event->type, 'team') !== false;
 
-    $pdf = Pdf::loadView('pdf.participationCertificate', compact('students'));
+    if ($is_team_event) {
+        // 🏆 TEAM EVENT - Show school name only (one cert per team/school)
+        $students = DB::table('students')
+            ->join('event_student', 'students.id', '=', 'event_student.student_id')
+            ->join('events', 'event_student.event_id', '=', 'events.id')
+            ->where('event_student.event_id', $eventId)
+            ->where('students.school_name', $school)
+            ->select(
+                DB::raw("'" . addslashes($school) . "' as student_name"),
+                DB::raw("'" . addslashes($event->name) . "' as event_name"),
+                DB::raw("'" . $event->event_date . "' as event_date")
+            )
+            ->limit(1)
+            ->get();
+    } else {
+        // 🎓 SOLO EVENT - Show individual student names (each student gets cert)
+        $students = DB::table('event_student')
+            ->join('students', 'event_student.student_id', '=', 'students.id')
+            ->join('events', 'event_student.event_id', '=', 'events.id')
+            ->where('event_student.event_id', $eventId)
+            ->where('students.school_name', $school)
+            ->select(
+                'students.name as student_name',
+                'events.name as event_name',
+                'events.event_date as event_date'
+            )
+            ->get();
+    }
+
+    $pdf = Pdf::loadView('pdf.participationCertificate', compact('students', 'is_team_event'));
 
     return $pdf->download('participation_certificates.pdf');
 }
+
+ 
 }

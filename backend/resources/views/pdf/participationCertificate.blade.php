@@ -107,6 +107,8 @@ $logo = $setting->logo ?? null;
 $coord = $setting->coordinator_signature ?? null;
 $principal = $setting->principal_signature ?? null;
 
+$is_team_event = $is_team_event ?? false;
+
 $inlineImageSrc = function ($path) {
     if (!$path) return null;
 
@@ -148,11 +150,19 @@ $principalSrc = $inlineImageSrc($principal);
     </div>
 
     <div class="text desc">
-        This certificate is proudly awarded to 
-        <b>{{ strtoupper($student->student_name) }}</b> 
-        for participating in the event 
-        <b>{{ $student->event_name }}</b>.  
-        Your dedication and participation are highly appreciated.
+        @if($is_team_event)
+            This certificate is proudly awarded to the team 
+            <b>{{ strtoupper($student->student_name) }}</b> 
+            for exceptional participation in the event 
+            <b>{{ $student->event_name }}</b>.  
+            The dedication and teamwork are highly appreciated.
+        @else
+            This certificate is proudly awarded to 
+            <b>{{ strtoupper($student->student_name) }}</b> 
+            for participating in the event 
+            <b>{{ $student->event_name }}</b>.  
+            Your dedication and participation are highly appreciated.
+        @endif
     </div>
 
     <div class="text event">
