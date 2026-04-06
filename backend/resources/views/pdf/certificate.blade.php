@@ -103,18 +103,40 @@ $bg = $setting->background_image ?? null;
 $logo = $setting->logo ?? null;
 $coord = $setting->coordinator_signature ?? null;
 $principal = $setting->principal_signature ?? null;
+
+$inlineImageSrc = function ($path) {
+    if (!$path) {
+        return null;
+    }
+
+    $fullPath = storage_path('app/public/' . $path);
+
+    if (!file_exists($fullPath)) {
+        return null;
+    }
+
+    $type = pathinfo($fullPath, PATHINFO_EXTENSION);
+    $data = base64_encode(file_get_contents($fullPath));
+
+    return 'data:image/' . $type . ';base64,' . $data;
+};
+
+$bgSrc = $inlineImageSrc($bg);
+$logoSrc = $inlineImageSrc($logo);
+$coordSrc = $inlineImageSrc($coord);
+$principalSrc = $inlineImageSrc($principal);
 @endphp
 
 <div class="container">
 
     <!-- ✅ Background -->
-    @if($bg)
-        <img src="{{ public_path('storage/'.$bg) }}?v={{ time() }}" class="bg">
+    @if($bgSrc)
+        <img src="{{ $bgSrc }}" class="bg">
     @endif
 
     <!-- ✅ Logo -->
-    @if($logo)
-        <img src="{{ public_path('storage/'.$logo) }}?v={{ time() }}" class="logo">
+    @if($logoSrc)
+        <img src="{{ $logoSrc }}" class="logo">
     @endif
 
     <!-- Text -->
@@ -144,17 +166,17 @@ $principal = $setting->principal_signature ?? null;
     </div>
 
     <!-- ✅ Coordinator -->
-    @if($coord)
+    @if($coordSrc)
     <div class="sign-center">
-        <img src="{{ public_path('storage/'.$coord) }}?v={{ time() }}" style="height:50px;"><br>
+        <img src="{{ $coordSrc }}" style="height:50px;"><br>
         Coordinator
     </div>
     @endif
 
     <!-- ✅ Principal -->
-    @if($principal)
+    @if($principalSrc)
     <div class="sign-right">
-        <img src="{{ public_path('storage/'.$principal) }}?v={{ time() }}" style="height:50px;"><br>
+        <img src="{{ $principalSrc }}" style="height:50px;"><br>
         Principal
     </div>
     @endif
