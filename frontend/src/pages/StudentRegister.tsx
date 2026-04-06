@@ -123,44 +123,93 @@ const StudentRegister: React.FC = () => {
 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+<div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="w-full max-w-6xl bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex flex-row">
           {/* Left Side - Info Section */}
-          <div className="hidden lg:block w-2/5 bg-gradient-to-br from-purple-600 to-indigo-700 p-8 text-white">
-            <div className="h-full flex flex-col justify-between">
-              <div>
-                <div className="text-5xl mb-6">🎭</div>
-                <h1 className="text-3xl font-bold mb-2">GRAND COMPETITION</h1>
-                <p className="text-sm mb-6">EXCELLENCE • CULTURE • SPORTS</p>
+         {/* Left Side - Enhanced Sports Info Section */}
+          <div className="hidden lg:flex w-2/5 bg-slate-950 p-10 text-white flex-col justify-between relative overflow-hidden">
+            
+            {/* Background Decorative Element */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -ml-32 -mb-32"></div>
 
-                <div className="border-l-4 border-yellow-400 pl-4 mb-8">
-                  <p className="text-sm opacity-90">Welcome to</p>
-                  <h2 className="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    FestHub 2026
-                  </h2>
-                  <p className="text-sm mt-2">Join the biggest cultural fest of the year!</p>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-8">
+                <span className="text-3xl">🏆</span>
+                <h1 className="text-xl font-black tracking-widest uppercase text-yellow-500">FestHub 2026</h1>
+              </div>
+
+              <h2 className="text-5xl font-extrabold leading-tight mb-6">
+                Unleash the <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                  Athlete In You
+                </span>
+              </h2>
+
+              <p className="text-gray-400 mb-10 max-w-sm leading-relaxed">
+                Join thousands of students across the nation for the ultimate showdown of talent, speed, and spirit.
+              </p>
+
+              {/* Sports Image Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-10">
+                <div className="group overflow-hidden rounded-2xl aspect-square border-2 border-white/10">
+                  <img 
+                    src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&q=80&w=300" 
+                    alt="Athletics" 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+                <div className="group overflow-hidden rounded-2xl aspect-square border-2 border-white/10 mt-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=300" 
+                    alt="Basketball" 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+ <div className="group overflow-hidden rounded-2xl aspect-square border-2 border-white/10 -mt-6">
+  <img 
+    src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=400" 
+    alt="Football" 
+    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+  />
+</div>
+                <div className="group overflow-hidden rounded-2xl aspect-square border-2 border-white/10">
+                  <img 
+                    src="https://images.unsplash.com/photo-1593787406536-3676a152d9cb?auto=format&fit=crop&q=80&w=300" 
+                    alt="Badminton" 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black text-sm font-bold">📞</div>
-                    <div>
-                      <p className="text-xs opacity-75">Contact</p>
-                      <p className="text-sm font-semibold">+91 9876543210</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-black text-sm font-bold">✉️</div>
-                    <div>
-                      <p className="text-xs opacity-75">Email</p>
-                      <p className="text-sm font-semibold">info@festhub2026.com</p>
-                    </div>
-                  </div>
+              {/* Event Stats */}
+              <div className="flex gap-8 border-t border-white/10 pt-8">
+                <div>
+                  <p className="text-2xl font-bold">50+</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Events</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">10K+</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Students</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">100+</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Schools</p>
                 </div>
               </div>
+            </div>
+
+            <div className="relative z-10 mt-8">
+               <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-black">
+                    📩
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Questions? Email us</p>
+                    <p className="text-sm font-semibold">support@festhub2026.com</p>
+                  </div>
+               </div>
             </div>
           </div>
 
