@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Event;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventRegistrationsController extends Controller
 {
@@ -235,4 +236,113 @@ public function checkRegistration(Request $request)
         'registration' => $registration
     ]);
 }
+
+public function getSchools()
+{
+    $schools = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->select('students.school_name')
+        ->distinct()
+        ->pluck('school_name');
+
+    return response()->json($schools);
+}
+
+public function getEventsBySchool($school)
+{
+    $events = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->join('events', 'event_student.event_id', '=', 'events.id')
+        ->where('students.school_name', $school)
+        ->select('events.id', 'events.name')
+        ->distinct()
+        ->get();
+
+    return response()->json($events);
+}
+public function getStudentsByEvent($eventId)
+{
+    $students = DB::table('event_student')
+        ->join('students', 'event_student.student_id', '=', 'students.id')
+        ->where('event_student.event_id', $eventId)
+        ->select('students.name', 'students.id')
+        ->get();
+
+    return response()->json($students);
+}
+
+
+public function downloadCertificate($eventId, $school)
+{
+    $event = Event::findOrFail($eventId);
+    $is_team_event = stripos($event->type, 'team') !== false;
+
+    if ($is_team_event) {
+        // 🏆 TEAM EVENT - Generate certificate for each team member using teams.members JSON
+        $teams = DB::table('teams')
+            ->join('students', 'teams.captain_id', '=', 'students.id')
+            ->join('events', 'teams.event_id', '=', 'events.id')
+            ->where('teams.event_id', $eventId)
+            ->where('students.school_name', $school)
+            ->select(
+                'teams.team_name',
+                'teams.members',
+                'students.name as captain_name',
+                'events.name as event_name',
+                'events.event_date as event_date'
+            )
+            ->get();
+
+        $students = collect();
+
+        foreach ($teams as $team) {
+            $members = json_decode($team->members, true) ?: [];
+            $captainName = trim($team->captain_name);
+
+            $members = array_values(array_unique(array_filter(array_map('trim', $members), function ($member) use ($captainName) {
+                return $member !== '' && strcasecmp($member, $captainName) !== 0;
+            })));
+
+            // Add captain certificate
+            $students->push((object)[
+                'student_name' => $captainName,
+                'event_name' => $team->event_name,
+                'event_date' => $team->event_date,
+                'team_name' => $team->team_name,
+            ]);
+
+            foreach ($members as $memberName) {
+                $students->push((object)[
+                    'student_name' => $memberName,
+                    'event_name' => $team->event_name,
+                    'event_date' => $team->event_date,
+                    'team_name' => $team->team_name,
+                ]);
+            }
+        }
+
+        $students = $students->unique(function ($item) {
+            return strtolower(trim($item->student_name)) . '|' . strtolower(trim($item->team_name ?? '')) . '|' . strtolower(trim($item->event_name));
+        })->values();
+    } else {
+        // 🎓 SOLO EVENT - Show individual student names (each student gets cert)
+        $students = DB::table('event_student')
+            ->join('students', 'event_student.student_id', '=', 'students.id')
+            ->join('events', 'event_student.event_id', '=', 'events.id')
+            ->where('event_student.event_id', $eventId)
+            ->where('students.school_name', $school)
+            ->select(
+                'students.name as student_name',
+                'events.name as event_name',
+                'events.event_date as event_date'
+            )
+            ->get();
+    }
+
+    $pdf = Pdf::loadView('pdf.participationCertificate', compact('students', 'is_team_event'));
+
+    return $pdf->download('participation_certificates.pdf');
+}
+
+ 
 }

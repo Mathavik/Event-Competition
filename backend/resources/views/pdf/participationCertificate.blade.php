@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 
@@ -24,6 +24,14 @@ body {
     height: 100%;
 }
 
+/* 🔥 SAME DESIGN AS WINNER */
+.logo {
+    position: absolute;
+    top: 5mm;
+    left: 10mm;
+    height: 70px;
+}
+
 .text {
     position: absolute;
     width: 100%;
@@ -31,50 +39,51 @@ body {
     color: #222;
 }
 
+/* 🎯 CONTENT ALIGNMENT */
 .presented {
-    top: 70mm;
-    font-size: 24px;
+    top: 75mm;
+    font-size: 22px;
 }
 
 .name {
-    top: 85mm;
-    font-size: 52px;
+    top: 92mm;
+    font-size: 48px;
     font-weight: bold;
     color: #b8860b;
     letter-spacing: 3px;
-    font-family: 'Cinzel', serif;
     text-transform: uppercase;
 }
 
 .desc {
-    top: 105mm;
-    font-size:22px;
+    top: 115mm;
+    font-size: 20px;
     width: 65%;
     left: 17.5%;
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
-.prize {
-    top: 150mm;
-    font-size: 26px;
+.event {
+    top: 140mm;
+    font-size: 22px;
     font-weight: bold;
-    color: #b8860b;
 }
 
+/* 📅 DATE */
 .date {
     position: absolute;
     bottom: 20mm;
     left: 40mm;
-    font-size: 26px;
+    font-size: 20px;
 }
 
+/* ✍️ SAME SIGNATURE POSITION AS WINNER */
 .sign-center {
     position: absolute;
     bottom: 25mm;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .sign-right {
@@ -82,14 +91,7 @@ body {
     bottom: 25mm;
     right: 40mm;
     text-align: center;
-    font-size: 18px;
-}
-
-.logo {
-    position: absolute;
-    top: 5mm;
-    left: 10mm;
-    height: 70px; /* 👈 small logo */
+    font-size: 16px;
 }
 </style>
 
@@ -99,21 +101,19 @@ body {
 
 @php
 $setting = \App\Models\CertificateSetting::first();
+
 $bg = $setting->background_image ?? null;
 $logo = $setting->logo ?? null;
 $coord = $setting->coordinator_signature ?? null;
 $principal = $setting->principal_signature ?? null;
 
+$is_team_event = $is_team_event ?? false;
+
 $inlineImageSrc = function ($path) {
-    if (!$path) {
-        return null;
-    }
+    if (!$path) return null;
 
     $fullPath = storage_path('app/public/' . $path);
-
-    if (!file_exists($fullPath)) {
-        return null;
-    }
+    if (!file_exists($fullPath)) return null;
 
     $type = pathinfo($fullPath, PATHINFO_EXTENSION);
     $data = base64_encode(file_get_contents($fullPath));
@@ -127,6 +127,7 @@ $coordSrc = $inlineImageSrc($coord);
 $principalSrc = $inlineImageSrc($principal);
 @endphp
 
+@foreach($students as $student)
 <div class="container">
 
     <!-- ✅ Background -->
@@ -134,38 +135,46 @@ $principalSrc = $inlineImageSrc($principal);
         <img src="{{ $bgSrc }}" class="bg">
     @endif
 
-    <!-- ✅ Logo -->
+    <!-- ✅ Logo (same as winner) -->
     @if($logoSrc)
         <img src="{{ $logoSrc }}" class="logo">
     @endif
 
-    <!-- Text -->
+    <!-- 🎯 CONTENT CHANGE ONLY -->
     <div class="text presented">
         Proudly Presented To
     </div>
 
     <div class="text name">
-        {{ strtoupper($student->name) }}
+        {{ strtoupper($student->student_name) }}
     </div>
 
     <div class="text desc">
-        This certificate is proudly awarded to <b>{{ strtoupper($student->name) }}</b> 
-        in recognition of outstanding performance and successful participation in 
-        <b>{{ $event->name }}</b>.  
-        Your dedication and excellence are appreciated.
+        @if($is_team_event)
+            This certificate is proudly awarded to 
+            <b>{{ strtoupper($student->student_name) }}</b>
+            for participating as a member of the team 
+            <b>{{ strtoupper($student->team_name ?? '') }}</b>
+            in the event <b>{{ $student->event_name }}</b>.
+            Your dedication and teamwork are highly appreciated.
+        @else
+            This certificate is proudly awarded to 
+            <b>{{ strtoupper($student->student_name) }}</b> 
+            for participating in the event 
+            <b>{{ $student->event_name }}</b>.  
+            Your dedication and participation are highly appreciated.
+        @endif
     </div>
 
-    @if(!empty($prize))
-    <div class="text prize">
-        {{ strtoupper($prize) }} PRIZE
+    <div class="text event">
+        {{ $student->event_name }}
     </div>
-    @endif
 
     <div class="date">
-        Date: {{ \Carbon\Carbon::parse($event->event_date)->format('d-m-Y') }}
+        Date: {{ \Carbon\Carbon::parse($student->event_date)->format('d-m-Y') }}
     </div>
 
-    <!-- ✅ Coordinator -->
+    <!-- ✅ Coordinator (same position) -->
     @if($coordSrc)
     <div class="sign-center">
         <img src="{{ $coordSrc }}" style="height:50px;"><br>
@@ -173,7 +182,7 @@ $principalSrc = $inlineImageSrc($principal);
     </div>
     @endif
 
-    <!-- ✅ Principal -->
+    <!-- ✅ Principal (same position) -->
     @if($principalSrc)
     <div class="sign-right">
         <img src="{{ $principalSrc }}" style="height:50px;"><br>
@@ -182,6 +191,7 @@ $principalSrc = $inlineImageSrc($principal);
     @endif
 
 </div>
+@endforeach
 
 </body>
 </html>
