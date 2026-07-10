@@ -4,7 +4,7 @@
     <title>School Report</title>
     <style>
         body { font-family: Arial; }
-        h2 { margin-top: 20px; }
+        h2 { margin-top: 20px; }l
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #000; padding: 8px; }
     </style>
