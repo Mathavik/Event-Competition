@@ -244,26 +244,21 @@ const StudentRegister: React.FC = () => {
                     />
                     {schoolSuggestions.length > 0 && (
                       <div className="absolute top-full left-0 right-0 border rounded-lg bg-white max-h-32 overflow-y-auto z-10 shadow-lg mt-1">
-                        {schoolSuggestions.map((school, idx) => (
-                          <div
-                            key={idx}
-                            className="p-2 hover:bg-purple-50 cursor-pointer border-b last:border-b-0 text-sm"
-                            onClick={() => {
-                              setForm((prev) => ({
-                                ...prev,
-                                school_name: school.school_name,
-                                school_code: school.school_code,
-                                email: school.email,
-                                phone: school.phone,
-                                city: school.city,
-                              }));
-                              setSchoolSuggestions([]);
-                            }}
-                          >
-                            <p className="font-medium">{school.school_name}</p>
-                            <p className="text-xs text-gray-500">{school.city} • {school.phone}</p>
-                          </div>
-                        ))}
+                       {schoolSuggestions.map((school, idx) => (
+  <div
+    key={idx}
+    className="p-2 hover:bg-purple-50 cursor-pointer border-b"
+    onClick={() => {
+      setForm((prev) => ({
+        ...prev,
+        school_name: school,
+      }));
+      setSchoolSuggestions([]);
+    }}
+  >
+    <p>{school}</p>
+  </div>
+))}
                       </div>
                     )}
                   </div>
