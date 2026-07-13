@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CreditCard, Calendar, Users, Building2, CheckCircle2 } from "lucide-react";
@@ -89,16 +89,16 @@ const PaymentPage: React.FC = () => {
           return;
         }
 
-        const res = await axios.post("http://127.0.0.1:8000/api/team-name", {
+        const res = await api.post("/team-name", {
           event_id: event.id,
           captain_id: Number(studentId),
           team_name: submittedTeamName,
           event_name: event.name,
-          members: validMembers, // Send team members
+          members: validMembers,
         });
         eventStudentId = res.data.event_student_id;
       } else {
-        const res = await axios.post("http://127.0.0.1:8000/api/register-event", {
+        const res = await api.post("/register-event", {
           student_id: studentId,
           event_id: event.id,
           event_time: `${event.event_date} ${event.start_time}`,
@@ -107,7 +107,7 @@ const PaymentPage: React.FC = () => {
         eventStudentId = res.data.event_student_id;
       }
 
-      await axios.post("http://127.0.0.1:8000/api/payments", {
+      await api.post("/payments", {
         event_student_id: eventStudentId,
         payment_id: "PAY" + Date.now(),
         payment_type: paymentType,

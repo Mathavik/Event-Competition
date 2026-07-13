@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "../../api";
 import { LayoutGrid, CalendarDays, UserCheck, TrendingUp, Activity } from "lucide-react";
 import {
   AreaChart,
@@ -55,13 +56,13 @@ const Dashboard: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/dashboard-counts")
-      .then(res => res.json())
+    api.get("/dashboard-counts")
+      .then(res => res.data)
       .then(data => setCounts(data))
       .catch(() => setCounts({ categories: 12, events: 34, registrations: 289 }));
 
-    fetch("http://127.0.0.1:8000/api/chart-data")
-      .then(res => res.json())
+    api.get("/chart-data")
+      .then(res => res.data)
       .then(data => setChartData(data))
       .catch(() =>
         setChartData([

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -53,9 +53,9 @@ const StudentRegister: React.FC = () => {
 
       if (value.length > 0) {
         try {
-          const res = await axios.get(
-            `http://127.0.0.1:8000/api/schools?q=${value}`
-          );
+          const res = await api.get("/schools", {
+            params: { q: value }
+          });
           setSchoolSuggestions(res.data);
         } catch (err) {
           console.log(err);
@@ -93,10 +93,7 @@ const StudentRegister: React.FC = () => {
   setIsLoading(true);
 
   try {
-    const res = await axios.post(
-      "http://127.0.0.1:8000/api/students",
-      form
-    );
+    const res = await api.post("/students", form);
 
     console.log("Response:", res.data); // 👈 debug
 

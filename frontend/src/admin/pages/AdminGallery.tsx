@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
-import axios from "axios";
 import { FaCloudUploadAlt, FaImages, FaCheckCircle } from "react-icons/fa";
 
 type Category = {
@@ -16,8 +15,8 @@ export default function AdminGallery() {
   const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/categories")
+    api
+      .get("/categories")
       .then((res) => setCategories(res.data))
       .catch((err) => console.log(err));
   }, []);

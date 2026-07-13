@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api";
 import Swal from "sweetalert2";
 import { FaPenToSquare, FaTrash, FaPlus, FaXmark } from "react-icons/fa6";
 
@@ -20,12 +20,10 @@ const Categories: React.FC = () => {
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const API_URL = "http://127.0.0.1:8000/api/categories";
-
   useEffect(() => { fetchCategories(); }, []);
 
   const fetchCategories = () => {
-    axios.get(API_URL).then((res) => setCategories(res.data));
+    api.get("/categories").then((res) => setCategories(res.data));
   };
 
   const resetForm = () => {
@@ -44,7 +42,7 @@ const Categories: React.FC = () => {
     if (imageFile) formData.append("image", imageFile);
 
     try {
-      await axios.post(API_URL, formData);
+      await api.post("/categories", formData);
       Swal.fire({
         title: "Success!",
         text: "New Category added!",
@@ -70,7 +68,7 @@ const Categories: React.FC = () => {
     if (imageFile) formData.append("image", imageFile);
 
     try {
-      await axios.post(`${API_URL}/${editData.id}`, formData);
+      await api.post(`/categories/${editData.id}`, formData);
       Swal.fire({
         title: "Success!",
         text: "Updated successfully",
@@ -101,7 +99,7 @@ const Categories: React.FC = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${API_URL}/${id}`);
+        await api.delete(`/categories/${id}`);
         Swal.fire("Deleted!", "Category deleted.", "success");
         fetchCategories();
       } catch (err) {
